@@ -9,19 +9,30 @@ module.exports = async function handler(req, res) {
     ${mode === 'ask' ? '{"answer": "your answer"}' : '{"summary":"3-4 sentences","themes":["..."],"overdue":["..."],"priorities":["..."],"checklist":["..."]}'}
     Notes: ${notes}`;
 
-    // gemini-3.8-flash மாடல் பயன்படுத்தப்படுகிறது
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
-    const r = await fetch(url, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: 'application/json' } }),
-    });
-    
-    if (!r.ok) {
-      const errText = await r.text();
-      return res.status(r.status).json({ error: `API Error: ${errText}` });
+    // Fallback Models (முதல் மாடல் வேலை செய்யவில்லை என்றால் அடுத்ததற்கு மாறும்)
+    const models = ['gemini-3.8-flash', 'gemini-3-flash', 'gemini-pro'];
+    let data = null;
+    let lastError = null;
+
+    for (const model of models) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+      const r = await fetch(url, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: 'application/json' } }),
+      });
+
+      if (r.ok) {
+        data = await r.json();
+        break; // வேலை செய்தால் லூப்பை விட்டு வெளியேறு
+      } else {
+        lastError = await r.text();
+      }
+    }
+
+    if (!data) {
+      return res.status(500).json({ error: `API Error: ${lastError}` });
     }
     
-    const data = await r.json();
     return res.status(200).json(JSON.parse(data.candidates?.[0]?.content?.parts?.[0]?.text || '{}'));
   } catch (e) { 
     return res.status(500).json({ error: e.message || 'SERVER_ERROR' }); 
