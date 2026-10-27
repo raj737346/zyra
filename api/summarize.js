@@ -16,17 +16,16 @@ module.exports = async function handler(req, res) {
     const { notes, projectName = 'General', image = null, mimeType = null, think = false, history = [] } = req.body || {};
     if (!notes && !image) return res.status(400).json({ error: 'INVALID_INPUT' });
 
-    // மிக முக்கியமான மொழி விதி (Strict Rule)
+    // மிகவும் கண்டிப்பான மொழி விதி (Strict Language Rule)
     const langRule = `MANDATORY LANGUAGE RULE: 
-    1. You MUST respond in the EXACT SAME language as the user's LATEST message.
-    2. If the user's latest message is in English, you MUST reply in English ONLY.
-    3. If the user's latest message is in Tamil, you MUST reply in Tamil ONLY.
-    4. DO NOT be influenced by previous messages. ONLY look at the latest message's language.
-    5. If the user explicitly asks to switch languages (e.g., "speak English"), obey immediately.`;
+    1. You MUST respond in the EXACT SAME language as the user's LATEST message. Look ONLY at the latest message, not the history.
+    2. If the latest message is in English (e.g., "How are you?"), you MUST reply in 100% English. Do NOT use ANY Tamil words or letters.
+    3. If the latest message is in Tamil, you MUST reply in 100% Tamil.
+    4. NEVER mix languages in the same response. Do not output Tamil letters in an English sentence.`;
 
     const memoryRule = `CRITICAL MEMORY RULE: 
-    1. You are in a continuous conversation. Review the ENTIRE history.
-    2. Remember previous context, but apply the language rule based on the LATEST message.`;
+    1. You are in a continuous conversation. Review the ENTIRE history to understand context.
+    2. But ALWAYS apply the language rule based on the user's LATEST message.`;
 
     const thinkPrompt = think ? "Think step by step. " : "";
     const systemPrompt = `You are Zyra, a highly intelligent AI. ${langRule} ${memoryRule} ${thinkPrompt}`;
@@ -55,7 +54,7 @@ module.exports = async function handler(req, res) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             contents: contents, 
-            generationConfig: { responseMimeType: 'application/json', temperature: 0.2, maxOutputTokens: 1500 }
+            generationConfig: { responseMimeType: 'application/json', temperature: 0.1, maxOutputTokens: 1500 }
           })
         });
 
