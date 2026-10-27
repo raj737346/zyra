@@ -10,69 +10,6 @@ function extractJSON(text) {
   }
 }
 
-// 1. DeepSeek API-ஐ அழைக்கும் ஃபங்ஷன் (மொழி கட்டுப்பாட்டுடன்)
-async function callDeepSeek(prompt, langRule) {
-  const apiKey = process.env.DEEPSEEK_API_KEY;
-  if (!apiKey) return null;
-
-  try {
-    // DeepSeek-க்கு நேரடியாக மொழி விதியை வலியுறுத்துகிறோம்
-    const strictPrompt = `${prompt}\n\n(IMPORTANT: You must reply ONLY in the language specified above. Do not use English if the user asked in Tamil.)`;
-
-    const r = await fetch('https://api.deepseek.com/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'deepseek-flash',
-        messages: [
-          { role: 'system', content: `You are a helpful assistant. ${langRule} Return ONLY a valid JSON object.` },
-          { role: 'user', content: strictPrompt }
-        ],
-        response_format: { type: 'json_object' },
-        stream: false
-      })
-    });
-
-    if (!r.ok) return null;
-    const data = await r.json();
-    const text = data.choices?.[0]?.message?.content;
-    if (!text) return null;
-    return JSON.parse(text);
-  } catch (e) {
-    return null;
-  }
-}
-
-// 2. Gemini API-ஐ அழைக்கும் ஃபங்ஷன்
-async function callGemini(prompt) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return null;
-
-  const models = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-3.8-flash'];
-  for (const model of models) {
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-      const r = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { responseMimeType: 'application/json', temperature: 0.1, maxOutputTokens: 1500 }
-        })
-      });
-      if (r.ok) {
-        const data = await r.json();
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (text) return JSON.parse(text);
-      }
-    } catch (e) {}
-  }
-  return null;
-}
-
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   try {
@@ -84,57 +21,45 @@ module.exports = async function handler(req, res) {
     1. You MUST detect the language of the user's LATEST message.
     2. You MUST reply in the EXACT SAME language the user used. 
     3. If the user asks in Tamil, reply in Tamil. If English, reply in English.
-    4. NEVER mix languages.`;
+    4. If the user says "Please talk with me Tamil" or "Please tell me Tamil", you MUST switch to Tamil IMMEDIATELY and reply in 100% Tamil.
+    5. NEVER mix languages.`;
 
     const thinkPrompt = think ? "Think step by step. " : "";
     const systemPrompt = `You are Zyra, a highly intelligent AI. ${langRule} ${thinkPrompt}`;
     
     const formatPrompt = `Return ONLY a valid JSON object: {"answer": "your full answer here"}`;
 
-    let prompt = `${systemPrompt}\n\nUser: ${notes || 'Analyze this image.'}\n\n${formatPrompt}`;
-    let finalData = null;
-
-    // 1. முதலில் DeepSeek-ஐ முயற்சி செய் (படம் இல்லை என்றால் மட்டும்)
-    if (!image) {
-      finalData = await callDeepSeek(prompt, langRule);
-    }
-
-    // 2. DeepSeek வேலை செய்யவில்லை என்றால், Gemini-ஐ முயற்சி செய்
-    if (!finalData) {
-      const contents = [{ parts: [{ text: prompt }] }];
-      if (image && mimeType) {
-        contents[0].parts.push({ inlineData: { mimeType: mimeType, data: image } });
-      }
-      
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (apiKey) {
-        const models = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-3.8-flash'];
-        for (const model of models) {
-          try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-            const r = await fetch(url, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                contents: contents,
-                generationConfig: { responseMimeType: 'application/json', temperature: 0.1, maxOutputTokens: 1500 }
-              })
-            });
-            if (r.ok) {
-              const data = await r.json();
-              const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-              if (text) { finalData = JSON.parse(text); break; }
-            }
-          } catch (e) {}
-        }
-      }
-    }
-
-    if (!finalData) {
-      return res.status(500).json({ error: 'API Error: Both DeepSeek and Gemini failed.' });
-    }
+    const contents = [];
     
-    return res.status(200).json(finalData);
+    // கடைசி மெசேஜை மட்டும் அனுப்புகிறோம்
+    const currentParts = [{ text: `${systemPrompt}\n\nUser: ${notes || 'Analyze this image.'}\n\n${formatPrompt}` }];
+    if (image && mimeType) currentParts.push({ inlineData: { mimeType: mimeType, data: image } });
+    contents.push({ role: 'user', parts: currentParts });
+
+    const models = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-3.8-flash'];
+    let finalData = null, lastErrorMsg = 'All models failed.';
+
+    for (const model of models) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+      try {
+        const r = await fetch(url, {
+          method: 'POST', 
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            contents: contents, 
+            generationConfig: { responseMimeType: 'application/json', temperature: 0.1, maxOutputTokens: 1500 }
+          })
+        });
+
+        if (r && r.ok) { finalData = await r.json(); break; } 
+        else if (r) { lastErrorMsg = await r.text(); }
+      } catch (err) { lastErrorMsg = err.message; }
+    }
+
+    if (!finalData) return res.status(500).json({ error: `API Error: ${lastErrorMsg}` });
+    
+    const rawText = finalData.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+    return res.status(200).json(extractJSON(rawText));
 
   } catch (e) { 
     return res.status(500).json({ error: e.message || 'SERVER_ERROR' }); 
