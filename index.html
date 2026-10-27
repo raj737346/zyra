@@ -10,17 +10,12 @@
 :root { --bg: #FFFFFF; --text: #000000; --text-light: #666666; --surface: #F4F4F4; --accent: #FF6B2C; --blue: #E8F0FE; --blue-text: #1A73E8; }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; padding: 0; height: 100vh; height: 100dvh; background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; font-size: 16px; overflow: hidden; }
-
-/* Center View (Initial Screen) */
 .center-view { height: 100%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; transition: opacity 0.3s; }
 .center-view h1 { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 44px; font-weight: 400; margin: 0 0 8px 0; letter-spacing: -0.02em; }
 .center-view p { color: var(--text-light); font-size: 15px; margin: 0; }
 html[lang="ta"] .center-view h1 { font-family: 'Noto Serif Tamil', serif; font-size: 38px; }
-
-/* Chat Area */
-.chat-area { display: none; height: 100%; width: 100%; overflow-y: auto; overscroll-behavior: contain; padding: calc(20px + env(safe-area-inset-top)) 16px 180px 16px; flex-direction: column; }
+.chat-area { display: none; height: 100%; width: 100%; overflow-y: auto; overscroll-behavior-y: contain; padding: calc(20px + env(safe-area-inset-top)) 16px 180px 16px; flex-direction: column; }
 .chat-area.active { display: flex; }
-
 .msg-user { align-self: flex-end; background: var(--surface); padding: 12px 18px; border-radius: 20px; max-width: 85%; margin-bottom: 24px; white-space: pre-wrap; font-size: 16px; display: flex; flex-direction: column; gap: 8px; }
 .msg-user img { max-width: 100%; border-radius: 12px; max-height: 200px; object-fit: cover; }
 .msg-ai { align-self: flex-start; width: 100%; margin-bottom: 30px; line-height: 1.6; font-size: 16px; }
@@ -37,6 +32,12 @@ html[lang="ta"] .center-view h1 { font-family: 'Noto Serif Tamil', serif; font-s
 .tool-btn { display: flex; align-items: center; gap: 6px; background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 20px; padding: 6px 12px; font-size: 13px; color: var(--text-light); cursor: pointer; font-weight: 500; transition: all 0.2s; }
 .tool-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .tool-btn.active { background: var(--blue); color: var(--blue-text); border-color: var(--blue); }
+
+/* Image Preview Area */
+.image-preview { display: none; padding: 8px; background: #FFF; border-radius: 12px; border: 1px solid #E5E5E5; margin-bottom: 4px; position: relative; width: fit-content; }
+.image-preview img { height: 60px; border-radius: 8px; display: block; }
+.image-preview .remove-img { position: absolute; top: -6px; right: -6px; background: #FF6B2C; color: #FFF; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; border: 2px solid #FFF; }
+
 .textarea-row { display: flex; align-items: flex-end; gap: 8px; }
 textarea { flex: 1; border: none; background: transparent; padding: 8px 0; font-size: 16px; resize: none; max-height: 120px; outline: none; font-family: inherit; line-height: 1.4; color: var(--text); }
 textarea::placeholder { color: var(--text-light); }
@@ -64,6 +65,13 @@ textarea::placeholder { color: var(--text-light); }
 
 <div class="bottom-bar">
   <div class="input-container">
+    
+    <!-- படம் தேர்ந்தெடுக்கப்பட்டால் இங்கே தெரியும் -->
+    <div class="image-preview" id="imagePreview">
+      <img id="previewImg" src="" alt="preview">
+      <div class="remove-img" onclick="removeImage()">×</div>
+    </div>
+
     <div class="top-tools">
       <button class="tool-btn" id="thinkBtn" onclick="toggleTool('think')">
         <svg viewBox="0 0 24 24"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
@@ -103,16 +111,11 @@ let mode = 'ask';
 let selectedImage = null, selectedMime = null;
 let isThinking = false, isSearching = false;
 let chatHistory = [];
+let userScrolledUp = false; // யூசர் மேலே ஸ்க்ரோல் செய்தாரா என்பதைக் கண்டறிய
 
 function toggleTool(tool) {
-  if (tool === 'think') {
-    isThinking = !isThinking;
-    $('thinkBtn').classList.toggle('active', isThinking);
-  } else if (tool === 'search') {
-    isSearching = !isSearching;
-    $('searchBtn').classList.toggle('active', isSearching);
-    if(isSearching) alert("Search feature is coming soon!");
-  }
+  if (tool === 'think') { isThinking = !isThinking; $('thinkBtn').classList.toggle('active', isThinking); }
+  else if (tool === 'search') { isSearching = !isSearching; $('searchBtn').classList.toggle('active', isSearching); if(isSearching) alert("Search feature is coming soon!"); }
 }
 
 function startVoice() {
@@ -121,15 +124,13 @@ function startVoice() {
   recognition.lang = 'ta-IN';
   recognition.interimResults = false;
   $('micBtn').style.color = 'red';
-  recognition.onresult = function(event) {
-    $('notes').value += event.results[0][0].transcript + " ";
-    $('micBtn').style.color = 'var(--text)';
-  };
+  recognition.onresult = function(event) { $('notes').value += event.results[0][0].transcript + " "; $('micBtn').style.color = 'var(--text)'; };
   recognition.onerror = function() { $('micBtn').style.color = 'var(--text)'; };
   recognition.onend = function() { $('micBtn').style.color = 'var(--text)'; };
   recognition.start();
 }
 
+// படம் தேர்ந்தெடுக்கும்போது
 function handleImage(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -137,23 +138,44 @@ function handleImage(event) {
   reader.onload = function(e) {
     selectedImage = e.target.result.split(',')[1];
     selectedMime = file.type;
-    $('notes').placeholder = "படம் இணைக்கப்பட்டது ✓";
+    
+    // ப்ரிவியூ காட்டு
+    $('previewImg').src = e.target.result;
+    $('imagePreview').style.display = 'block';
   };
   reader.readAsDataURL(file);
 }
 
+// படத்தை நீக்க
+function removeImage() {
+  selectedImage = null; selectedMime = null;
+  $('imagePreview').style.display = 'none';
+  $('fileInput').value = '';
+}
+
 function esc(s) { return String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
 
-// ஸ்க்ரோல் செய்ய உதவும் பங்ஷன்
+// ஸ்க்ரோல் செய்யும் ஃபங்ஷன் (மேலே ஸ்க்ரோல் செய்தால் தானாகக் கீழே இழுக்காது)
 function scrollToBottom() {
-  const chat = $('chatArea');
-  chat.scrollTop = chat.scrollHeight;
+  if (!userScrolledUp) {
+    const chat = $('chatArea');
+    setTimeout(() => { chat.scrollTo({ top: chat.scrollHeight, behavior: 'smooth' }); }, 50);
+  }
 }
+
+// யூசர் மேலே ஸ்க்ரோல் செய்கிறாரா என்பதைக் கண்டறிதல்
+$('chatArea').addEventListener('scroll', function() {
+  const chat = this;
+  // கீழே இருந்து 100px-க்கு மேல் மேலே இருந்தால், அது மேலே ஸ்க்ரோல் செய்கிறார் என்று அர்த்தம்
+  const isAtBottom = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 100;
+  userScrolledUp = !isAtBottom;
+});
 
 async function spark() {
   const notes = $('notes').value.trim();
   if (!notes && !selectedImage) return;
   
+  userScrolledUp = false; // புதிய மெசேஜ் அனுப்பும்போது கீழே ஸ்க்ரோல் செய்ய அனுமதி
   $('centerView').style.display = 'none';
   $('chatArea').classList.add('active');
   const chat = $('chatArea');
@@ -175,7 +197,7 @@ async function spark() {
     userMsg.appendChild(textNode);
   }
   chat.appendChild(userMsg);
-  scrollToBottom(); // புதிய மெசேஜ் வந்ததும் கீழே ஸ்க்ரோல் செய்
+  scrollToBottom();
 
   const loaderMsg = document.createElement('div');
   loaderMsg.className = 'msg-ai';
@@ -226,9 +248,8 @@ async function spark() {
   } finally {
     sendBtn.disabled = false;
     $('notes').value = ''; $('notes').style.height = '';
-    $('notes').placeholder = "Message Zyra...";
-    selectedImage = null; selectedMime = null; $('fileInput').value = '';
-    scrollToBottom(); // பதில் வந்ததும் கீழே ஸ்க்ரோல் செய்
+    removeImage(); // படம் அனுப்பிய பிறகு அதை நீக்கு
+    scrollToBottom();
   }
 }
 </script>
