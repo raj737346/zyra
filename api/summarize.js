@@ -12,6 +12,20 @@ function extractJSON(text) {
   }
 }
 
+// Timeout உடன் Fetch செய்யும் ஃபங்ஷன்
+async function fetchWithTimeout(url, options, timeout = 7000) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(id);
+    return response;
+  } catch (error) {
+    clearTimeout(id);
+    throw error;
+  }
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   try {
@@ -37,38 +51,52 @@ module.exports = async function handler(req, res) {
     if (image && mimeType) currentParts.push({ inlineData: { mimeType: mimeType, data: image } });
     contents.push({ role: 'user', parts: currentParts });
 
-    // நேரடியாக வேகமான மாடல்
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
-    
-    // சர்வர் பக்கம் 15 வினாடி Timeout (Frontend 20s-க்குள் முடிந்துவிடும்)
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-    const r = await fetch(url, {
-      method: 'POST', 
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        contents: contents, 
-        generationConfig: { responseMimeType: 'application/json', temperature: 0.3, maxOutputTokens: 800 } 
-      }),
-      signal: controller.signal
+    const requestBody = JSON.stringify({ 
+      contents: contents, 
+      generationConfig: { responseMimeType: 'application/json', temperature: 0.4, maxOutputTokens: 800 } 
     });
-    
-    clearTimeout(timeoutId);
 
-    if (!r.ok) {
-      const errText = await r.text();
-      return res.status(r.status).json({ error: `API Error: ${errText}` });
+    // வேகமான மாடல்களின் வரிசை (Lite -> Flash -> Pro)
+    const models = [
+      'gemini-3.5-flash-lite', 
+      'gemini-3.5-flash', 
+      'gemini-3.8-flash'
+    ];
+
+    let finalData = null;
+    let lastErrorMsg = 'All models failed or timed out.';
+
+    for (const model of models) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+      
+      try {
+        // ஒரு மாடலுக்கு 7 வினாடிகள் மட்டும் காத்திரு. பதில் வரவில்லை என்றால் அடுத்ததற்கு மாறு.
+        const r = await fetchWithTimeout(url, {
+          method: 'POST', 
+          headers: { 'Content-Type': 'application/json' },
+          body: requestBody
+        }, 7000);
+
+        if (r && r.ok) {
+          finalData = await r.json();
+          break; // வெற்றி! லூப்பை விட்டு வெளியேறு
+        } else if (r) {
+          lastErrorMsg = await r.text();
+        }
+      } catch (err) {
+        lastErrorMsg = err.message;
+        // Timeout ஆனால் அடுத்த மாடலுக்கு மாறும்
+      }
+    }
+
+    if (!finalData) {
+      return res.status(503).json({ error: `சர்வர் மிக மெதுவாக உள்ளது. மீண்டும் முயற்சிக்கவும்.` });
     }
     
-    const data = await r.json();
-    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+    const rawText = finalData.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
     return res.status(200).json(extractJSON(rawText));
 
   } catch (e) { 
-    if (e.name === 'AbortError') {
-      return res.status(504).json({ error: 'Google API-ல் இருந்து பதில் வர அதிக நேரம் எடுக்கிறது. மீண்டும் முயற்சிக்கவும்.' });
-    }
     return res.status(500).json({ error: e.message || 'SERVER_ERROR' }); 
   }
 };
