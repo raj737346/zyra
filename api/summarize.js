@@ -13,31 +13,24 @@ function extractJSON(text) {
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   try {
-    // history-ஐ இப்போது நாம் பெறுகிறோம்
-    const { notes, image = null, mimeType = null, think = false, history = [] } = req.body || {};
+    const { notes, image = null, mimeType = null, think = false } = req.body || {};
     if (!notes && !image) return res.status(400).json({ error: 'INVALID_INPUT' });
 
+    // மிக முக்கியமான விதி: பயனர் எந்த மொழியில் கேட்கிறாரோ, அதே மொழியில் பதில் சொல்ல வேண்டும்
     const langRule = `MANDATORY LANGUAGE RULE: 
-    1. If the user explicitly asks to switch languages (e.g., "Please talk with me Tamil" or "Speak English"), you MUST obey immediately and switch to that language for the rest of the conversation.
-    2. Otherwise, respond in the SAME language as the user's LATEST message.
-    3. NEVER mix languages. Do not output Tamil letters in an English sentence.`;
-
-    const memoryRule = `CRITICAL MEMORY RULE: 
-    1. You have access to the ENTIRE chat history provided below.
-    2. Use this history to understand the context. The user might refer to something they said earlier.`;
+    1. You MUST detect the language of the user's LATEST message.
+    2. You MUST reply in the EXACT SAME language the user used.
+    3. If the user asks in Tamil, reply in Tamil. If English, reply in English. If Hindi, reply in Hindi. If Telugu, reply in Telugu. 
+    4. NEVER mix languages. Provide a complete and natural response in the user's language.`;
 
     const thinkPrompt = think ? "Think step by step. " : "";
-    const systemPrompt = `You are Zyra, a highly intelligent AI. ${langRule} ${memoryRule} ${thinkPrompt}`;
+    const systemPrompt = `You are Zyra, a highly intelligent AI. ${langRule} ${thinkPrompt}`;
     
     const formatPrompt = `Return ONLY a valid JSON object: {"answer": "your full answer here"}`;
 
     const contents = [];
     
-    // UNLIMITED MEMORY: முழு History-யும் அனுப்பப்படுகிறது (வரம்பு இல்லை)
-    history.forEach(msg => {
-      contents.push({ role: msg.role === 'user' ? 'user' : 'model', parts: [{ text: msg.text }] });
-    });
-
+    // கடைசி மெசேஜை மட்டும் அனுப்புகிறோம்
     const currentParts = [{ text: `${systemPrompt}\n\nUser: ${notes || 'Analyze this image.'}\n\n${formatPrompt}` }];
     if (image && mimeType) currentParts.push({ inlineData: { mimeType: mimeType, data: image } });
     contents.push({ role: 'user', parts: currentParts });
