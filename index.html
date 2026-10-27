@@ -7,111 +7,31 @@
 <title>Zyra</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Instrument+Serif:ital@1&family=Noto+Serif+Tamil:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #FFFFFF;
-  --text: #000000;
-  --text-light: #888888;
-  --surface: #F4F4F4;
-  --accent: #FF6B2C;
-}
+:root { --bg: #FFFFFF; --text: #000000; --text-light: #888888; --surface: #F4F4F4; --accent: #FF6B2C; }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body {
-  margin: 0; padding: 0;
-  height: 100vh; height: 100dvh;
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Inter', -apple-system, sans-serif;
-  font-size: 16px;
-  overflow: hidden;
-}
-.center-view {
-  height: 100%; width: 100%;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 20px;
-  transition: opacity 0.3s;
-}
-.center-view h1 {
-  font-family: 'Instrument Serif', serif; font-style: italic;
-  font-size: 44px; font-weight: 400; margin: 0 0 8px 0;
-  letter-spacing: -0.02em;
-}
-.center-view p {
-  color: var(--text-light); font-size: 15px; margin: 0;
-}
+html, body { margin: 0; padding: 0; height: 100vh; height: 100dvh; background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; font-size: 16px; overflow: hidden; }
+.center-view { height: 100%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; transition: opacity 0.3s; }
+.center-view h1 { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 44px; font-weight: 400; margin: 0 0 8px 0; letter-spacing: -0.02em; }
+.center-view p { color: var(--text-light); font-size: 15px; margin: 0; }
 html[lang="ta"] .center-view h1 { font-family: 'Noto Serif Tamil', serif; font-size: 38px; }
-.chat-area {
-  display: none;
-  height: 100%; width: 100%;
-  overflow-y: auto;
-  padding: calc(20px + env(safe-area-inset-top)) 16px 100px 16px;
-  flex-direction: column;
-}
+.chat-area { display: none; height: 100%; width: 100%; overflow-y: auto; padding: calc(20px + env(safe-area-inset-top)) 16px 100px 16px; flex-direction: column; }
 .chat-area.active { display: flex; }
-.msg-user {
-  align-self: flex-end;
-  background: var(--surface);
-  padding: 12px 18px;
-  border-radius: 20px;
-  max-width: 85%;
-  margin-bottom: 24px;
-  white-space: pre-wrap;
-  font-size: 16px;
-}
-.msg-ai {
-  align-self: flex-start;
-  width: 100%;
-  margin-bottom: 30px;
-  line-height: 1.6;
-  font-size: 16px;
-}
-.msg-ai h3 {
-  font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--accent); margin: 20px 0 6px;
-}
+.msg-user { align-self: flex-end; background: var(--surface); padding: 12px 18px; border-radius: 20px; max-width: 85%; margin-bottom: 24px; white-space: pre-wrap; font-size: 16px; }
+.msg-ai { align-self: flex-start; width: 100%; margin-bottom: 30px; line-height: 1.6; font-size: 16px; }
+.msg-ai h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin: 20px 0 6px; }
 .msg-ai h3:first-child { margin-top: 0; }
 .msg-ai p { margin: 0 0 12px; }
 .msg-ai ul, .msg-ai ol { margin: 0 0 12px; padding-left: 20px; }
 .msg-ai li { margin-bottom: 6px; }
-.bottom-bar {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  padding: 10px 16px calc(16px + env(safe-area-inset-bottom));
-  background: #FFFFFF;
-  display: flex; flex-direction: column; gap: 10px;
-}
-.modes {
-  display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px;
-  scrollbar-width: none;
-}
+.bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 10px 16px calc(16px + env(safe-area-inset-bottom)); background: #FFFFFF; display: flex; flex-direction: column; gap: 10px; }
+.modes { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
 .modes::-webkit-scrollbar { display: none; }
-.mode-btn {
-  border: none; background: transparent;
-  padding: 6px 12px; border-radius: 16px;
-  font-size: 13px; color: var(--text-light); cursor: pointer;
-  white-space: nowrap;
-}
-.mode-btn.active {
-  background: var(--surface); color: var(--text); font-weight: 500;
-}
-.input-pill {
-  display: flex; align-items: flex-end; gap: 10px;
-  background: var(--surface);
-  border-radius: 26px;
-  padding: 8px 8px 8px 18px;
-}
-textarea {
-  flex: 1; border: none; background: transparent;
-  padding: 10px 0; font-size: 16px; resize: none;
-  max-height: 120px; outline: none; font-family: inherit; line-height: 1.4;
-  color: var(--text);
-}
+.mode-btn { border: none; background: transparent; padding: 6px 12px; border-radius: 16px; font-size: 13px; color: var(--text-light); cursor: pointer; white-space: nowrap; }
+.mode-btn.active { background: var(--surface); color: var(--text); font-weight: 500; }
+.input-pill { display: flex; align-items: flex-end; gap: 10px; background: var(--surface); border-radius: 26px; padding: 8px 8px 8px 18px; }
+textarea { flex: 1; border: none; background: transparent; padding: 10px 0; font-size: 16px; resize: none; max-height: 120px; outline: none; font-family: inherit; line-height: 1.4; color: var(--text); }
 textarea::placeholder { color: var(--text-light); }
-.send-btn {
-  background: var(--text); color: #FFF;
-  border: none; width: 36px; height: 36px;
-  border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; flex-shrink: 0; transition: opacity 0.2s;
-}
+.send-btn { background: var(--text); color: #FFF; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: opacity 0.2s; }
 .send-btn:disabled { opacity: 0.2; }
 .send-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 .loader { display: flex; gap: 4px; align-items: center; color: var(--text-light); font-size: 14px; padding: 10px 0; }
@@ -215,7 +135,6 @@ async function spark() {
     chat.removeChild(loaderMsg);
     const errMsg = document.createElement('div');
     errMsg.className = 'msg-ai';
-    // இங்கே தான் உண்மையான எரர் காட்டப்படும்
     errMsg.innerHTML = `<p style="color:#FF6B2C; font-weight:500; padding:12px; background:#FFF0E5; border-radius:12px;">${e.message || I18N[lang].error}</p>`;
     chat.appendChild(errMsg);
   } finally {
