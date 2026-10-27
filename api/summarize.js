@@ -16,12 +16,14 @@ module.exports = async function handler(req, res) {
     const { notes, image = null, mimeType = null, think = false } = req.body || {};
     if (!notes && !image) return res.status(400).json({ error: 'INVALID_INPUT' });
 
-    // மிக முக்கியமான விதி: பயனர் எந்த மொழியில் கேட்கிறாரோ, அதே மொழியில் பதில் சொல்ல வேண்டும்
+    // 100% கண்டிப்பான மொழி விதி (அனைத்து மொழிகளுக்கும்)
     const langRule = `MANDATORY LANGUAGE RULE: 
     1. You MUST detect the language of the user's LATEST message.
     2. You MUST reply in the EXACT SAME language the user used.
-    3. If the user asks in Tamil, reply in Tamil. If English, reply in English. If Hindi, reply in Hindi. If Telugu, reply in Telugu. 
-    4. NEVER mix languages. Provide a complete and natural response in the user's language.`;
+    3. This applies to ALL languages (Tamil, English, Malayalam, Telugu, Hindi, Spanish, Japanese, etc.).
+    4. If the user asks in Malayalam, reply in Malayalam. If Telugu, reply in Telugu.
+    5. NEVER mix languages. Do not output English letters in a Tamil sentence or vice versa.
+    6. If the user explicitly says "Please talk with me [Language]", switch to that language immediately and completely.`;
 
     const thinkPrompt = think ? "Think step by step. " : "";
     const systemPrompt = `You are Zyra, a highly intelligent AI. ${langRule} ${thinkPrompt}`;
