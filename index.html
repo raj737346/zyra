@@ -25,7 +25,7 @@ html[lang="ta"] .center-view h1 { font-family: 'Noto Serif Tamil', serif; font-s
 .msg-ai ul, .msg-ai ol { margin: 0 0 12px; padding-left: 20px; }
 .msg-ai li { margin-bottom: 6px; }
 
-/* Bottom Bar - New Design */
+/* Bottom Bar */
 .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 10px 16px calc(16px + env(safe-area-inset-bottom)); background: #FFFFFF; display: flex; flex-direction: column; gap: 10px; }
 .input-container { display: flex; flex-direction: column; background: var(--surface); border-radius: 24px; padding: 12px 16px; gap: 8px; border: 1px solid #E5E5E5; }
 .top-tools { display: flex; gap: 8px; align-items: center; }
@@ -59,7 +59,6 @@ textarea::placeholder { color: var(--text-light); }
 
 <div class="bottom-bar">
   <div class="input-container">
-    <!-- மேலே உள்ள பட்டன்கள் (Think & Search) -->
     <div class="top-tools">
       <button class="tool-btn" id="thinkBtn" onclick="toggleTool('think')">
         <svg viewBox="0 0 24 24"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
@@ -71,12 +70,10 @@ textarea::placeholder { color: var(--text-light); }
       </button>
     </div>
 
-    <!-- டெக்ஸ்ட் பாக்ஸ் -->
     <div class="textarea-row">
       <textarea id="notes" rows="1" placeholder="Message Zyra..." oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
     </div>
 
-    <!-- கீழே உள்ள பட்டன்கள் (+, Mic, Send) -->
     <div class="action-row">
       <button class="icon-btn" onclick="document.getElementById('fileInput').click()">
         <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -96,17 +93,12 @@ textarea::placeholder { color: var(--text-light); }
 
 <script>
 const $ = id => document.getElementById(id);
-let lang = 'ta', mode = 'weekly';
+let lang = 'auto'; // Default-ஆக Auto-வை வைத்துள்ளோம்
+let mode = 'ask';  // Chat-க்கு 'ask' mode தான் சரி
 let selectedImage = null, selectedMime = null;
 let isThinking = false, isSearching = false;
+let chatHistory = []; // முந்தைய மெசேஜ்களைச் சேமிக்க
 
-const I18N = {
-  ta: { placeholder: 'Message Zyra...', error: 'பிழை ஏற்பட்டது.' },
-  en: { placeholder: 'Message Zyra...', error: 'An error occurred.' },
-  hi: { placeholder: 'Zyra को संदेश भेजें...', error: 'त्रुटि हुई।' }
-};
-
-// பட்டன்களை ON/OFF செய்யும் ஃபங்ஷன்
 function toggleTool(tool) {
   if (tool === 'think') {
     isThinking = !isThinking;
@@ -114,23 +106,18 @@ function toggleTool(tool) {
   } else if (tool === 'search') {
     isSearching = !isSearching;
     $('searchBtn').classList.toggle('active', isSearching);
-    if(isSearching) alert("Search feature is coming soon! (Requires external API)");
+    if(isSearching) alert("Search feature is coming soon!");
   }
 }
 
-// குரல் மூலம் பேசும் வசதி (Voice Typing)
 function startVoice() {
-  if (!('webkitSpeechRecognition' in window)) {
-    alert("உங்கள் போனில் குரல் வசதி ஆதரிக்கப்படவில்லை."); return;
-  }
+  if (!('webkitSpeechRecognition' in window)) { alert("Voice not supported."); return; }
   const recognition = new webkitSpeechRecognition();
   recognition.lang = 'ta-IN';
   recognition.interimResults = false;
-  $('micBtn').style.color = 'red'; // பேசும்போது சிவப்பு நிறம்
-
+  $('micBtn').style.color = 'red';
   recognition.onresult = function(event) {
-    const transcript = event.results[0][0].transcript;
-    $('notes').value += transcript + " ";
+    $('notes').value += event.results[0][0].transcript + " ";
     $('micBtn').style.color = 'var(--text)';
   };
   recognition.onerror = function() { $('micBtn').style.color = 'var(--text)'; };
@@ -138,7 +125,6 @@ function startVoice() {
   recognition.start();
 }
 
-// படம் தேர்ந்தெடுத்தல்
 function handleImage(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -163,6 +149,10 @@ async function spark() {
   const sendBtn = $('sendBtn');
   sendBtn.disabled = true;
   
+  // யூசர் மெசேஜைச் சேமி
+  const userMsgObj = { role: "user", text: notes };
+  chatHistory.push(userMsgObj);
+
   const userMsg = document.createElement('div');
   userMsg.className = 'msg-user';
   if (selectedImage) {
@@ -176,14 +166,16 @@ async function spark() {
     userMsg.appendChild(textNode);
   }
   chat.appendChild(userMsg);
+  window.scrollTo(0, document.body.scrollHeight);
 
   const loaderMsg = document.createElement('div');
   loaderMsg.className = 'msg-ai';
   loaderMsg.innerHTML = '<div class="loader"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
   chat.appendChild(loaderMsg);
+  window.scrollTo(0, document.body.scrollHeight);
 
   try {
-    const payload = { notes, mode, lang, think: isThinking, search: isSearching };
+    const payload = { notes, mode, lang, think: isThinking, history: chatHistory.slice(0, -1) };
     if (selectedImage) { payload.image = selectedImage; payload.mimeType = selectedMime; }
 
     const res = await fetch('/api/summarize', {
@@ -193,11 +185,14 @@ async function spark() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'ERROR');
     
+    // AI மெசேஜைச் சேமி
+    const aiText = data.answer || data.summary || "பதில் கிடைக்கவில்லை.";
+    chatHistory.push({ role: "model", text: aiText });
+
     chat.removeChild(loaderMsg);
     const aiMsg = document.createElement('div');
     aiMsg.className = 'msg-ai';
-    // பதிலைக் காட்டு (mode-ஐப் பொருத்து)
-    aiMsg.innerHTML = `<h3>பதில்</h3><p>${esc(data.answer || data.summary || JSON.stringify(data))}</p>`;
+    aiMsg.innerHTML = `<h3>பதில்</h3><p>${esc(aiText)}</p>`;
     chat.appendChild(aiMsg);
 
   } catch (e) {
@@ -209,7 +204,7 @@ async function spark() {
   } finally {
     sendBtn.disabled = false;
     $('notes').value = ''; $('notes').style.height = '';
-    $('notes').placeholder = I18N[lang].placeholder;
+    $('notes').placeholder = "Message Zyra...";
     selectedImage = null; selectedMime = null; $('fileInput').value = '';
     window.scrollTo(0, document.body.scrollHeight);
   }
