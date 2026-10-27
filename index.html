@@ -24,6 +24,8 @@ html[lang="ta"] .center-view h1 { font-family: 'Noto Serif Tamil', serif; font-s
 .msg-ai p { margin: 0 0 12px; }
 .msg-ai ul, .msg-ai ol { margin: 0 0 12px; padding-left: 20px; }
 .msg-ai li { margin-bottom: 6px; }
+
+/* Bottom Bar */
 .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 10px 16px calc(16px + env(safe-area-inset-bottom)); background: #FFFFFF; display: flex; flex-direction: column; gap: 10px; }
 .input-container { display: flex; flex-direction: column; background: var(--surface); border-radius: 24px; padding: 12px 16px; gap: 8px; border: 1px solid #E5E5E5; }
 .top-tools { display: flex; gap: 8px; align-items: center; }
@@ -38,6 +40,7 @@ textarea::placeholder { color: var(--text-light); }
 .icon-btn svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .send-btn { background: var(--text); color: #FFF; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-left: auto; }
 .send-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
 .loader { display: flex; gap: 4px; align-items: center; color: var(--text-light); font-size: 14px; padding: 10px 0; }
 .dot { width: 5px; height: 5px; background: var(--text-light); border-radius: 50%; animation: pulse 1s infinite alternate; }
 .dot:nth-child(2) { animation-delay: 0.2s; }
@@ -173,8 +176,9 @@ async function spark() {
     const payload = { notes, mode, lang, think: isThinking, history: chatHistory.slice(0, -1) };
     if (selectedImage) { payload.image = selectedImage; payload.mimeType = selectedMime; }
 
+    // Timeout நேரத்தை 30 வினாடிகளாக அதிகரித்துள்ளோம்
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s limit (Retries காரணமாக அதிகரிக்கப்பட்டது)
+    const timeoutId = setTimeout(() => controller.abort(), 30000); 
 
     const res = await fetch('/api/summarize', {
       method: 'POST', 
