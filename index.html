@@ -10,12 +10,17 @@
 :root { --bg: #FFFFFF; --text: #000000; --text-light: #666666; --surface: #F4F4F4; --accent: #FF6B2C; --blue: #E8F0FE; --blue-text: #1A73E8; }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; padding: 0; height: 100vh; height: 100dvh; background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; font-size: 16px; overflow: hidden; }
+
+/* Center View (Initial Screen) */
 .center-view { height: 100%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; transition: opacity 0.3s; }
 .center-view h1 { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 44px; font-weight: 400; margin: 0 0 8px 0; letter-spacing: -0.02em; }
 .center-view p { color: var(--text-light); font-size: 15px; margin: 0; }
 html[lang="ta"] .center-view h1 { font-family: 'Noto Serif Tamil', serif; font-size: 38px; }
-.chat-area { display: none; height: 100%; width: 100%; overflow-y: auto; padding: calc(20px + env(safe-area-inset-top)) 16px 120px 16px; flex-direction: column; }
+
+/* Chat Area */
+.chat-area { display: none; height: 100%; width: 100%; overflow-y: auto; overscroll-behavior: contain; padding: calc(20px + env(safe-area-inset-top)) 16px 180px 16px; flex-direction: column; }
 .chat-area.active { display: flex; }
+
 .msg-user { align-self: flex-end; background: var(--surface); padding: 12px 18px; border-radius: 20px; max-width: 85%; margin-bottom: 24px; white-space: pre-wrap; font-size: 16px; display: flex; flex-direction: column; gap: 8px; }
 .msg-user img { max-width: 100%; border-radius: 12px; max-height: 200px; object-fit: cover; }
 .msg-ai { align-self: flex-start; width: 100%; margin-bottom: 30px; line-height: 1.6; font-size: 16px; }
@@ -26,7 +31,7 @@ html[lang="ta"] .center-view h1 { font-family: 'Noto Serif Tamil', serif; font-s
 .msg-ai li { margin-bottom: 6px; }
 
 /* Bottom Bar */
-.bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 10px 16px calc(16px + env(safe-area-inset-bottom)); background: #FFFFFF; display: flex; flex-direction: column; gap: 10px; }
+.bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 10px 16px calc(16px + env(safe-area-inset-bottom)); background: #FFFFFF; display: flex; flex-direction: column; gap: 10px; z-index: 10; }
 .input-container { display: flex; flex-direction: column; background: var(--surface); border-radius: 24px; padding: 12px 16px; gap: 8px; border: 1px solid #E5E5E5; }
 .top-tools { display: flex; gap: 8px; align-items: center; }
 .tool-btn { display: flex; align-items: center; gap: 6px; background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 20px; padding: 6px 12px; font-size: 13px; color: var(--text-light); cursor: pointer; font-weight: 500; transition: all 0.2s; }
@@ -139,6 +144,12 @@ function handleImage(event) {
 
 function esc(s) { return String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
 
+// ஸ்க்ரோல் செய்ய உதவும் பங்ஷன்
+function scrollToBottom() {
+  const chat = $('chatArea');
+  chat.scrollTop = chat.scrollHeight;
+}
+
 async function spark() {
   const notes = $('notes').value.trim();
   if (!notes && !selectedImage) return;
@@ -164,19 +175,18 @@ async function spark() {
     userMsg.appendChild(textNode);
   }
   chat.appendChild(userMsg);
-  window.scrollTo(0, document.body.scrollHeight);
+  scrollToBottom(); // புதிய மெசேஜ் வந்ததும் கீழே ஸ்க்ரோல் செய்
 
   const loaderMsg = document.createElement('div');
   loaderMsg.className = 'msg-ai';
   loaderMsg.innerHTML = '<div class="loader"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
   chat.appendChild(loaderMsg);
-  window.scrollTo(0, document.body.scrollHeight);
+  scrollToBottom();
 
   try {
     const payload = { notes, mode, lang, think: isThinking, history: chatHistory.slice(0, -1) };
     if (selectedImage) { payload.image = selectedImage; payload.mimeType = selectedMime; }
 
-    // Timeout நேரத்தை 30 வினாடிகளாக அதிகரித்துள்ளோம்
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000); 
 
@@ -218,7 +228,7 @@ async function spark() {
     $('notes').value = ''; $('notes').style.height = '';
     $('notes').placeholder = "Message Zyra...";
     selectedImage = null; selectedMime = null; $('fileInput').value = '';
-    window.scrollTo(0, document.body.scrollHeight);
+    scrollToBottom(); // பதில் வந்ததும் கீழே ஸ்க்ரோல் செய்
   }
 }
 </script>
