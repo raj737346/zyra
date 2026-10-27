@@ -30,7 +30,7 @@ module.exports = async function handler(req, res) {
 
     const contents = [];
     
-    // UNLIMITED MEMORY: நினைவாற்றல் வரம்பு எதுவும் இல்லை. முழு History-யும் அனுப்பப்படுகிறது.
+    // UNLIMITED MEMORY (முழு History-யும் அனுப்பப்படுகிறது)
     history.forEach(msg => {
       contents.push({ role: msg.role === 'user' ? 'user' : 'model', parts: [{ text: msg.text }] });
     });
@@ -59,7 +59,8 @@ module.exports = async function handler(req, res) {
       } catch (err) { lastErrorMsg = err.message; }
     }
 
-    if (!finalData) return res.status(503).json({ error: `சர்வர் பிழை அல்லது வரம்பு முடிந்தது.` });
+    // மிக முக்கியம்: உண்மையான Error-ஐ இங்கே காட்டுகிறோம்
+    if (!finalData) return res.status(500).json({ error: `API Error: ${lastErrorMsg}` });
     
     const rawText = finalData.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
     return res.status(200).json(extractJSON(rawText));
