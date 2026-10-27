@@ -13,25 +13,31 @@ function extractJSON(text) {
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   try {
-    const { notes, image = null, mimeType = null, think = false } = req.body || {};
+    // history-ஐ இப்போது நாம் பெறுகிறோம்
+    const { notes, image = null, mimeType = null, think = false, history = [] } = req.body || {};
     if (!notes && !image) return res.status(400).json({ error: 'INVALID_INPUT' });
 
-    // மிகவும் கண்டிப்பான மொழி விதி
     const langRule = `MANDATORY LANGUAGE RULE: 
-    1. You MUST respond in the EXACT SAME language as the user's LATEST message.
-    2. Look ONLY at the latest message. Ignore the language of previous messages.
-    3. If the user's latest message is in English, you MUST reply in 100% English. Do NOT use ANY Tamil words.
-    4. If the user's latest message is in Tamil, you MUST reply in 100% Tamil.
-    5. NEVER mix languages. Do not output Tamil letters in an English sentence or vice versa.`;
+    1. If the user explicitly asks to switch languages (e.g., "Please talk with me Tamil" or "Speak English"), you MUST obey immediately and switch to that language for the rest of the conversation.
+    2. Otherwise, respond in the SAME language as the user's LATEST message.
+    3. NEVER mix languages. Do not output Tamil letters in an English sentence.`;
+
+    const memoryRule = `CRITICAL MEMORY RULE: 
+    1. You have access to the ENTIRE chat history provided below.
+    2. Use this history to understand the context. The user might refer to something they said earlier.`;
 
     const thinkPrompt = think ? "Think step by step. " : "";
-    const systemPrompt = `You are Zyra, a highly intelligent AI. ${langRule} ${thinkPrompt}`;
+    const systemPrompt = `You are Zyra, a highly intelligent AI. ${langRule} ${memoryRule} ${thinkPrompt}`;
     
     const formatPrompt = `Return ONLY a valid JSON object: {"answer": "your full answer here"}`;
 
     const contents = [];
     
-    // நினைவாற்றலை நீக்கிவிட்டு, கடைசி மெசேஜை மட்டும் அனுப்புகிறோம்
+    // UNLIMITED MEMORY: முழு History-யும் அனுப்பப்படுகிறது (வரம்பு இல்லை)
+    history.forEach(msg => {
+      contents.push({ role: msg.role === 'user' ? 'user' : 'model', parts: [{ text: msg.text }] });
+    });
+
     const currentParts = [{ text: `${systemPrompt}\n\nUser: ${notes || 'Analyze this image.'}\n\n${formatPrompt}` }];
     if (image && mimeType) currentParts.push({ inlineData: { mimeType: mimeType, data: image } });
     contents.push({ role: 'user', parts: currentParts });
