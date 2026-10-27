@@ -5,9 +5,7 @@ module.exports = async function handler(req, res) {
     if (!notes && !image) return res.status(400).json({ error: 'INVALID_INPUT' });
 
     const langName = { ta: 'Tamil', en: 'English', hi: 'Hindi' }[lang] || 'English';
-    
-    // 'Think' ON செய்திருந்தால், AI-க்கு ஆழமாக யோசிக்கச் சொல்லும் ப்ராம்ப்ட்
-    const thinkPrompt = think ? "Think step by step to provide the most accurate and deeply reasoned answer. " : "";
+    const thinkPrompt = think ? "Think step by step. " : "";
 
     const prompt = `You are Zyra. ${thinkPrompt}Respond in ${langName}. Based on the provided notes and/or image, return STRICT JSON:
     ${mode === 'ask' ? '{"answer": "your answer"}' : '{"summary":"3-4 sentences","themes":["..."],"overdue":["..."],"priorities":["..."],"checklist":["..."]}'}
@@ -18,24 +16,27 @@ module.exports = async function handler(req, res) {
       parts.push({ inlineData: { mimeType: mimeType, data: image } });
     }
 
-    const models = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-2.5-flash'];
-    let data = null, lastError = null;
+    // Loop இல்லாமல், நேரடியாக வேகமான மாடல் (gemini-2.5-flash)
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+    
+    const r = await fetch(url, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        contents: [{ parts: parts }], 
+        generationConfig: { 
+          responseMimeType: 'application/json',
+          temperature: 0.2, // குறைவான வெப்பநிலை = வேகமான மற்றும் துல்லியமான பதில்
+          maxOutputTokens: 800 // வார்த்தைகளைக் குறைத்து வேகத்தை அதிகரிக்கிறது
+        } 
+      }),
+    });
 
-    for (const model of models) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
-      const r = await fetch(url, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          contents: [{ parts: parts }], 
-          generationConfig: { responseMimeType: 'application/json' } 
-        }),
-      });
-
-      if (r.ok) { data = await r.json(); break; } 
-      else { lastError = await r.text(); }
+    if (!r.ok) {
+      const errText = await r.text();
+      return res.status(r.status).json({ error: `API Error: ${errText}` });
     }
-
-    if (!data) return res.status(500).json({ error: `API Error: ${lastError}` });
+    
+    const data = await r.json();
     return res.status(200).json(JSON.parse(data.candidates?.[0]?.content?.parts?.[0]?.text || '{}'));
   } catch (e) { 
     return res.status(500).json({ error: e.message || 'SERVER_ERROR' }); 
