@@ -505,8 +505,25 @@ async function spark() {
   scrollToBottom(true);
 
   try {
+    // Get the saved language preference
+    let savedLang = localStorage.getItem('zyra_lang_pref') || 'auto';
+    
+    // Check if user asks to switch language
+    if (/talk.*tamil|tamil.*talk|speak.*tamil/i.test(notes)) { savedLang = 'Tamil'; localStorage.setItem('zyra_lang_pref', savedLang); }
+    else if (/talk.*english|english.*talk|speak.*english/i.test(notes)) { savedLang = 'English'; localStorage.setItem('zyra_lang_pref', savedLang); }
+    else if (/talk.*hindi|hindi.*talk|speak.*hindi/i.test(notes)) { savedLang = 'Hindi'; localStorage.setItem('zyra_lang_pref', savedLang); }
+    else if (/talk.*malayalam|malayalam.*talk|speak.*malayalam/i.test(notes)) { savedLang = 'Malayalam'; localStorage.setItem('zyra_lang_pref', savedLang); }
+    else if (/talk.*telugu|telugu.*talk|speak.*telugu/i.test(notes)) { savedLang = 'Telugu'; localStorage.setItem('zyra_lang_pref', savedLang); }
+    else if (/talk.*kannada|kannada.*talk|speak.*kannada/i.test(notes)) { savedLang = 'Kannada'; localStorage.setItem('zyra_lang_pref', savedLang); }
+    // Add more languages as needed...
+
+    let finalNotes = notes;
+    if (savedLang !== 'auto') {
+      finalNotes = notes + `\n\n(Important: Please reply to my message in ${savedLang} only.)`;
+    }
+
     const historyToSend = currentChat.messages.slice(0, -1).map(m => ({ role: m.role, text: m.text }));
-    const payload = { notes, projectName: currentChat.title, mode: 'ask', lang: 'auto', think: isThinking, history: historyToSend };
+    const payload = { notes: finalNotes, projectName: currentChat.title, mode: 'ask', lang: 'auto', think: isThinking, history: historyToSend };
     if (selectedImage) { payload.image = selectedImage.split(',')[1]; payload.mimeType = selectedMime; }
 
     const controller = new AbortController();
