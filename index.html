@@ -7,9 +7,35 @@
 <title>Zyra</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Instrument+Serif:ital@1&family=Noto+Serif+Tamil:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root { --bg: #FFFFFF; --text: #000000; --text-light: #666666; --surface: #F4F4F4; --accent: #FF6B2C; --blue: #E8F0FE; --blue-text: #1A73E8; }
+:root { --bg: #FFFFFF; --text: #000000; --text-light: #666666; --surface: #F4F4F4; --accent: #FF6B2C; --blue: #E8F0FE; --blue-text: #1A73E8; --sidebar-bg: #F9F9F9; }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { margin: 0; padding: 0; height: 100vh; height: 100dvh; background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; font-size: 16px; display: flex; flex-direction: column; overflow: hidden; }
+
+/* Top Header */
+.top-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; padding-top: calc(10px + env(safe-area-inset-top)); background: #FFF; border-bottom: 1px solid #E5E5E5; z-index: 5; }
+.header-left { display: flex; align-items: center; gap: 8px; }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.menu-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text); padding: 4px; }
+.header-title { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 22px; margin: 0; }
+.top-plus-btn { background: var(--surface); border: none; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; color: var(--text); }
+.new-chat-btn { background: var(--text); color: #FFF; border: none; border-radius: 8px; padding: 6px 12px; font-size: 13px; cursor: pointer; font-weight: 500; }
+
+/* Sidebar Overlay */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 15; display: none; opacity: 0; transition: opacity 0.3s; }
+.overlay.open { display: block; opacity: 1; }
+
+/* Sidebar */
+.sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; height: 100dvh; background: var(--sidebar-bg); z-index: 20; transition: left 0.3s ease; display: flex; flex-direction: column; box-shadow: 2px 0 10px rgba(0,0,0,0.1); padding-top: env(safe-area-inset-top); }
+.sidebar.open { left: 0; }
+.sidebar-header { padding: 16px; display: flex; align-items: center; justify-content: space-between; }
+.sidebar-search { margin: 0 16px 16px 16px; padding: 10px 14px; border-radius: 8px; border: 1px solid #E5E5E5; font-size: 14px; outline: none; font-family: inherit; background: #FFF; }
+.sidebar-list { flex: 1; overflow-y: auto; padding: 0 12px 20px 12px; }
+.sidebar-group-title { font-size: 11px; font-weight: 600; color: var(--text-light); margin: 16px 8px 8px 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+.sidebar-item { padding: 10px 12px; border-radius: 8px; font-size: 14px; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+.sidebar-item:hover, .sidebar-item.active { background: #E8E8E8; }
+.sidebar-item .text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+.delete-icon { color: var(--text-light); font-size: 16px; padding: 0 4px; opacity: 0.5; }
+.delete-icon:hover { opacity: 1; color: #FF0000; }
 
 /* Center View */
 .center-view { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
@@ -17,8 +43,8 @@ body { margin: 0; padding: 0; height: 100vh; height: 100dvh; background: var(--b
 .center-view p { color: var(--text-light); font-size: 15px; margin: 0; }
 html[lang="ta"] .center-view h1 { font-family: 'Noto Serif Tamil', serif; font-size: 38px; }
 
-/* Chat Area */
-.chat-area { display: none; flex: 1; overflow-y: auto; padding: 20px 16px; flex-direction: column; }
+/* Chat Area - Unlimited Scroll */
+.chat-area { display: none; flex: 1; overflow-y: auto; padding: 20px 16px 40px 16px; flex-direction: column; }
 .chat-area.active { display: flex; }
 .msg-user { align-self: flex-end; background: var(--surface); padding: 12px 18px; border-radius: 20px; max-width: 85%; margin-bottom: 24px; font-size: 16px; display: flex; flex-direction: column; gap: 8px; }
 .msg-user img { max-width: 100%; border-radius: 12px; max-height: 200px; object-fit: cover; }
@@ -28,14 +54,12 @@ html[lang="ta"] .center-view h1 { font-family: 'Noto Serif Tamil', serif; font-s
 .msg-ai p { margin: 0 0 12px; }
 
 /* Bottom Bar */
-.bottom-bar { padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: #FFFFFF; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #E5E5E5; }
+.bottom-bar { padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: #FFFFFF; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #E5E5E5; z-index: 5; }
 .input-container { display: flex; flex-direction: column; background: var(--surface); border-radius: 24px; padding: 10px 14px; gap: 8px; }
 .top-tools { display: flex; gap: 8px; align-items: center; }
 .tool-btn { display: flex; align-items: center; gap: 6px; background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 20px; padding: 4px 10px; font-size: 12px; color: var(--text-light); cursor: pointer; font-weight: 500; }
-.tool-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; }
 .tool-btn.active { background: var(--blue); color: var(--blue-text); border-color: var(--blue); }
 
-/* Image Preview */
 .image-preview { display: none; padding: 6px; background: #FFF; border-radius: 10px; border: 1px solid #E5E5E5; margin-bottom: 4px; position: relative; width: fit-content; }
 .image-preview img { height: 50px; border-radius: 6px; display: block; }
 .image-preview .remove-img { position: absolute; top: -6px; right: -6px; background: #FF6B2C; color: #FFF; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; }
@@ -43,9 +67,9 @@ html[lang="ta"] .center-view h1 { font-family: 'Noto Serif Tamil', serif; font-s
 .textarea-row { display: flex; align-items: flex-end; gap: 8px; }
 textarea { flex: 1; border: none; background: transparent; padding: 6px 0; font-size: 16px; resize: none; max-height: 100px; outline: none; font-family: inherit; line-height: 1.4; color: var(--text); }
 textarea::placeholder { color: var(--text-light); }
-.action-row { display: flex; align-items: center; gap: 10px; }
+.action-row { display: flex; align-items: center; gap: 8px; }
 .icon-btn { background: transparent; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); padding: 4px; }
-.icon-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; }
+.icon-btn svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .send-btn { background: var(--text); color: #FFF; border: none; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-left: auto; }
 .send-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.5; }
 
@@ -54,9 +78,98 @@ textarea::placeholder { color: var(--text-light); }
 .dot:nth-child(2) { animation-delay: 0.2s; }
 .dot:nth-child(3) { animation-delay: 0.4s; }
 @keyframes pulse { to { opacity: 0.2; transform: translateY(-3px); } }
+
+/* Top New Page Modal */
+.top-page-modal { position: fixed; inset: 0; background: #FFF; z-index: 100; display: none; flex-direction: column; padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); }
+.top-page-modal.open { display: flex; }
+.top-page-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+.close-top-page { background: none; border: none; font-size: 24px; cursor: pointer; }
+.top-page-modal h2 { font-family: 'Instrument Serif', serif; font-style: italic; }
+
+/* Bottom Sheet (Attachment) */
+.attachment-page { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 60; display: none; align-items: flex-end; justify-content: center; }
+.attachment-page.open { display: flex; }
+.attachment-sheet { width: 100%; max-width: 600px; background: #FFF; border-radius: 24px 24px 0 0; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); animation: slideUp 0.3s ease-out; }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.attachment-sheet h3 { margin: 0 0 20px 0; font-size: 18px; text-align: center; font-family: 'Instrument Serif', serif; font-style: italic; }
+.attachment-option { display: flex; align-items: center; gap: 16px; padding: 16px; border-radius: 16px; background: var(--surface); margin-bottom: 12px; cursor: pointer; font-weight: 500; font-size: 16px; }
+.attachment-option svg { width: 28px; height: 28px; stroke: var(--text); fill: none; stroke-width: 2; }
+.attachment-cancel { width: 100%; padding: 16px; border: none; background: transparent; font-size: 16px; font-weight: 600; color: var(--text-light); cursor: pointer; margin-top: 10px; }
+
+/* Voice Mode Overlay */
+.voice-mode { position: fixed; inset: 0; background: #000000; z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; color: #FFF; }
+.voice-mode.active { display: flex; }
+.voice-circle { width: 120px; height: 120px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 40px; animation: breathe 1.5s infinite alternate; }
+.voice-circle svg { width: 50px; height: 50px; stroke: #FFF; fill: none; stroke-width: 2; }
+@keyframes breathe { from { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 44, 0.7); } to { transform: scale(1.1); box-shadow: 0 0 0 30px rgba(255, 107, 44, 0); } }
+.voice-text { font-size: 18px; color: #DDD; margin-bottom: 20px; text-align: center; }
+.close-voice { position: absolute; bottom: 50px; background: rgba(255,255,255,0.2); border: none; color: #FFF; padding: 12px 24px; border-radius: 30px; font-size: 16px; cursor: pointer; }
 </style>
 </head>
 <body>
+
+<!-- Top New Page (Opens when Top + is clicked) -->
+<div class="top-page-modal" id="topPageModal">
+  <div class="top-page-header">
+    <button class="close-top-page" onclick="closeTopPage()">✕</button>
+    <h2>New Tools (புதிய வசதிகள்)</h2>
+  </div>
+  <p style="color: var(--text-light);">இந்தப் பக்கத்தில் புதிய வசதிகள் விரைவில் சேர்க்கப்படும்.</p>
+</div>
+
+<!-- Bottom Sheet (Attachment) -->
+<div class="attachment-page" id="attachmentPage" onclick="closeAttachmentPage(event)">
+  <div class="attachment-sheet" onclick="event.stopPropagation()">
+    <h3>Attach File</h3>
+    <div class="attachment-option" onclick="triggerFileInput('image/*')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      Photo Library (புகைப்படங்கள்)
+    </div>
+    <div class="attachment-option" onclick="triggerFileInput('image/*', true)">
+      <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      Camera (கேமரா)
+    </div>
+    <div class="attachment-option" onclick="triggerFileInput('application/pdf')">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Document (ஆவணங்கள்)
+    </div>
+    <button class="attachment-cancel" onclick="closeAttachmentPage(event)">Cancel</button>
+  </div>
+</div>
+
+<!-- Voice Mode Overlay -->
+<div class="voice-mode" id="voiceMode">
+  <div class="voice-circle">
+    <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+  </div>
+  <div class="voice-text" id="voiceStatus">பேசுங்கள் (Listening...)</div>
+  <button class="close-voice" onclick="stopVoice()">Cancel</button>
+</div>
+
+<!-- Sidebar Overlay -->
+<div class="overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h2 style="margin:0;font-size:20px;">Chats</h2>
+    <button class="menu-btn" onclick="toggleSidebar()">✕</button>
+  </div>
+  <input type="text" id="searchInput" class="sidebar-search" placeholder="Search chat content..." oninput="renderSidebar()">
+  <div class="sidebar-list" id="sidebarList"></div>
+</div>
+
+<!-- Top Header -->
+<div class="top-header">
+  <div class="header-left">
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    <h1 class="header-title">Zyra</h1>
+  </div>
+  <div class="header-right">
+    <button class="top-plus-btn" onclick="openTopPage()">+</button>
+    <button class="new-chat-btn" onclick="startNewChat()">+ New</button>
+  </div>
+</div>
 
 <div class="center-view" id="centerView">
   <h1 id="tagline">மனதில் ஒரு பொறி.</h1>
@@ -67,7 +180,6 @@ textarea::placeholder { color: var(--text-light); }
 
 <div class="bottom-bar">
   <div class="input-container">
-    
     <div class="image-preview" id="imagePreview">
       <img id="previewImg" src="" alt="preview">
       <div class="remove-img" onclick="removeImage()">×</div>
@@ -77,9 +189,6 @@ textarea::placeholder { color: var(--text-light); }
       <button class="tool-btn" id="thinkBtn" onclick="toggleTool('think')">
         <svg viewBox="0 0 24 24"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg> Think
       </button>
-      <button class="tool-btn" id="searchBtn" onclick="toggleTool('search')">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Search
-      </button>
     </div>
 
     <div class="textarea-row">
@@ -87,12 +196,26 @@ textarea::placeholder { color: var(--text-light); }
     </div>
 
     <div class="action-row">
-      <button class="icon-btn" onclick="document.getElementById('fileInput').click()">
-        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <button class="icon-btn" id="speakerBtn" onclick="toggleSpeaker()">
+        <svg id="speakerIcon" viewBox="0 0 24 24">
+           <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+           <line x1="22" y1="9" x2="16" y2="15"/>
+           <line x1="16" y1="9" x2="22" y2="15"/>
+        </svg>
+      </button>
+
+      <button class="icon-btn" onclick="openAttachmentPage()">
+        <svg viewBox="0 0 24 24">
+           <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+           <line x1="12" y1="8" x2="12" y2="16"/>
+           <line x1="8" y1="12" x2="16" y2="12"/>
+        </svg>
       </button>
       <input type="file" id="fileInput" accept="image/*" onchange="handleImage(event)" hidden>
+      <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleImage(event)" hidden>
+      <input type="file" id="docInput" accept=".pdf,.doc,.docx,.txt" onchange="handleImage(event)" hidden>
       
-      <button class="icon-btn" id="micBtn" onclick="startVoice()">
+      <button class="icon-btn" id="micBtn" onclick="startVoiceMode()">
         <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
       </button>
 
@@ -106,33 +229,198 @@ textarea::placeholder { color: var(--text-light); }
 <script>
 const $ = id => document.getElementById(id);
 let selectedImage = null, selectedMime = null;
-let isThinking = false, isSearching = false;
-let chatHistory = [];
+let isThinking = false;
 let userScrolledUp = false;
+let allChats = []; 
+let activeChatId = null;
+let recognition = null;
+let isMuted = true;
+
+function openTopPage() { $('topPageModal').classList.add('open'); }
+function closeTopPage() { $('topPageModal').classList.remove('open'); }
+
+function openAttachmentPage() { $('attachmentPage').classList.add('open'); }
+function closeAttachmentPage(e) {
+  if (e && e.target !== e.currentTarget && e.type === 'click' && e.target.className !== 'attachment-cancel') return;
+  $('attachmentPage').classList.remove('open');
+}
+function triggerFileInput(type, isCamera = false) {
+  closeAttachmentPage(); 
+  if (isCamera) $('cameraInput').click();
+  else if (type === 'application/pdf') $('docInput').click();
+  else $('fileInput').click();
+}
+
+function toggleSpeaker() {
+  isMuted = !isMuted;
+  const icon = $('speakerIcon');
+  if (isMuted) {
+    icon.innerHTML = `<path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/>`;
+    window.speechSynthesis.cancel();
+  } else {
+    icon.innerHTML = `<path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>`;
+  }
+}
+
+function speakText(text) {
+  if (isMuted) return;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  if (/[\u0B80-\u0BFF]/.test(text)) utterance.lang = 'ta-IN';
+  else if (/[\u0900-\u097F]/.test(text)) utterance.lang = 'hi-IN';
+  else utterance.lang = 'en-US';
+  window.speechSynthesis.speak(utterance);
+}
+
+function toggleSidebar() {
+  $('sidebar').classList.toggle('open');
+  $('sidebarOverlay').classList.toggle('open');
+}
+
+function initApp() {
+  try {
+    const savedChats = localStorage.getItem('zyra_chats');
+    if (savedChats) allChats = JSON.parse(savedChats);
+  } catch (e) {}
+
+  if (allChats.length === 0) startNewChat();
+  else {
+    activeChatId = allChats[0].id;
+    renderCurrentChat();
+  }
+  renderSidebar();
+}
+
+function startNewChat() {
+  const newChat = { id: 'chat_' + Date.now(), title: 'New Chat', timestamp: Date.now(), messages: [] };
+  allChats.unshift(newChat);
+  activeChatId = newChat.id;
+  saveData();
+  $('centerView').style.display = 'flex';
+  $('chatArea').classList.remove('active');
+  $('chatArea').innerHTML = '';
+  $('notes').value = '';
+  renderSidebar();
+  if ($('sidebar').classList.contains('open')) toggleSidebar();
+}
+
+function saveData() {
+  try { localStorage.setItem('zyra_chats', JSON.stringify(allChats)); } catch (e) {}
+}
+
+function renderSidebar() {
+  const query = $('searchInput').value.toLowerCase();
+  const list = $('sidebarList');
+  let filtered = allChats;
+  if (query) filtered = allChats.filter(chat => chat.title.toLowerCase().includes(query) || chat.messages.some(m => m.text && m.text.toLowerCase().includes(query)));
+
+  const groups = { 'Today': [], 'Yesterday': [], 'Previous 7 Days': [], 'Older': [] };
+  filtered.forEach(chat => {
+    const date = new Date(chat.timestamp);
+    const today = new Date(); today.setHours(0,0,0,0);
+    const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
+    if (date >= today) groups['Today'].push(chat);
+    else if (date >= yesterday) groups['Yesterday'].push(chat);
+    else if (date >= new Date(today.getTime() - 7*24*60*60*1000)) groups['Previous 7 Days'].push(chat);
+    else groups['Older'].push(chat);
+  });
+
+  let html = '';
+  for (const [groupName, chats] of Object.entries(groups)) {
+    if (chats.length > 0) {
+      html += `<div class="sidebar-group-title">${groupName}</div>`;
+      chats.forEach(chat => {
+        const isActive = chat.id === activeChatId ? 'active' : '';
+        html += `<div class="sidebar-item ${isActive}" onclick="loadChat('${chat.id}')"><span class="text">${esc(chat.title)}</span><span class="delete-icon" onclick="deleteChat(event, '${chat.id}')">🗑️</span></div>`;
+      });
+    }
+  }
+  if (!html) html = '<p style="text-align:center;color:#888;font-size:14px;margin-top:20px;">No results found.</p>';
+  list.innerHTML = html;
+}
+
+function loadChat(id) {
+  activeChatId = id;
+  renderCurrentChat();
+  renderSidebar();
+  if ($('sidebar').classList.contains('open')) toggleSidebar();
+}
+
+function deleteChat(e, id) {
+  e.stopPropagation();
+  if (!confirm("இந்த அரட்டையை அழிக்கவா?")) return;
+  allChats = allChats.filter(c => c.id !== id);
+  saveData();
+  if (activeChatId === id) {
+    if (allChats.length > 0) activeChatId = allChats[0].id;
+    else { startNewChat(); return; }
+  }
+  renderSidebar();
+  renderCurrentChat();
+}
+
+function renderCurrentChat() {
+  const chatArea = $('chatArea');
+  chatArea.innerHTML = '';
+  const chat = allChats.find(c => c.id === activeChatId);
+  
+  if (!chat || chat.messages.length === 0) {
+    $('centerView').style.display = 'flex';
+    chatArea.classList.remove('active');
+    return;
+  }
+  
+  $('centerView').style.display = 'none';
+  chatArea.classList.add('active');
+  
+  chat.messages.forEach(msg => {
+    const div = document.createElement('div');
+    if (msg.role === 'user') {
+      div.className = 'msg-user';
+      if (msg.image) { const img = document.createElement('img'); img.src = msg.image; div.appendChild(img); }
+      if (msg.text) { const span = document.createElement('span'); span.textContent = msg.text; div.appendChild(span); }
+    } else {
+      div.className = 'msg-ai';
+      div.innerHTML = `<h3>பதில்</h3><p>${esc(msg.text)}</p>`;
+    }
+    chatArea.appendChild(div);
+  });
+  scrollToBottom(true);
+}
 
 function toggleTool(tool) {
   if (tool === 'think') { isThinking = !isThinking; $('thinkBtn').classList.toggle('active', isThinking); }
-  else if (tool === 'search') { isSearching = !isSearching; $('searchBtn').classList.toggle('active', isSearching); if(isSearching) alert("Search feature coming soon!"); }
 }
 
-function startVoice() {
-  if (!('webkitSpeechRecognition' in window)) { alert("Voice not supported."); return; }
-  const recognition = new webkitSpeechRecognition();
-  recognition.lang = 'ta-IN';
+function startVoiceMode() {
+  if (!('webkitSpeechRecognition' in window)) { alert("உங்கள் போனில் குரல் வசதி ஆதரிக்கப்படவில்லை."); return; }
+  $('voiceMode').classList.add('active');
+  $('voiceStatus').textContent = "பேசுங்கள் (Listening...)";
+  recognition = new webkitSpeechRecognition();
+  recognition.lang = 'ta-IN'; 
   recognition.interimResults = false;
-  $('micBtn').style.color = 'red';
-  recognition.onresult = function(event) { $('notes').value += event.results[0][0].transcript + " "; $('micBtn').style.color = 'var(--text)'; };
-  recognition.onerror = function() { $('micBtn').style.color = 'var(--text)'; };
-  recognition.onend = function() { $('micBtn').style.color = 'var(--text)'; };
+  recognition.onresult = function(event) {
+    const text = event.results[0][0].transcript;
+    $('voiceStatus').textContent = "புரிந்துகொண்டது: " + text;
+    setTimeout(() => {
+      $('voiceMode').classList.remove('active');
+      $('notes').value = text;
+      spark(); 
+    }, 1000);
+  };
+  recognition.onerror = function(e) { $('voiceStatus').textContent = "பிழை: மீண்டும் முயற்சிக்கவும்."; setTimeout(() => $('voiceMode').classList.remove('active'), 1500); };
+  recognition.onend = function() { if ($('voiceMode').classList.contains('active')) $('voiceStatus').textContent = "பேச்சு முடிந்தது..."; };
   recognition.start();
 }
+
+function stopVoice() { if (recognition) recognition.stop(); $('voiceMode').classList.remove('active'); }
 
 function handleImage(event) {
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = function(e) {
-    selectedImage = e.target.result.split(',')[1];
+    selectedImage = e.target.result;
     selectedMime = file.type;
     $('previewImg').src = e.target.result;
     $('imagePreview').style.display = 'block';
@@ -144,19 +432,26 @@ function removeImage() {
   selectedImage = null; selectedMime = null;
   $('imagePreview').style.display = 'none';
   $('fileInput').value = '';
+  $('cameraInput').value = '';
+  $('docInput').value = '';
 }
 
 function esc(s) { return String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
 
-function scrollToBottom() {
-  if (!userScrolledUp) {
+// --- PERFECT SCROLL LOGIC ---
+function scrollToBottom(force = false) {
+  if (!userScrolledUp || force) {
     const chat = $('chatArea');
-    setTimeout(() => { chat.scrollTo({ top: chat.scrollHeight, behavior: 'smooth' }); }, 50);
+    // Use requestAnimationFrame for smooth rendering
+    requestAnimationFrame(() => {
+      chat.scrollTop = chat.scrollHeight;
+    });
   }
 }
 
 $('chatArea').addEventListener('scroll', function() {
   const chat = this;
+  // If the user is near the bottom (within 100px), allow auto-scroll
   const isAtBottom = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 100;
   userScrolledUp = !isAtBottom;
 });
@@ -168,36 +463,35 @@ async function spark() {
   userScrolledUp = false; 
   $('centerView').style.display = 'none';
   $('chatArea').classList.add('active');
-  const chat = $('chatArea');
   const sendBtn = $('sendBtn');
   sendBtn.disabled = true;
   
-  chatHistory.push({ role: "user", text: notes });
+  const currentChat = allChats.find(c => c.id === activeChatId);
+  if (currentChat.messages.length === 0 && notes) currentChat.title = notes.substring(0, 30) + (notes.length > 30 ? '...' : '');
+  currentChat.timestamp = Date.now();
+  
+  const newUserMsg = { role: "user", text: notes || 'Image provided', image: selectedImage };
+  currentChat.messages.push(newUserMsg);
+  saveData();
+  renderSidebar();
 
-  const userMsg = document.createElement('div');
-  userMsg.className = 'msg-user';
-  if (selectedImage) {
-    const img = document.createElement('img');
-    img.src = `data:${selectedMime};base64,${selectedImage}`;
-    userMsg.appendChild(img);
-  }
-  if (notes) {
-    const textNode = document.createElement('span');
-    textNode.textContent = notes;
-    userMsg.appendChild(textNode);
-  }
-  chat.appendChild(userMsg);
-  scrollToBottom();
+  const userMsgDiv = document.createElement('div');
+  userMsgDiv.className = 'msg-user';
+  if (selectedImage) { const img = document.createElement('img'); img.src = selectedImage; userMsgDiv.appendChild(img); }
+  if (notes) { const textNode = document.createElement('span'); textNode.textContent = notes; userMsgDiv.appendChild(textNode); }
+  $('chatArea').appendChild(userMsgDiv);
+  scrollToBottom(true); // Force scroll to bottom when user sends
 
   const loaderMsg = document.createElement('div');
   loaderMsg.className = 'msg-ai';
   loaderMsg.innerHTML = '<div class="loader"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
-  chat.appendChild(loaderMsg);
-  scrollToBottom();
+  $('chatArea').appendChild(loaderMsg);
+  scrollToBottom(true);
 
   try {
-    const payload = { notes, mode: 'ask', lang: 'auto', think: isThinking, history: chatHistory.slice(0, -1) };
-    if (selectedImage) { payload.image = selectedImage; payload.mimeType = selectedMime; }
+    const historyToSend = currentChat.messages.slice(0, -1).map(m => ({ role: m.role, text: m.text }));
+    const payload = { notes, projectName: currentChat.title, mode: 'ask', lang: 'auto', think: isThinking, history: historyToSend };
+    if (selectedImage) { payload.image = selectedImage.split(',')[1]; payload.mimeType = selectedMime; }
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000); 
@@ -209,32 +503,36 @@ async function spark() {
     
     clearTimeout(timeoutId);
     const data = await res.json();
-    
     if (!res.ok) throw new Error(data.error || 'ERROR');
     
     const aiText = data.answer || data.summary || "பதில் கிடைக்கவில்லை.";
-    chatHistory.push({ role: "model", text: aiText });
+    currentChat.messages.push({ role: "model", text: aiText });
+    saveData();
+    speakText(aiText);
 
-    chat.removeChild(loaderMsg);
+    $('chatArea').removeChild(loaderMsg);
     const aiMsg = document.createElement('div');
     aiMsg.className = 'msg-ai';
     aiMsg.innerHTML = `<h3>பதில்</h3><p>${esc(aiText)}</p>`;
-    chat.appendChild(aiMsg);
+    $('chatArea').appendChild(aiMsg);
+    scrollToBottom(true);
 
   } catch (e) {
-    chat.removeChild(loaderMsg);
+    $('chatArea').removeChild(loaderMsg);
     const errMsg = document.createElement('div');
     errMsg.className = 'msg-ai';
     let errText = e.name === 'AbortError' ? "பதில் வர அதிக நேரம் எடுக்கிறது." : e.message;
     errMsg.innerHTML = `<p style="color:#FF6B2C; font-weight:500; padding:12px; background:#FFF0E5; border-radius:12px;">${errText}</p>`;
-    chat.appendChild(errMsg);
+    $('chatArea').appendChild(errMsg);
+    scrollToBottom(true);
   } finally {
     sendBtn.disabled = false;
     $('notes').value = ''; $('notes').style.height = '';
     removeImage(); 
-    scrollToBottom();
   }
 }
+
+window.onload = initApp;
 </script>
 </body>
 </html>
