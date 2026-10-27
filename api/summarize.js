@@ -13,21 +13,25 @@ function extractJSON(text) {
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   try {
-    const { notes, image = null, mimeType = null, think = false, history = [] } = req.body || {};
+    const { notes, projectName = 'General', image = null, mimeType = null, think = false, history = [] } = req.body || {};
     if (!notes && !image) return res.status(400).json({ error: 'INVALID_INPUT' });
 
-    const langRule = `IMPORTANT LANGUAGE RULE: 
-    1. Always detect the language of the user's LATEST message and respond in that language.
-    2. If the user asks to speak in Tamil (e.g., "Please tell me Tamil"), you MUST TRANSLATE your answer or the image analysis into Tamil. Do not explain what Tamil is.`;
-
-    const visionRule = `VISION RULE: Analyze the image carefully. Describe the exact details accurately. Do not hallucinate.`;
+    const langRule = `MANDATORY LANGUAGE RULE: 
+    1. You must respond in the EXACT SAME language the user used in their latest message.
+    2. If the user uses Tamil, reply ONLY in pure, correct Tamil. 
+    3. If the user uses English, reply ONLY in pure English.
+    4. NEVER mix languages or output gibberish/partial letters. 
+    5. Provide a complete, fluent, and natural response.`;
 
     const thinkPrompt = think ? "Think step by step. " : "";
-    const systemPrompt = `You are Zyra, a highly intelligent AI. ${langRule} ${visionRule} ${thinkPrompt}`;
-    const formatPrompt = `Return ONLY a valid JSON object: {"answer": "your answer here"}`;
+    const systemPrompt = `You are Zyra, a highly intelligent AI. ${langRule} ${thinkPrompt}`;
+    
+    const formatPrompt = `Return ONLY a valid JSON object: {"answer": "your full answer here"}`;
 
     const contents = [];
-    history.slice(-6).forEach(msg => {
+    
+    // UNLIMITED MEMORY: நினைவாற்றல் வரம்பு எதுவும் இல்லை. முழு History-யும் அனுப்பப்படுகிறது.
+    history.forEach(msg => {
       contents.push({ role: msg.role === 'user' ? 'user' : 'model', parts: [{ text: msg.text }] });
     });
 
@@ -46,7 +50,7 @@ module.exports = async function handler(req, res) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             contents: contents, 
-            generationConfig: { responseMimeType: 'application/json', temperature: 0.2, maxOutputTokens: 800 } 
+            generationConfig: { responseMimeType: 'application/json', temperature: 0.2, maxOutputTokens: 1500 }
           })
         });
 
