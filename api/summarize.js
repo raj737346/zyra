@@ -18,15 +18,21 @@ module.exports = async function handler(req, res) {
     const { notes, mode = 'ask', lang = 'auto', image = null, mimeType = null, think = false, history = [] } = req.body || {};
     if (!notes && !image) return res.status(400).json({ error: 'INVALID_INPUT' });
 
-    const langRule = "Detect the language of the user's LATEST message and respond in THAT language. If the user explicitly asks you to speak in a specific language (e.g., 'speak Tamil'), strictly obey that instruction and switch languages immediately.";
+    // மிக முக்கியமான மாற்றம்: மொழிபெயர்ப்பு கட்டளை
+    const langRule = `IMPORTANT LANGUAGE RULE: 
+    The user wants you to respond in the language they request or the language of their latest message.
+    If the user asks to speak in Tamil (e.g., "Please tell me Tamil" or "Speak Tamil"), you MUST TRANSLATE your previous response or the image analysis into Tamil. 
+    DO NOT explain what the Tamil language is. DO NOT respond in English if they asked for Tamil. Just provide the exact meaning/answer in Tamil.`;
+
     const thinkPrompt = think ? "Think step by step. " : "";
-    const systemPrompt = `You are Zyra, an AI assistant. ${langRule} ${thinkPrompt}Provide helpful, clear answers.`;
+    const systemPrompt = `You are Zyra, a helpful AI assistant. ${langRule} ${thinkPrompt}`;
     
     const formatPrompt = `Return ONLY a valid JSON object. No markdown.
     ${mode === 'ask' ? '{"answer": "your answer here"}' : '{"summary":"...","themes":["..."],"overdue":["..."],"priorities":["..."],"checklist":["..."]}'}`;
 
     const contents = [];
-    history.slice(-4).forEach(msg => {
+    // கடைசி 6 மெசேஜ்களை நினைவில் வைத்துக்கொள்ளும் (சூழலைப் புரிந்துகொள்ள)
+    history.slice(-6).forEach(msg => {
       contents.push({ role: msg.role === 'user' ? 'user' : 'model', parts: [{ text: msg.text }] });
     });
 
@@ -34,16 +40,11 @@ module.exports = async function handler(req, res) {
     if (image && mimeType) currentParts.push({ inlineData: { mimeType: mimeType, data: image } });
     contents.push({ role: 'user', parts: currentParts });
 
-    const requestBody = JSON.stringify({ 
-      contents: contents, 
-      generationConfig: { responseMimeType: 'application/json', temperature: 0.4, maxOutputTokens: 800 } 
-    });
-
-    // தினசரி 500 இலவச கோரிக்கைகள் கொண்ட மாடல்கள் (வரம்பு முடிந்தால் அடுத்ததற்கு மாறும்)
+    // அதிவேக மாடல்கள் (Quota பிரச்சனை வராமல் இருக்க)
     const models = [
       'gemini-3.5-flash-lite', 
       'gemini-3.1-flash-lite',
-      'gemini-2.5-flash-lite'
+      'gemini-3.8-flash'
     ];
 
     let finalData = null;
@@ -56,12 +57,15 @@ module.exports = async function handler(req, res) {
         const r = await fetch(url, {
           method: 'POST', 
           headers: { 'Content-Type': 'application/json' },
-          body: requestBody
+          body: JSON.stringify({ 
+            contents: contents, 
+            generationConfig: { responseMimeType: 'application/json', temperature: 0.3, maxOutputTokens: 800 } 
+          })
         });
 
         if (r && r.ok) {
           finalData = await r.json();
-          break;
+          break; 
         } else if (r) {
           lastErrorMsg = await r.text();
         }
@@ -71,7 +75,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (!finalData) {
-      return res.status(503).json({ error: `இலவச வரம்பு முடிந்துவிட்டது. தயவுசெய்து நாளை மீண்டும் முயற்சிக்கவும்.` });
+      return res.status(503).json({ error: `சர்வர் மிக மெதுவாக உள்ளது அல்லது இலவச வரம்பு முடிந்தது. மீண்டும் முயற்சிக்கவும்.` });
     }
     
     const rawText = finalData.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
