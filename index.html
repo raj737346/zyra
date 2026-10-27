@@ -122,11 +122,14 @@ textarea::placeholder { color: var(--text-light); }
 </style>
 </head>
 <body>
+
 <div class="center-view" id="centerView">
   <h1 id="tagline">மனதில் ஒரு பொறி.</h1>
   <p id="intro">உங்கள் எண்ணங்களைத் தெளிவாக்குங்கள்.</p>
 </div>
+
 <div class="chat-area" id="chatArea"></div>
+
 <div class="bottom-bar">
   <div class="modes">
     <button class="mode-btn active" data-mode="weekly" onclick="setMode('weekly')">வாரச் சுருக்கம்</button>
@@ -140,48 +143,61 @@ textarea::placeholder { color: var(--text-light); }
     </button>
   </div>
 </div>
+
 <script>
 const $ = id => document.getElementById(id);
 let lang = 'ta', mode = 'weekly';
+
 const I18N = {
-  ta: { tagline: 'மனதில் ஒரு பொறி.', intro: 'உங்கள் எண்ணங்களைத் தெளிவாக்குங்கள்.', placeholder: 'உங்கள் குறிப்புகளை இங்கே எழுதுங்கள்...', summary: 'சுருக்கம்', themes: 'கருப்பொருள்கள்', overdue: 'தொடர வேண்டியவை', priorities: 'முன்னுரிமைகள்', checklist: 'செயல் பட்டியல்', answer: 'பதில்', error: 'பிழை: தயவுசெய்து Vercel லிங்க் மூலம் திறக்கவும் அல்லது API Key-ஐ சரிபார்க்கவும்.' },
-  en: { tagline: 'Spark your mind.', intro: 'Make sense of your thoughts.', placeholder: 'Message Zyra...', summary: 'Summary', themes: 'Themes', overdue: 'Open loops', priorities: 'Priorities', checklist: 'Checklist', answer: 'Answer', error: 'Error: Please open via Vercel link or check API Key.' },
-  hi: { tagline: 'मन में एक चिंगारी।', intro: 'अपने विचारों को स्पष्ट करें।', placeholder: 'Zyra को संदेश भेजें...', summary: 'सारांश', themes: 'विषय', overdue: 'बाक़ी काम', priorities: 'प्राथमिकताएँ', checklist: 'सूची', answer: 'जवाब', error: 'त्रुटि: कृपया Vercel लिंक से खोलें या API Key जाँचें।' }
+  ta: { tagline: 'மனதில் ஒரு பொறி.', intro: 'உங்கள் எண்ணங்களைத் தெளிவாக்குங்கள்.', placeholder: 'உங்கள் குறிப்புகளை இங்கே எழுதுங்கள்...', summary: 'சுருக்கம்', themes: 'கருப்பொருள்கள்', overdue: 'தொடர வேண்டியவை', priorities: 'முன்னுரிமைகள்', checklist: 'செயல் பட்டியல்', answer: 'பதில்', error: 'பிழை ஏற்பட்டது. மீண்டும் முயலுங்கள்.' },
+  en: { tagline: 'Spark your mind.', intro: 'Make sense of your thoughts.', placeholder: 'Message Zyra...', summary: 'Summary', themes: 'Themes', overdue: 'Open loops', priorities: 'Priorities', checklist: 'Checklist', answer: 'Answer', error: 'An error occurred. Please try again.' },
+  hi: { tagline: 'मन में एक चिंगारी।', intro: 'अपने विचारों को स्पष्ट करें।', placeholder: 'Zyra को संदेश भेजें...', summary: 'सारांश', themes: 'विषय', overdue: 'बाक़ी काम', priorities: 'प्राथमिकताएँ', checklist: 'सूची', answer: 'जवाब', error: 'एक त्रुटि हुई। कृपया पुनः प्रयास करें।' }
 };
+
 function setMode(m) {
   mode = m;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === m));
 }
+
 function esc(s) { return String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
+
 async function spark() {
   const notes = $('notes').value.trim();
   if (!notes) return;
+  
   $('centerView').style.display = 'none';
   $('chatArea').classList.add('active');
+  
   const chat = $('chatArea');
   const sendBtn = $('sendBtn');
   sendBtn.disabled = true;
   $('notes').value = ''; $('notes').style.height = '';
+
   const userMsg = document.createElement('div');
   userMsg.className = 'msg-user';
   userMsg.textContent = notes;
   chat.appendChild(userMsg);
   window.scrollTo(0, document.body.scrollHeight);
+
   const loaderMsg = document.createElement('div');
   loaderMsg.className = 'msg-ai';
   loaderMsg.innerHTML = '<div class="loader"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
   chat.appendChild(loaderMsg);
   window.scrollTo(0, document.body.scrollHeight);
+
   try {
     const res = await fetch('/api/summarize', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ notes, mode, lang })
     });
     const data = await res.json();
+    
     if (!res.ok) throw new Error(data.error || 'ERROR');
+    
     chat.removeChild(loaderMsg);
     const aiMsg = document.createElement('div');
     aiMsg.className = 'msg-ai';
+    
     let html = '';
     if (mode === 'ask') {
       html = `<h3>${I18N[lang].answer}</h3><p>${esc(data.answer || '')}</p>`;
@@ -194,11 +210,13 @@ async function spark() {
     }
     aiMsg.innerHTML = html;
     chat.appendChild(aiMsg);
+
   } catch (e) {
     chat.removeChild(loaderMsg);
     const errMsg = document.createElement('div');
     errMsg.className = 'msg-ai';
-    errMsg.innerHTML = errMsg.innerHTML = `<p style="color:#FF6B2C; font-weight:500; padding:12px; background:#FFF0E5; border-radius:12px;">${e.message || I18N[lang].error}</p>`;
+    // இங்கே தான் உண்மையான எரர் காட்டப்படும்
+    errMsg.innerHTML = `<p style="color:#FF6B2C; font-weight:500; padding:12px; background:#FFF0E5; border-radius:12px;">${e.message || I18N[lang].error}</p>`;
     chat.appendChild(errMsg);
   } finally {
     sendBtn.disabled = false;
