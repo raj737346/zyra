@@ -16,13 +16,13 @@ module.exports = async function handler(req, res) {
     const { notes, image = null, mimeType = null, think = false } = req.body || {};
     if (!notes && !image) return res.status(400).json({ error: 'INVALID_INPUT' });
 
-    // உலகின் அனைத்து மொழிகளுக்கான கண்டிப்பான விதி
+    // மிகவும் கண்டிப்பான மொழி விதி
     const langRule = `MANDATORY LANGUAGE RULE: 
-    1. You support ALL WORLD LANGUAGES (English, Tamil, Hindi, Malayalam, Kannada, Telugu, Spanish, French, German, Japanese, Chinese, Arabic, Russian, Portuguese, Italian, Korean, etc.).
-    2. You MUST detect the language of the user's LATEST message.
-    3. You MUST reply in the EXACT SAME language the user used.
-    4. If the user asks in Spanish, reply in Spanish. If Japanese, reply in Japanese. If Tamil, reply in Tamil.
-    5. NEVER mix languages. Do NOT use Tamil letters in an English sentence.`;
+    1. You MUST respond in the EXACT SAME language as the user's LATEST message.
+    2. Look ONLY at the latest message. Ignore the language of previous messages.
+    3. If the user's latest message is in English, you MUST reply in 100% English. Do NOT use ANY Tamil words.
+    4. If the user's latest message is in Tamil, you MUST reply in 100% Tamil.
+    5. NEVER mix languages. Do not output Tamil letters in an English sentence or vice versa.`;
 
     const thinkPrompt = think ? "Think step by step. " : "";
     const systemPrompt = `You are Zyra, a highly intelligent AI. ${langRule} ${thinkPrompt}`;
@@ -31,7 +31,7 @@ module.exports = async function handler(req, res) {
 
     const contents = [];
     
-    // கடைசி மெசேஜை மட்டும் அனுப்புகிறோம்
+    // நினைவாற்றலை நீக்கிவிட்டு, கடைசி மெசேஜை மட்டும் அனுப்புகிறோம்
     const currentParts = [{ text: `${systemPrompt}\n\nUser: ${notes || 'Analyze this image.'}\n\n${formatPrompt}` }];
     if (image && mimeType) currentParts.push({ inlineData: { mimeType: mimeType, data: image } });
     contents.push({ role: 'user', parts: currentParts });
