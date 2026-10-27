@@ -10,12 +10,15 @@ function extractJSON(text) {
   }
 }
 
-// 1. DeepSeek API-ஐ அழைக்கும் ஃபங்ஷன்
-async function callDeepSeek(prompt) {
+// 1. DeepSeek API-ஐ அழைக்கும் ஃபங்ஷன் (மொழி கட்டுப்பாட்டுடன்)
+async function callDeepSeek(prompt, langRule) {
   const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey) return null;
 
   try {
+    // DeepSeek-க்கு நேரடியாக மொழி விதியை வலியுறுத்துகிறோம்
+    const strictPrompt = `${prompt}\n\n(IMPORTANT: You must reply ONLY in the language specified above. Do not use English if the user asked in Tamil.)`;
+
     const r = await fetch('https://api.deepseek.com/chat/completions', {
       method: 'POST',
       headers: {
@@ -25,8 +28,8 @@ async function callDeepSeek(prompt) {
       body: JSON.stringify({
         model: 'deepseek-flash',
         messages: [
-          { role: 'system', content: 'You are a helpful assistant. Return ONLY a valid JSON object.' },
-          { role: 'user', content: prompt }
+          { role: 'system', content: `You are a helpful assistant. ${langRule} Return ONLY a valid JSON object.` },
+          { role: 'user', content: strictPrompt }
         ],
         response_format: { type: 'json_object' },
         stream: false
@@ -80,7 +83,7 @@ module.exports = async function handler(req, res) {
     const langRule = `MANDATORY LANGUAGE RULE: 
     1. You MUST detect the language of the user's LATEST message.
     2. You MUST reply in the EXACT SAME language the user used. 
-    3. If the user asks in Tamil, reply in Tamil. If English, reply in English. If Telugu, reply in Telugu. If Hindi, reply in Hindi.
+    3. If the user asks in Tamil, reply in Tamil. If English, reply in English.
     4. NEVER mix languages.`;
 
     const thinkPrompt = think ? "Think step by step. " : "";
@@ -93,7 +96,7 @@ module.exports = async function handler(req, res) {
 
     // 1. முதலில் DeepSeek-ஐ முயற்சி செய் (படம் இல்லை என்றால் மட்டும்)
     if (!image) {
-      finalData = await callDeepSeek(prompt);
+      finalData = await callDeepSeek(prompt, langRule);
     }
 
     // 2. DeepSeek வேலை செய்யவில்லை என்றால், Gemini-ஐ முயற்சி செய்
