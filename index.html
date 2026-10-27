@@ -108,7 +108,6 @@ textarea::placeholder { color: var(--text-light); }
 </head>
 <body>
 
-<!-- Top New Page (Opens when Top + is clicked) -->
 <div class="top-page-modal" id="topPageModal">
   <div class="top-page-header">
     <button class="close-top-page" onclick="closeTopPage()">✕</button>
@@ -117,7 +116,6 @@ textarea::placeholder { color: var(--text-light); }
   <p style="color: var(--text-light);">இந்தப் பக்கத்தில் புதிய வசதிகள் விரைவில் சேர்க்கப்படும்.</p>
 </div>
 
-<!-- Bottom Sheet (Attachment) -->
 <div class="attachment-page" id="attachmentPage" onclick="closeAttachmentPage(event)">
   <div class="attachment-sheet" onclick="event.stopPropagation()">
     <h3>Attach File</h3>
@@ -137,7 +135,6 @@ textarea::placeholder { color: var(--text-light); }
   </div>
 </div>
 
-<!-- Voice Mode Overlay -->
 <div class="voice-mode" id="voiceMode">
   <div class="voice-circle">
     <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
@@ -146,10 +143,8 @@ textarea::placeholder { color: var(--text-light); }
   <button class="close-voice" onclick="stopVoice()">Cancel</button>
 </div>
 
-<!-- Sidebar Overlay -->
 <div class="overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-<!-- Sidebar -->
 <div class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <h2 style="margin:0;font-size:20px;">Chats</h2>
@@ -159,7 +154,6 @@ textarea::placeholder { color: var(--text-light); }
   <div class="sidebar-list" id="sidebarList"></div>
 </div>
 
-<!-- Top Header -->
 <div class="top-header">
   <div class="header-left">
     <button class="menu-btn" onclick="toggleSidebar()">☰</button>
@@ -438,11 +432,9 @@ function removeImage() {
 
 function esc(s) { return String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
 
-// --- PERFECT SCROLL LOGIC ---
 function scrollToBottom(force = false) {
   if (!userScrolledUp || force) {
     const chat = $('chatArea');
-    // Use requestAnimationFrame for smooth rendering
     requestAnimationFrame(() => {
       chat.scrollTop = chat.scrollHeight;
     });
@@ -451,7 +443,6 @@ function scrollToBottom(force = false) {
 
 $('chatArea').addEventListener('scroll', function() {
   const chat = this;
-  // If the user is near the bottom (within 100px), allow auto-scroll
   const isAtBottom = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 100;
   userScrolledUp = !isAtBottom;
 });
@@ -480,7 +471,7 @@ async function spark() {
   if (selectedImage) { const img = document.createElement('img'); img.src = selectedImage; userMsgDiv.appendChild(img); }
   if (notes) { const textNode = document.createElement('span'); textNode.textContent = notes; userMsgDiv.appendChild(textNode); }
   $('chatArea').appendChild(userMsgDiv);
-  scrollToBottom(true); // Force scroll to bottom when user sends
+  scrollToBottom(true); 
 
   const loaderMsg = document.createElement('div');
   loaderMsg.className = 'msg-ai';
