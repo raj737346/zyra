@@ -15,8 +15,14 @@ module.exports = async function handler(req, res) {
       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: 'application/json' } }),
     });
     
-    if (!r.ok) return res.status(500).json({ error: 'AI_ERROR' });
+    if (!r.ok) {
+      const errText = await r.text();
+      return res.status(r.status).json({ error: `API Error: ${errText}` });
+    }
+    
     const data = await r.json();
     return res.status(200).json(JSON.parse(data.candidates?.[0]?.content?.parts?.[0]?.text || '{}'));
-  } catch (e) { return res.status(500).json({ error: 'SERVER_ERROR' }); }
+  } catch (e) { 
+    return res.status(500).json({ error: e.message || 'SERVER_ERROR' }); 
+  }
 };
