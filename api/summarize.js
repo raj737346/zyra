@@ -1,43 +1,54 @@
 function extractJSON(text) {
   try {
-    // மார்க்டவுன் கோட் பிளாக்குகளை நீக்குதல்
     let clean = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    
-    // முதல் { மற்றும் கடைசி } குறியீட்டிற்கு இடையே உள்ளதை மட்டும் எடுத்தல்
     const start = clean.indexOf('{');
     const end = clean.lastIndexOf('}');
-    
     if (start !== -1 && end !== -1 && end > start) {
       clean = clean.substring(start, end + 1);
     }
-    
     return JSON.parse(clean);
   } catch (e) {
-    return { summary: text, themes: [], overdue: [], priorities: [], checklist: [], answer: text };
+    return { summary: text, answer: text };
   }
 }
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   try {
-    const { notes, mode = 'weekly', lang = 'ta', image = null, mimeType = null, think = false } = req.body || {};
+    const { notes, mode = 'weekly', lang = 'auto', image = null, mimeType = null, think = false, history = [] } = req.body || {};
     if (!notes && !image) return res.status(400).json({ error: 'INVALID_INPUT' });
 
-    const langName = { ta: 'Tamil', en: 'English', hi: 'Hindi' }[lang] || 'English';
-    
-    // Think ON செய்திருந்தால், AI-க்கு ஆழமாக யோசிக்கச் சொல்லும் ப்ராம்ப்ட்
-    const thinkPrompt = think ? "Think step by step and provide a detailed answer. " : "";
+    // மொழி விதி: 'auto' என்றால், யூசர் எழுதும் மொழியிலேயே பதில் தர வேண்டும்
+    const langRule = lang === 'auto' 
+      ? "Always respond in the SAME LANGUAGE the user used in their latest message." 
+      : `Respond in ${lang}.`;
 
-    // AI-க்கு கண்டிப்பாக JSON மட்டுமே வேண்டும் என்று கட்டளையிடுதல்
-    const prompt = `You are Zyra, an AI assistant. ${thinkPrompt}Respond in ${langName}. Based on the notes/image, return ONLY a valid JSON object. Do not include any markdown formatting like \`\`\`json. Return STRICT JSON:
-    ${mode === 'ask' ? '{"answer": "your answer here"}' : '{"summary":"3-4 sentences","themes":["theme1","theme2"],"overdue":["item1"],"priorities":["priority1","priority2"],"checklist":["task1","task2"]}'}
-    
-    Notes: ${notes || 'No text notes provided.'}`;
+    const thinkPrompt = think ? "Think step by step. " : "";
 
-    const parts = [{ text: prompt }];
+    // System Instruction (AI-ன் நடத்தை)
+    const systemPrompt = `You are Zyra, an intelligent and friendly AI assistant. ${langRule} ${thinkPrompt}Provide helpful, clear, and natural answers.`;
+    
+    // JSON Output format
+    const formatPrompt = `Based on the user's message, return ONLY a valid JSON object. Do not include markdown formatting like \`\`\`json.
+    ${mode === 'ask' ? '{"answer": "your answer here"}' : '{"summary":"3-4 sentences","themes":["..."],"overdue":["..."],"priorities":["..."],"checklist":["..."]}'}`;
+
+    // Chat History-ஐ Gemini Format-க்கு மாற்றுதல்
+    const contents = [];
+    
+    // History சேர்ப்பு (கடைசி 6 மெசேஜ்கள் மட்டும் வேகத்திற்காக)
+    history.slice(-6).forEach(msg => {
+      contents.push({
+        role: msg.role === 'user' ? 'user' : 'model',
+        parts: [{ text: msg.text }]
+      });
+    });
+
+    // தற்போதைய யூசர் மெசேஜ்
+    const currentParts = [{ text: `${systemPrompt}\n\nUser Message: ${notes || 'Image provided.'}\n\n${formatPrompt}` }];
     if (image && mimeType) {
-      parts.push({ inlineData: { mimeType: mimeType, data: image } });
+      currentParts.push({ inlineData: { mimeType: mimeType, data: image } });
     }
+    contents.push({ role: 'user', parts: currentParts });
 
     const models = ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite'];
     let data = null, lastError = null;
@@ -47,10 +58,10 @@ module.exports = async function handler(req, res) {
       const r = await fetch(url, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          contents: [{ parts: parts }], 
+          contents: contents, 
           generationConfig: { 
             responseMimeType: 'application/json',
-            temperature: 0.2,
+            temperature: 0.4,
             maxOutputTokens: 1000
           } 
         }),
