@@ -18,35 +18,28 @@ module.exports = async function handler(req, res) {
     const { notes, mode = 'ask', lang = 'auto', image = null, mimeType = null, think = false, history = [] } = req.body || {};
     if (!notes && !image) return res.status(400).json({ error: 'INVALID_INPUT' });
 
-    // மிக முக்கியமான மாற்றம்: மொழிபெயர்ப்பு கட்டளை
     const langRule = `IMPORTANT LANGUAGE RULE: 
-    The user wants you to respond in the language they request or the language of their latest message.
-    If the user asks to speak in Tamil (e.g., "Please tell me Tamil" or "Speak Tamil"), you MUST TRANSLATE your previous response or the image analysis into Tamil. 
-    DO NOT explain what the Tamil language is. DO NOT respond in English if they asked for Tamil. Just provide the exact meaning/answer in Tamil.`;
+    1. Always detect the language of the user's LATEST message and respond in that language.
+    2. If the user asks to speak in a specific language (e.g., "Please tell me Tamil"), you MUST TRANSLATE your answer or the image analysis into Tamil. Do not just explain what Tamil is.`;
+
+    const visionRule = `VISION RULE: Analyze the image carefully. If an image is provided, describe the exact details in the image accurately. Do not hallucinate or guess things that are not there.`;
 
     const thinkPrompt = think ? "Think step by step. " : "";
-    const systemPrompt = `You are Zyra, a helpful AI assistant. ${langRule} ${thinkPrompt}`;
+    const systemPrompt = `You are Zyra, a highly intelligent and accurate AI assistant. ${langRule} ${visionRule} ${thinkPrompt}`;
     
     const formatPrompt = `Return ONLY a valid JSON object. No markdown.
     ${mode === 'ask' ? '{"answer": "your answer here"}' : '{"summary":"...","themes":["..."],"overdue":["..."],"priorities":["..."],"checklist":["..."]}'}`;
 
     const contents = [];
-    // கடைசி 6 மெசேஜ்களை நினைவில் வைத்துக்கொள்ளும் (சூழலைப் புரிந்துகொள்ள)
     history.slice(-6).forEach(msg => {
       contents.push({ role: msg.role === 'user' ? 'user' : 'model', parts: [{ text: msg.text }] });
     });
 
-    const currentParts = [{ text: `${systemPrompt}\n\nUser: ${notes || 'Image'}\n\n${formatPrompt}` }];
+    const currentParts = [{ text: `${systemPrompt}\n\nUser: ${notes || 'Analyze this image.'}\n\n${formatPrompt}` }];
     if (image && mimeType) currentParts.push({ inlineData: { mimeType: mimeType, data: image } });
     contents.push({ role: 'user', parts: currentParts });
 
-    // அதிவேக மாடல்கள் (Quota பிரச்சனை வராமல் இருக்க)
-    const models = [
-      'gemini-3.5-flash-lite', 
-      'gemini-3.1-flash-lite',
-      'gemini-3.8-flash'
-    ];
-
+    const models = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-3.8-flash'];
     let finalData = null;
     let lastErrorMsg = 'All models failed or quota exceeded.';
 
@@ -59,7 +52,7 @@ module.exports = async function handler(req, res) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             contents: contents, 
-            generationConfig: { responseMimeType: 'application/json', temperature: 0.3, maxOutputTokens: 800 } 
+            generationConfig: { responseMimeType: 'application/json', temperature: 0.2, maxOutputTokens: 800 } 
           })
         });
 
