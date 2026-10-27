@@ -1,32 +1,25 @@
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   try {
-    const { notes, mode = 'weekly', lang = 'ta', image = null, mimeType = null } = req.body || {};
+    const { notes, mode = 'weekly', lang = 'ta', image = null, mimeType = null, think = false } = req.body || {};
     if (!notes && !image) return res.status(400).json({ error: 'INVALID_INPUT' });
 
     const langName = { ta: 'Tamil', en: 'English', hi: 'Hindi' }[lang] || 'English';
     
-    // ப்ராம்ப்ட் (Prompt) தயாரிப்பு
-    const prompt = `You are Zyra. Respond in ${langName}. Based on the provided notes and/or image, return STRICT JSON:
+    // 'Think' ON செய்திருந்தால், AI-க்கு ஆழமாக யோசிக்கச் சொல்லும் ப்ராம்ப்ட்
+    const thinkPrompt = think ? "Think step by step to provide the most accurate and deeply reasoned answer. " : "";
+
+    const prompt = `You are Zyra. ${thinkPrompt}Respond in ${langName}. Based on the provided notes and/or image, return STRICT JSON:
     ${mode === 'ask' ? '{"answer": "your answer"}' : '{"summary":"3-4 sentences","themes":["..."],"overdue":["..."],"priorities":["..."],"checklist":["..."]}'}
     Notes: ${notes || 'No text notes provided.'}`;
 
-    // Gemini-க்கு அனுப்ப வேண்டிய பாகங்கள் (Parts)
     const parts = [{ text: prompt }];
-    
-    // படம் இருந்தால், அதைச் சேர்த்துக்கொள்ளவும்
     if (image && mimeType) {
-      parts.push({
-        inlineData: {
-          mimeType: mimeType,
-          data: image
-        }
-      });
+      parts.push({ inlineData: { mimeType: mimeType, data: image } });
     }
 
     const models = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-2.5-flash'];
-    let data = null;
-    let lastError = null;
+    let data = null, lastError = null;
 
     for (const model of models) {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
@@ -38,18 +31,11 @@ module.exports = async function handler(req, res) {
         }),
       });
 
-      if (r.ok) {
-        data = await r.json();
-        break;
-      } else {
-        lastError = await r.text();
-      }
+      if (r.ok) { data = await r.json(); break; } 
+      else { lastError = await r.text(); }
     }
 
-    if (!data) {
-      return res.status(500).json({ error: `API Error: ${lastError}` });
-    }
-    
+    if (!data) return res.status(500).json({ error: `API Error: ${lastError}` });
     return res.status(200).json(JSON.parse(data.candidates?.[0]?.content?.parts?.[0]?.text || '{}'));
   } catch (e) { 
     return res.status(500).json({ error: e.message || 'SERVER_ERROR' }); 
