@@ -16,26 +16,26 @@ module.exports = async function handler(req, res) {
     const { notes, projectName = 'General', image = null, mimeType = null, think = false, history = [] } = req.body || {};
     if (!notes && !image) return res.status(400).json({ error: 'INVALID_INPUT' });
 
+    // மிக முக்கியமான மொழி விதி
     const langRule = `MANDATORY LANGUAGE RULE: 
-    1. You must respond in the EXACT SAME language the user used in their latest message.
-    2. If the user uses Tamil, reply ONLY in pure, correct Tamil. 
-    3. If the user uses English, reply ONLY in pure English.
-    4. NEVER mix languages or output gibberish.`;
+    1. You MUST respond in the EXACT SAME language the user used in their latest message.
+    2. If the user's latest message is in Tamil, reply ONLY in Tamil. 
+    3. If the user's latest message is in English, reply ONLY in English.
+    4. DO NOT mix languages. If the user asks to speak in a specific language, switch to it immediately.`;
 
     const memoryRule = `CRITICAL MEMORY RULE: 
     1. You are in a continuous conversation. Review the ENTIRE history provided below.
-    2. The user might mention something earlier and refer to it now. You MUST remember what they said previously.
-    3. If the user gives multiple instructions or asks multiple questions, address ALL of them.
-    4. Do NOT forget previous context.`;
+    2. Remember what the user said previously.
+    3. Do NOT forget previous context.`;
 
     const thinkPrompt = think ? "Think step by step. " : "";
-    const systemPrompt = `You are Zyra, a highly intelligent AI with excellent long-term memory. ${langRule} ${memoryRule} ${thinkPrompt}`;
+    const systemPrompt = `You are Zyra, a highly intelligent AI. ${langRule} ${memoryRule} ${thinkPrompt}`;
     
     const formatPrompt = `Return ONLY a valid JSON object: {"answer": "your full answer here"}`;
 
     const contents = [];
     
-    // UNLIMITED MEMORY (முழு History-யும் அனுப்பப்படுகிறது)
+    // UNLIMITED MEMORY
     history.forEach(msg => {
       contents.push({ role: msg.role === 'user' ? 'user' : 'model', parts: [{ text: msg.text }] });
     });
