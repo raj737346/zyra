@@ -20,11 +20,16 @@ module.exports = async function handler(req, res) {
     1. You must respond in the EXACT SAME language the user used in their latest message.
     2. If the user uses Tamil, reply ONLY in pure, correct Tamil. 
     3. If the user uses English, reply ONLY in pure English.
-    4. NEVER mix languages or output gibberish/partial letters. 
-    5. Provide a complete, fluent, and natural response.`;
+    4. NEVER mix languages or output gibberish.`;
+
+    const memoryRule = `CRITICAL MEMORY RULE: 
+    1. You are in a continuous conversation. Review the ENTIRE history provided below.
+    2. The user might mention something earlier and refer to it now. You MUST remember what they said previously.
+    3. If the user gives multiple instructions or asks multiple questions, address ALL of them.
+    4. Do NOT forget previous context.`;
 
     const thinkPrompt = think ? "Think step by step. " : "";
-    const systemPrompt = `You are Zyra, a highly intelligent AI. ${langRule} ${thinkPrompt}`;
+    const systemPrompt = `You are Zyra, a highly intelligent AI with excellent long-term memory. ${langRule} ${memoryRule} ${thinkPrompt}`;
     
     const formatPrompt = `Return ONLY a valid JSON object: {"answer": "your full answer here"}`;
 
@@ -59,7 +64,6 @@ module.exports = async function handler(req, res) {
       } catch (err) { lastErrorMsg = err.message; }
     }
 
-    // மிக முக்கியம்: உண்மையான Error-ஐ இங்கே காட்டுகிறோம்
     if (!finalData) return res.status(500).json({ error: `API Error: ${lastErrorMsg}` });
     
     const rawText = finalData.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
