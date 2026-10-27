@@ -12,6 +12,11 @@
 html, body { margin: 0; padding: 0; height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; font-size: 16px; overflow: hidden; }
 body { display: flex; flex-direction: column; height: 100dvh; }
 
+/* Login Screen */
+#loginScreen { position: fixed; inset: 0; background: #FFF; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+#loginScreen h1 { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 44px; margin: 0 0 10px; }
+#loginScreen p { color: #666; margin-bottom: 30px; }
+
 /* Top Header */
 .top-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; padding-top: calc(10px + env(safe-area-inset-top)); background: #FFF; border-bottom: 1px solid #E5E5E5; z-index: 5; flex-shrink: 0; }
 .header-left { display: flex; align-items: center; gap: 8px; }
@@ -20,6 +25,7 @@ body { display: flex; flex-direction: column; height: 100dvh; }
 .header-title { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 22px; margin: 0; }
 .top-plus-btn { background: var(--surface); border: none; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; color: var(--text); }
 .new-chat-btn { background: var(--text); color: #FFF; border: none; border-radius: 8px; padding: 6px 12px; font-size: 13px; cursor: pointer; font-weight: 500; }
+.logout-btn { background: none; border: none; color: #FF6B2C; font-size: 14px; cursor: pointer; margin-left: 8px; }
 
 /* Sidebar Overlay */
 .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 15; display: none; opacity: 0; transition: opacity 0.3s; }
@@ -53,6 +59,24 @@ html[lang="ta"] .center-view h1 { font-family: 'Noto Serif Tamil', serif; font-s
 .msg-ai h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin: 20px 0 6px; }
 .msg-ai h3:first-child { margin-top: 0; }
 .msg-ai p { margin: 0 0 12px; }
+
+/* Action Sheet (Preview Options) */
+.action-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 150; display: none; align-items: flex-end; justify-content: center; }
+.action-sheet.open { display: flex; }
+.action-sheet-content { width: 100%; max-width: 600px; background: #FFF; border-radius: 24px 24px 0 0; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); animation: slideUp 0.3s ease-out; }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.action-sheet-content h3 { margin: 0 0 20px 0; font-size: 18px; text-align: center; font-family: 'Instrument Serif', serif; font-style: italic; }
+.action-option { display: flex; align-items: center; gap: 16px; padding: 16px; border-radius: 16px; background: var(--surface); margin-bottom: 12px; cursor: pointer; font-weight: 500; font-size: 16px; }
+.action-option svg { width: 28px; height: 28px; stroke: var(--text); fill: none; stroke-width: 2; }
+.action-cancel { width: 100%; padding: 16px; border: none; background: transparent; font-size: 16px; font-weight: 600; color: var(--text-light); cursor: pointer; margin-top: 10px; }
+
+/* Preview Modal */
+.preview-modal { position: fixed; inset: 0; background: #FFF; z-index: 200; display: none; flex-direction: column; }
+.preview-modal.open { display: flex; }
+.preview-header { padding: 10px 16px; padding-top: calc(10px + env(safe-area-inset-top)); background: #F9F9F9; border-bottom: 1px solid #E5E5E5; display: flex; justify-content: space-between; align-items: center; }
+.preview-title { font-weight: 600; font-size: 16px; }
+.preview-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text); }
+.preview-iframe { flex: 1; width: 100%; border: none; }
 
 /* Bottom Bar */
 .bottom-bar { padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: #FFFFFF; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #E5E5E5; z-index: 5; flex-shrink: 0; }
@@ -91,7 +115,6 @@ textarea::placeholder { color: var(--text-light); }
 .attachment-page { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 60; display: none; align-items: flex-end; justify-content: center; }
 .attachment-page.open { display: flex; }
 .attachment-sheet { width: 100%; max-width: 600px; background: #FFF; border-radius: 24px 24px 0 0; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); animation: slideUp 0.3s ease-out; }
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 .attachment-sheet h3 { margin: 0 0 20px 0; font-size: 18px; text-align: center; font-family: 'Instrument Serif', serif; font-style: italic; }
 .attachment-option { display: flex; align-items: center; gap: 16px; padding: 16px; border-radius: 16px; background: var(--surface); margin-bottom: 12px; cursor: pointer; font-weight: 500; font-size: 16px; }
 .attachment-option svg { width: 28px; height: 28px; stroke: var(--text); fill: none; stroke-width: 2; }
@@ -106,8 +129,68 @@ textarea::placeholder { color: var(--text-light); }
 .voice-text { font-size: 18px; color: #DDD; margin-bottom: 20px; text-align: center; }
 .close-voice { position: absolute; bottom: 50px; background: rgba(255,255,255,0.2); border: none; color: #FFF; padding: 12px 24px; border-radius: 30px; font-size: 16px; cursor: pointer; }
 </style>
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+  // ⚠️ இங்கே உங்கள் Firebase Config-ஐ மாற்றவும்
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  window.firebaseAuth = auth;
+  window.googleProvider = provider;
+  window.signInWithPopup = signInWithPopup;
+  window.signOut = signOut;
+  window.onAuthStateChanged = onAuthStateChanged;
+</script>
 </head>
 <body>
+
+<!-- Login Screen -->
+<div id="loginScreen">
+  <h1>Zyra</h1>
+  <p>Sign in to continue</p>
+  <button onclick="loginWithGoogle()" style="display:flex; align-items:center; gap:10px; background:#FFF; border:1px solid #ddd; padding:12px 24px; border-radius:10px; font-size:16px; font-weight:500; cursor:pointer; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+    <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+    Continue with Google
+  </button>
+</div>
+
+<!-- Single Action Sheet (Preview Options) -->
+<div class="action-sheet" id="actionSheet" onclick="closeActionSheet(event)">
+  <div class="action-sheet-content" onclick="event.stopPropagation()">
+    <h3>HTML Code Ready</h3>
+    <div class="action-option" onclick="doAction('live')">
+      <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Live Preview (App-ல் பார்)
+    </div>
+    <div class="action-option" onclick="doAction('browser')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      Open in Browser (Chrome-ல் திற)
+    </div>
+    <button class="action-cancel" onclick="closeActionSheet(event)">Cancel</button>
+  </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="preview-modal" id="previewModal">
+  <div class="preview-header">
+    <span class="preview-title">Live Preview</span>
+    <button class="preview-close" onclick="closePreview()">✕</button>
+  </div>
+  <iframe class="preview-iframe" id="previewIframe"></iframe>
+</div>
 
 <!-- Top New Page -->
 <div class="top-page-modal" id="topPageModal">
@@ -169,6 +252,7 @@ textarea::placeholder { color: var(--text-light); }
   <div class="header-right">
     <button class="top-plus-btn" onclick="openTopPage()">+</button>
     <button class="new-chat-btn" onclick="startNewChat()">+ New</button>
+    <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
 </div>
 
@@ -189,6 +273,9 @@ textarea::placeholder { color: var(--text-light); }
     <div class="top-tools">
       <button class="tool-btn" id="thinkBtn" onclick="toggleTool('think')">
         <svg viewBox="0 0 24 24"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg> Think
+      </button>
+      <button class="tool-btn" id="searchBtn" onclick="toggleTool('search')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Search
       </button>
     </div>
 
@@ -231,11 +318,13 @@ textarea::placeholder { color: var(--text-light); }
 const $ = id => document.getElementById(id);
 let selectedImage = null, selectedMime = null;
 let isThinking = false;
+let isSearching = false;
 let userScrolledUp = false;
 let allChats = []; 
 let activeChatId = null;
 let recognition = null;
 let isMuted = true;
+let currentHTMLCode = ""; // To store the HTML for the action sheet
 
 // Visual Viewport API for perfect mobile keyboard handling
 if (window.visualViewport) {
@@ -246,6 +335,52 @@ if (window.visualViewport) {
     }
   });
 }
+
+// 60 நாள் Auto-Delete ஃபங்ஷன்
+function cleanOldChats() {
+  try {
+    const savedChats = localStorage.getItem('zyra_chats');
+    if (!savedChats) return;
+    let allChats = JSON.parse(savedChats);
+    const sixtyDaysAgo = Date.now() - (60 * 24 * 60 * 60 * 1000);
+    const filteredChats = allChats.filter(chat => chat.timestamp > sixtyDaysAgo);
+    if (filteredChats.length !== allChats.length) {
+      localStorage.setItem('zyra_chats', JSON.stringify(filteredChats));
+    }
+  } catch (e) {}
+}
+
+// Login Functions
+window.loginWithGoogle = async function() {
+  try {
+    await signInWithPopup(firebaseAuth, googleProvider);
+  } catch (e) {
+    alert("Login failed: " + e.message);
+  }
+};
+
+window.logout = async function() {
+  try {
+    await signOut(firebaseAuth);
+    localStorage.removeItem('zyra_chats'); // Optional: Clear chats on logout
+    location.reload();
+  } catch (e) {
+    alert("Logout failed: " + e.message);
+  }
+};
+
+// App Init
+window.onload = function() {
+  onAuthStateChanged(firebaseAuth, (user) => {
+    if (user) {
+      $('loginScreen').style.display = 'none';
+      cleanOldChats(); // Auto-delete old chats
+      initApp();
+    } else {
+      $('loginScreen').style.display = 'flex';
+    }
+  });
+};
 
 function openTopPage() { $('topPageModal').classList.add('open'); }
 function closeTopPage() { $('topPageModal').classList.remove('open'); }
@@ -370,10 +505,43 @@ function deleteChat(e, id) {
   renderCurrentChat();
 }
 
+// --- Single Button Action Sheet Logic ---
+function openActionSheet(htmlCode) {
+  currentHTMLCode = htmlCode;
+  $('actionSheet').classList.add('open');
+}
+function closeActionSheet(e) {
+  if (e && e.target !== e.currentTarget && e.type === 'click' && e.target.className !== 'action-cancel') return;
+  $('actionSheet').classList.remove('open');
+}
+function doAction(type) {
+  let cleanCode = currentHTMLCode;
+  const match = cleanCode.match(/```html([\s\S]*?)```/);
+  if (match) cleanCode = match[1].trim();
+  else {
+     const matchGeneric = cleanCode.match(/```([\s\S]*?)```/);
+     if(matchGeneric) cleanCode = matchGeneric[1].trim();
+  }
+
+  if (type === 'live') {
+    $('previewIframe').srcdoc = cleanCode;
+    $('previewModal').classList.add('open');
+  } else if (type === 'browser') {
+    window.open('data:text/html;charset=utf-8,' + encodeURIComponent(cleanCode), '_blank');
+  }
+  closeActionSheet();
+}
+
+function closePreview() {
+  $('previewModal').classList.remove('open');
+  $('previewIframe').srcdoc = '';
+}
+// -----------------------------------------
+
 // தலைப்பைத் தானாக மாற்றும் ஃபங்ஷன்
 function getAnswerHeader(text) {
-  if (/[\u0B80-\u0BFF]/.test(text)) return 'பதில்'; // தமிழ் எழுத்துக்கள் இருந்தால்
-  return 'ANSWER'; // இல்லையென்றால் ஆங்கிலம்
+  if (/[\u0B80-\u0BFF]/.test(text)) return 'பதில்';
+  return 'ANSWER';
 }
 
 function renderCurrentChat() {
@@ -399,7 +567,21 @@ function renderCurrentChat() {
     } else {
       div.className = 'msg-ai';
       const headerTitle = getAnswerHeader(msg.text);
-      div.innerHTML = `<h3>${headerTitle}</h3><p>${esc(msg.text)}</p>`;
+      
+      let previewBtn = '';
+      if (msg.text.includes('<html') || msg.text.includes('<body') || msg.text.includes('```html')) {
+        const safeText = encodeURIComponent(msg.text);
+        previewBtn = `
+          <div style="margin-top:12px;">
+             <button onclick="openActionSheet(decodeURIComponent('${safeText}'))" style="background:var(--text); color:#FFF; border:none; padding:8px 14px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;">
+               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+               Preview Code
+             </button>
+          </div>
+        `;
+      }
+
+      div.innerHTML = `<h3>${headerTitle}</h3><p>${esc(msg.text)}</p>${previewBtn}`;
     }
     chatArea.appendChild(div);
   });
@@ -408,6 +590,7 @@ function renderCurrentChat() {
 
 function toggleTool(tool) {
   if (tool === 'think') { isThinking = !isThinking; $('thinkBtn').classList.toggle('active', isThinking); }
+  else if (tool === 'search') { isSearching = !isSearching; $('searchBtn').classList.toggle('active', isSearching); }
 }
 
 function startVoiceMode() {
@@ -523,7 +706,7 @@ async function spark() {
     }
 
     const historyToSend = currentChat.messages.slice(0, -1).map(m => ({ role: m.role, text: m.text }));
-    const payload = { notes: finalNotes, projectName: currentChat.title, mode: 'ask', lang: 'auto', think: isThinking, history: historyToSend };
+    const payload = { notes: finalNotes, projectName: currentChat.title, mode: 'ask', lang: 'auto', think: isThinking, history: historyToSend, isSearching: isSearching };
     if (selectedImage) { payload.image = selectedImage.split(',')[1]; payload.mimeType = selectedMime; }
 
     const controller = new AbortController();
@@ -544,12 +727,27 @@ async function spark() {
     speakText(aiText);
 
     $('chatArea').removeChild(loaderMsg);
+    
     const aiMsg = document.createElement('div');
     aiMsg.className = 'msg-ai';
     
     const headerTitle = getAnswerHeader(aiText);
     aiMsg.innerHTML = `<h3>${headerTitle}</h3><p>${esc(aiText)}</p>`;
     
+    if (aiText.includes('<html') || aiText.includes('<body') || aiText.includes('```html')) {
+      const safeText = encodeURIComponent(aiText);
+      const buttonDiv = document.createElement('div');
+      buttonDiv.style = "margin-top:12px;";
+      
+      const previewBtn = document.createElement('button');
+      previewBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px; vertical-align:middle;"><polygon points="5 3 19 12 5 21 5 3"/></svg> Preview Code`;
+      previewBtn.style = "background:var(--text); color:#FFF; border:none; padding:8px 14px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center;";
+      previewBtn.onclick = () => openActionSheet(decodeURIComponent(safeText));
+      
+      buttonDiv.appendChild(previewBtn);
+      aiMsg.appendChild(buttonDiv);
+    }
+
     $('chatArea').appendChild(aiMsg);
     scrollToBottom(true);
 
@@ -567,8 +765,6 @@ async function spark() {
     removeImage(); 
   }
 }
-
-window.onload = initApp;
 </script>
 </body>
 </html>
