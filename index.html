@@ -24,8 +24,6 @@ html[lang="ta"] .center-view h1 { font-family: 'Noto Serif Tamil', serif; font-s
 .msg-ai p { margin: 0 0 12px; }
 .msg-ai ul, .msg-ai ol { margin: 0 0 12px; padding-left: 20px; }
 .msg-ai li { margin-bottom: 6px; }
-
-/* Bottom Bar */
 .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 10px 16px calc(16px + env(safe-area-inset-bottom)); background: #FFFFFF; display: flex; flex-direction: column; gap: 10px; }
 .input-container { display: flex; flex-direction: column; background: var(--surface); border-radius: 24px; padding: 12px 16px; gap: 8px; border: 1px solid #E5E5E5; }
 .top-tools { display: flex; gap: 8px; align-items: center; }
@@ -40,7 +38,6 @@ textarea::placeholder { color: var(--text-light); }
 .icon-btn svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .send-btn { background: var(--text); color: #FFF; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-left: auto; }
 .send-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-
 .loader { display: flex; gap: 4px; align-items: center; color: var(--text-light); font-size: 14px; padding: 10px 0; }
 .dot { width: 5px; height: 5px; background: var(--text-light); border-radius: 50%; animation: pulse 1s infinite alternate; }
 .dot:nth-child(2) { animation-delay: 0.2s; }
@@ -59,7 +56,6 @@ textarea::placeholder { color: var(--text-light); }
 
 <div class="bottom-bar">
   <div class="input-container">
-    <!-- மேலே உள்ள பட்டன்கள் (Think & Search) -->
     <div class="top-tools">
       <button class="tool-btn" id="thinkBtn" onclick="toggleTool('think')">
         <svg viewBox="0 0 24 24"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
@@ -71,12 +67,10 @@ textarea::placeholder { color: var(--text-light); }
       </button>
     </div>
 
-    <!-- டெக்ஸ்ட் பாக்ஸ் -->
     <div class="textarea-row">
       <textarea id="notes" rows="1" placeholder="Message Zyra..." oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
     </div>
 
-    <!-- கீழே உள்ள பட்டன்கள் (+, Mic, Send) -->
     <div class="action-row">
       <button class="icon-btn" onclick="document.getElementById('fileInput').click()">
         <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -100,7 +94,7 @@ let lang = 'auto';
 let mode = 'ask';  
 let selectedImage = null, selectedMime = null;
 let isThinking = false, isSearching = false;
-let chatHistory = []; // நினைவாற்றல் (Memory)
+let chatHistory = [];
 
 function toggleTool(tool) {
   if (tool === 'think') {
@@ -119,7 +113,6 @@ function startVoice() {
   recognition.lang = 'ta-IN';
   recognition.interimResults = false;
   $('micBtn').style.color = 'red';
-  
   recognition.onresult = function(event) {
     $('notes').value += event.results[0][0].transcript + " ";
     $('micBtn').style.color = 'var(--text)';
@@ -153,7 +146,6 @@ async function spark() {
   const sendBtn = $('sendBtn');
   sendBtn.disabled = true;
   
-  // யூசர் மெசேஜைச் சேமி
   chatHistory.push({ role: "user", text: notes });
 
   const userMsg = document.createElement('div');
@@ -181,9 +173,8 @@ async function spark() {
     const payload = { notes, mode, lang, think: isThinking, history: chatHistory.slice(0, -1) };
     if (selectedImage) { payload.image = selectedImage; payload.mimeType = selectedMime; }
 
-    // 15 வினாடி Timeout (மெதுவாக இருந்தால் நிறுத்திக்கொள்ள)
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s limit (Retries காரணமாக அதிகரிக்கப்பட்டது)
 
     const res = await fetch('/api/summarize', {
       method: 'POST', 
@@ -192,7 +183,7 @@ async function spark() {
       signal: controller.signal
     });
     
-    clearTimeout(timeoutId); // பதில் வந்ததும் Timeout-ஐ நீக்கு
+    clearTimeout(timeoutId);
 
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'ERROR');
