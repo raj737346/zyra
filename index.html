@@ -59,6 +59,7 @@ textarea::placeholder { color: var(--text-light); }
 
 <div class="bottom-bar">
   <div class="input-container">
+    <!-- மேலே உள்ள பட்டன்கள் (Think & Search) -->
     <div class="top-tools">
       <button class="tool-btn" id="thinkBtn" onclick="toggleTool('think')">
         <svg viewBox="0 0 24 24"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
@@ -70,10 +71,12 @@ textarea::placeholder { color: var(--text-light); }
       </button>
     </div>
 
+    <!-- டெக்ஸ்ட் பாக்ஸ் -->
     <div class="textarea-row">
       <textarea id="notes" rows="1" placeholder="Message Zyra..." oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
     </div>
 
+    <!-- கீழே உள்ள பட்டன்கள் (+, Mic, Send) -->
     <div class="action-row">
       <button class="icon-btn" onclick="document.getElementById('fileInput').click()">
         <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -93,11 +96,11 @@ textarea::placeholder { color: var(--text-light); }
 
 <script>
 const $ = id => document.getElementById(id);
-let lang = 'auto'; // Default-ஆக Auto-வை வைத்துள்ளோம்
-let mode = 'ask';  // Chat-க்கு 'ask' mode தான் சரி
+let lang = 'auto'; 
+let mode = 'ask';  
 let selectedImage = null, selectedMime = null;
 let isThinking = false, isSearching = false;
-let chatHistory = []; // முந்தைய மெசேஜ்களைச் சேமிக்க
+let chatHistory = []; // நினைவாற்றல் (Memory)
 
 function toggleTool(tool) {
   if (tool === 'think') {
@@ -111,11 +114,12 @@ function toggleTool(tool) {
 }
 
 function startVoice() {
-  if (!('webkitSpeechRecognition' in window)) { alert("Voice not supported."); return; }
+  if (!('webkitSpeechRecognition' in window)) { alert("உங்கள் போனில் குரல் வசதி ஆதரிக்கப்படவில்லை."); return; }
   const recognition = new webkitSpeechRecognition();
   recognition.lang = 'ta-IN';
   recognition.interimResults = false;
   $('micBtn').style.color = 'red';
+  
   recognition.onresult = function(event) {
     $('notes').value += event.results[0][0].transcript + " ";
     $('micBtn').style.color = 'var(--text)';
@@ -150,8 +154,7 @@ async function spark() {
   sendBtn.disabled = true;
   
   // யூசர் மெசேஜைச் சேமி
-  const userMsgObj = { role: "user", text: notes };
-  chatHistory.push(userMsgObj);
+  chatHistory.push({ role: "user", text: notes });
 
   const userMsg = document.createElement('div');
   userMsg.className = 'msg-user';
@@ -178,14 +181,22 @@ async function spark() {
     const payload = { notes, mode, lang, think: isThinking, history: chatHistory.slice(0, -1) };
     if (selectedImage) { payload.image = selectedImage; payload.mimeType = selectedMime; }
 
+    // 15 வினாடி Timeout (மெதுவாக இருந்தால் நிறுத்திக்கொள்ள)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
     const res = await fetch('/api/summarize', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      method: 'POST', 
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: controller.signal
     });
+    
+    clearTimeout(timeoutId); // பதில் வந்ததும் Timeout-ஐ நீக்கு
+
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'ERROR');
     
-    // AI மெசேஜைச் சேமி
     const aiText = data.answer || data.summary || "பதில் கிடைக்கவில்லை.";
     chatHistory.push({ role: "model", text: aiText });
 
@@ -199,7 +210,13 @@ async function spark() {
     chat.removeChild(loaderMsg);
     const errMsg = document.createElement('div');
     errMsg.className = 'msg-ai';
-    errMsg.innerHTML = `<p style="color:#FF6B2C; font-weight:500; padding:12px; background:#FFF0E5; border-radius:12px;">${e.message}</p>`;
+    
+    let errText = e.message;
+    if (e.name === 'AbortError') {
+      errText = "பதில் வர அதிக நேரம் எடுக்கிறது. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.";
+    }
+    
+    errMsg.innerHTML = `<p style="color:#FF6B2C; font-weight:500; padding:12px; background:#FFF0E5; border-radius:12px;">${errText}</p>`;
     chat.appendChild(errMsg);
   } finally {
     sendBtn.disabled = false;
