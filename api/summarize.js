@@ -1,15 +1,29 @@
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   try {
-    const { notes, mode = 'weekly', lang = 'ta' } = req.body || {};
-    if (!notes) return res.status(400).json({ error: 'INVALID_INPUT' });
+    const { notes, mode = 'weekly', lang = 'ta', image = null, mimeType = null } = req.body || {};
+    if (!notes && !image) return res.status(400).json({ error: 'INVALID_INPUT' });
 
     const langName = { ta: 'Tamil', en: 'English', hi: 'Hindi' }[lang] || 'English';
-    const prompt = `You are Zyra. Respond in ${langName}. Based on notes, return STRICT JSON:
+    
+    // ப்ராம்ப்ட் (Prompt) தயாரிப்பு
+    const prompt = `You are Zyra. Respond in ${langName}. Based on the provided notes and/or image, return STRICT JSON:
     ${mode === 'ask' ? '{"answer": "your answer"}' : '{"summary":"3-4 sentences","themes":["..."],"overdue":["..."],"priorities":["..."],"checklist":["..."]}'}
-    Notes: ${notes}`;
+    Notes: ${notes || 'No text notes provided.'}`;
 
-    // சரியான மாடல் பெயர்கள்
+    // Gemini-க்கு அனுப்ப வேண்டிய பாகங்கள் (Parts)
+    const parts = [{ text: prompt }];
+    
+    // படம் இருந்தால், அதைச் சேர்த்துக்கொள்ளவும்
+    if (image && mimeType) {
+      parts.push({
+        inlineData: {
+          mimeType: mimeType,
+          data: image
+        }
+      });
+    }
+
     const models = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-2.5-flash'];
     let data = null;
     let lastError = null;
@@ -18,12 +32,15 @@ module.exports = async function handler(req, res) {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
       const r = await fetch(url, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: 'application/json' } }),
+        body: JSON.stringify({ 
+          contents: [{ parts: parts }], 
+          generationConfig: { responseMimeType: 'application/json' } 
+        }),
       });
 
       if (r.ok) {
         data = await r.json();
-        break; // வேலை செய்தால் லூப்பை விட்டு வெளியேறு
+        break;
       } else {
         lastError = await r.text();
       }
