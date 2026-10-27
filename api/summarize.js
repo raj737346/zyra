@@ -18,9 +18,7 @@ module.exports = async function handler(req, res) {
     const { notes, mode = 'ask', lang = 'auto', image = null, mimeType = null, think = false, history = [] } = req.body || {};
     if (!notes && !image) return res.status(400).json({ error: 'INVALID_INPUT' });
 
-    // மொழி விதி: யூசர் கடைசியாக எந்த மொழியில் பேசினாரோ, அதற்கு ஏற்றவாறு மாற வேண்டும்
     const langRule = "Detect the language of the user's LATEST message and respond in THAT language. If the user explicitly asks you to speak in a specific language (e.g., 'speak Tamil'), strictly obey that instruction and switch languages immediately.";
-
     const thinkPrompt = think ? "Think step by step. " : "";
     const systemPrompt = `You are Zyra, an AI assistant. ${langRule} ${thinkPrompt}Provide helpful, clear answers.`;
     
@@ -28,7 +26,6 @@ module.exports = async function handler(req, res) {
     ${mode === 'ask' ? '{"answer": "your answer here"}' : '{"summary":"...","themes":["..."],"overdue":["..."],"priorities":["..."],"checklist":["..."]}'}`;
 
     const contents = [];
-    // கடைசி 4 மெசேஜ்களை மட்டும் நினைவில் வைத்துக்கொள்ளும் (வேகத்திற்காக)
     history.slice(-4).forEach(msg => {
       contents.push({ role: msg.role === 'user' ? 'user' : 'model', parts: [{ text: msg.text }] });
     });
@@ -37,25 +34,47 @@ module.exports = async function handler(req, res) {
     if (image && mimeType) currentParts.push({ inlineData: { mimeType: mimeType, data: image } });
     contents.push({ role: 'user', parts: currentParts });
 
-    // Gemini 3.8 Flash மாடலை நேரடியாகப் பயன்படுத்துதல் (இது தான் தற்போது மிகவும் நிலையானது)
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
-    
-    const r = await fetch(url, {
-      method: 'POST', 
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        contents: contents, 
-        generationConfig: { responseMimeType: 'application/json', temperature: 0.4, maxOutputTokens: 800 } 
-      })
+    const requestBody = JSON.stringify({ 
+      contents: contents, 
+      generationConfig: { responseMimeType: 'application/json', temperature: 0.4, maxOutputTokens: 800 } 
     });
 
-    if (!r.ok) {
-      const errText = await r.text();
-      return res.status(r.status).json({ error: `API Error: ${errText}` });
+    // தினசரி 500 இலவச கோரிக்கைகள் கொண்ட மாடல்கள் (வரம்பு முடிந்தால் அடுத்ததற்கு மாறும்)
+    const models = [
+      'gemini-3.5-flash-lite', 
+      'gemini-3.1-flash-lite',
+      'gemini-2.5-flash-lite'
+    ];
+
+    let finalData = null;
+    let lastErrorMsg = 'All models failed or quota exceeded.';
+
+    for (const model of models) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+      
+      try {
+        const r = await fetch(url, {
+          method: 'POST', 
+          headers: { 'Content-Type': 'application/json' },
+          body: requestBody
+        });
+
+        if (r && r.ok) {
+          finalData = await r.json();
+          break;
+        } else if (r) {
+          lastErrorMsg = await r.text();
+        }
+      } catch (err) {
+        lastErrorMsg = err.message;
+      }
+    }
+
+    if (!finalData) {
+      return res.status(503).json({ error: `இலவச வரம்பு முடிந்துவிட்டது. தயவுசெய்து நாளை மீண்டும் முயற்சிக்கவும்.` });
     }
     
-    const data = await r.json();
-    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+    const rawText = finalData.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
     return res.status(200).json(extractJSON(rawText));
 
   } catch (e) { 
