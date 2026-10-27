@@ -7,14 +7,14 @@
 <title>Zyra</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Instrument+Serif:ital@1&family=Noto+Serif+Tamil:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root { --bg: #FFFFFF; --text: #000000; --text-light: #888888; --surface: #F4F4F4; --accent: #FF6B2C; }
+:root { --bg: #FFFFFF; --text: #000000; --text-light: #666666; --surface: #F4F4F4; --accent: #FF6B2C; --blue: #E8F0FE; --blue-text: #1A73E8; }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; padding: 0; height: 100vh; height: 100dvh; background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; font-size: 16px; overflow: hidden; }
 .center-view { height: 100%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; transition: opacity 0.3s; }
 .center-view h1 { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 44px; font-weight: 400; margin: 0 0 8px 0; letter-spacing: -0.02em; }
 .center-view p { color: var(--text-light); font-size: 15px; margin: 0; }
 html[lang="ta"] .center-view h1 { font-family: 'Noto Serif Tamil', serif; font-size: 38px; }
-.chat-area { display: none; height: 100%; width: 100%; overflow-y: auto; padding: calc(20px + env(safe-area-inset-top)) 16px 100px 16px; flex-direction: column; }
+.chat-area { display: none; height: 100%; width: 100%; overflow-y: auto; padding: calc(20px + env(safe-area-inset-top)) 16px 120px 16px; flex-direction: column; }
 .chat-area.active { display: flex; }
 .msg-user { align-self: flex-end; background: var(--surface); padding: 12px 18px; border-radius: 20px; max-width: 85%; margin-bottom: 24px; white-space: pre-wrap; font-size: 16px; display: flex; flex-direction: column; gap: 8px; }
 .msg-user img { max-width: 100%; border-radius: 12px; max-height: 200px; object-fit: cover; }
@@ -24,18 +24,23 @@ html[lang="ta"] .center-view h1 { font-family: 'Noto Serif Tamil', serif; font-s
 .msg-ai p { margin: 0 0 12px; }
 .msg-ai ul, .msg-ai ol { margin: 0 0 12px; padding-left: 20px; }
 .msg-ai li { margin-bottom: 6px; }
+
+/* Bottom Bar - New Design */
 .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 10px 16px calc(16px + env(safe-area-inset-bottom)); background: #FFFFFF; display: flex; flex-direction: column; gap: 10px; }
-.modes { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
-.modes::-webkit-scrollbar { display: none; }
-.mode-btn { border: none; background: transparent; padding: 6px 12px; border-radius: 16px; font-size: 13px; color: var(--text-light); cursor: pointer; white-space: nowrap; }
-.mode-btn.active { background: var(--surface); color: var(--text); font-weight: 500; }
-.input-pill { display: flex; align-items: flex-end; gap: 6px; background: var(--surface); border-radius: 26px; padding: 8px 8px 8px 12px; }
-.attach-btn { background: transparent; border: none; font-size: 20px; cursor: pointer; padding: 6px; color: var(--text-light); display: flex; align-items: center; justify-content: center; }
-textarea { flex: 1; border: none; background: transparent; padding: 10px 0; font-size: 16px; resize: none; max-height: 120px; outline: none; font-family: inherit; line-height: 1.4; color: var(--text); }
+.input-container { display: flex; flex-direction: column; background: var(--surface); border-radius: 24px; padding: 12px 16px; gap: 8px; border: 1px solid #E5E5E5; }
+.top-tools { display: flex; gap: 8px; align-items: center; }
+.tool-btn { display: flex; align-items: center; gap: 6px; background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 20px; padding: 6px 12px; font-size: 13px; color: var(--text-light); cursor: pointer; font-weight: 500; transition: all 0.2s; }
+.tool-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tool-btn.active { background: var(--blue); color: var(--blue-text); border-color: var(--blue); }
+.textarea-row { display: flex; align-items: flex-end; gap: 8px; }
+textarea { flex: 1; border: none; background: transparent; padding: 8px 0; font-size: 16px; resize: none; max-height: 120px; outline: none; font-family: inherit; line-height: 1.4; color: var(--text); }
 textarea::placeholder { color: var(--text-light); }
-.send-btn { background: var(--text); color: #FFF; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: opacity 0.2s; }
-.send-btn:disabled { opacity: 0.2; }
+.action-row { display: flex; align-items: center; gap: 12px; }
+.icon-btn { background: transparent; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); padding: 4px; }
+.icon-btn svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.send-btn { background: var(--text); color: #FFF; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-left: auto; }
 .send-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
 .loader { display: flex; gap: 4px; align-items: center; color: var(--text-light); font-size: 14px; padding: 10px 0; }
 .dot { width: 5px; height: 5px; background: var(--text-light); border-radius: 50%; animation: pulse 1s infinite alternate; }
 .dot:nth-child(2) { animation-delay: 0.2s; }
@@ -53,77 +58,111 @@ textarea::placeholder { color: var(--text-light); }
 <div class="chat-area" id="chatArea"></div>
 
 <div class="bottom-bar">
-  <div class="modes">
-    <button class="mode-btn active" data-mode="weekly" onclick="setMode('weekly')">வாரச் சுருக்கம்</button>
-    <button class="mode-btn" data-mode="daily" onclick="setMode('daily')">தினசரி</button>
-    <button class="mode-btn" data-mode="ask" onclick="setMode('ask')">கேள்</button>
-  </div>
-  <div class="input-pill">
-    <!-- 📎 படம் அனுப்பும் பட்டன் -->
-    <button class="attach-btn" onclick="document.getElementById('fileInput').click()">📎</button>
-    <input type="file" id="fileInput" accept="image/*" onchange="handleImage(event)" hidden>
-    
-    <textarea id="notes" rows="1" placeholder="Message Zyra..." oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
-    <button class="send-btn" id="sendBtn" onclick="spark()">
-      <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-    </button>
+  <div class="input-container">
+    <!-- மேலே உள்ள பட்டன்கள் (Think & Search) -->
+    <div class="top-tools">
+      <button class="tool-btn" id="thinkBtn" onclick="toggleTool('think')">
+        <svg viewBox="0 0 24 24"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
+        Think
+      </button>
+      <button class="tool-btn" id="searchBtn" onclick="toggleTool('search')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Search
+      </button>
+    </div>
+
+    <!-- டெக்ஸ்ட் பாக்ஸ் -->
+    <div class="textarea-row">
+      <textarea id="notes" rows="1" placeholder="Message Zyra..." oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
+    </div>
+
+    <!-- கீழே உள்ள பட்டன்கள் (+, Mic, Send) -->
+    <div class="action-row">
+      <button class="icon-btn" onclick="document.getElementById('fileInput').click()">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <input type="file" id="fileInput" accept="image/*" onchange="handleImage(event)" hidden>
+      
+      <button class="icon-btn" id="micBtn" onclick="startVoice()">
+        <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+      </button>
+
+      <button class="send-btn" id="sendBtn" onclick="spark()">
+        <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      </button>
+    </div>
   </div>
 </div>
 
 <script>
 const $ = id => document.getElementById(id);
 let lang = 'ta', mode = 'weekly';
-let selectedImage = null; // படத்தைச் சேமிக்க
-let selectedMime = null;
+let selectedImage = null, selectedMime = null;
+let isThinking = false, isSearching = false;
 
 const I18N = {
-  ta: { tagline: 'மனதில் ஒரு பொறி.', intro: 'உங்கள் எண்ணங்களைத் தெளிவாக்குங்கள்.', placeholder: 'உங்கள் குறிப்புகளை இங்கே எழுதுங்கள்...', summary: 'சுருக்கம்', themes: 'கருப்பொருள்கள்', overdue: 'தொடர வேண்டியவை', priorities: 'முன்னுரிமைகள்', checklist: 'செயல் பட்டியல்', answer: 'பதில்', error: 'பிழை ஏற்பட்டது. மீண்டும் முயலுங்கள்.' },
-  en: { tagline: 'Spark your mind.', intro: 'Make sense of your thoughts.', placeholder: 'Message Zyra...', summary: 'Summary', themes: 'Themes', overdue: 'Open loops', priorities: 'Priorities', checklist: 'Checklist', answer: 'Answer', error: 'An error occurred. Please try again.' },
-  hi: { tagline: 'मन में एक चिंगारी।', intro: 'अपने विचारों को स्पष्ट करें।', placeholder: 'Zyra को संदेश भेजें...', summary: 'सारांश', themes: 'विषय', overdue: 'बाक़ी काम', priorities: 'प्राथमिकताएँ', checklist: 'सूची', answer: 'जवाब', error: 'एक त्रुटि हुई। कृपया पुनः प्रयास करें।' }
+  ta: { placeholder: 'Message Zyra...', error: 'பிழை ஏற்பட்டது.' },
+  en: { placeholder: 'Message Zyra...', error: 'An error occurred.' },
+  hi: { placeholder: 'Zyra को संदेश भेजें...', error: 'त्रुटि हुई।' }
 };
 
-// படத்தைத் தேர்ந்தெடுக்கும் ஃபங்ஷன்
+// பட்டன்களை ON/OFF செய்யும் ஃபங்ஷன்
+function toggleTool(tool) {
+  if (tool === 'think') {
+    isThinking = !isThinking;
+    $('thinkBtn').classList.toggle('active', isThinking);
+  } else if (tool === 'search') {
+    isSearching = !isSearching;
+    $('searchBtn').classList.toggle('active', isSearching);
+    if(isSearching) alert("Search feature is coming soon! (Requires external API)");
+  }
+}
+
+// குரல் மூலம் பேசும் வசதி (Voice Typing)
+function startVoice() {
+  if (!('webkitSpeechRecognition' in window)) {
+    alert("உங்கள் போனில் குரல் வசதி ஆதரிக்கப்படவில்லை."); return;
+  }
+  const recognition = new webkitSpeechRecognition();
+  recognition.lang = 'ta-IN';
+  recognition.interimResults = false;
+  $('micBtn').style.color = 'red'; // பேசும்போது சிவப்பு நிறம்
+
+  recognition.onresult = function(event) {
+    const transcript = event.results[0][0].transcript;
+    $('notes').value += transcript + " ";
+    $('micBtn').style.color = 'var(--text)';
+  };
+  recognition.onerror = function() { $('micBtn').style.color = 'var(--text)'; };
+  recognition.onend = function() { $('micBtn').style.color = 'var(--text)'; };
+  recognition.start();
+}
+
+// படம் தேர்ந்தெடுத்தல்
 function handleImage(event) {
   const file = event.target.files[0];
   if (!file) return;
-  
-  if (file.size > 4 * 1024 * 1024) {
-    alert("படத்தின் அளவு 4MB-க்கு குறைவாக இருக்க வேண்டும்.");
-    return;
-  }
-
   const reader = new FileReader();
   reader.onload = function(e) {
-    // Base64 data URL-ல் இருந்து படத்தின் டேட்டாவை மட்டும் பிரித்தெடுக்கவும்
-    const dataUrl = e.target.result;
-    selectedImage = dataUrl.split(',')[1];
+    selectedImage = e.target.result.split(',')[1];
     selectedMime = file.type;
-    
-    // யூசருக்கு படம் தேர்ந்தெடுக்கப்பட்டதைக் காட்ட ஒரு சிறிய அறிவிப்பு
-    $('notes').placeholder = "படம் இணைக்கப்பட்டது ✓ (செய்தியை டைப் செய்யவும்)";
+    $('notes').placeholder = "படம் இணைக்கப்பட்டது ✓";
   };
   reader.readAsDataURL(file);
-}
-
-function setMode(m) {
-  mode = m;
-  document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === m));
 }
 
 function esc(s) { return String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
 
 async function spark() {
   const notes = $('notes').value.trim();
-  if (!notes && !selectedImage) return; // டெக்ஸ்ட் அல்லது படம் ஏதாவது ஒன்று இருக்க வேண்டும்
+  if (!notes && !selectedImage) return;
   
   $('centerView').style.display = 'none';
   $('chatArea').classList.add('active');
-  
   const chat = $('chatArea');
   const sendBtn = $('sendBtn');
   sendBtn.disabled = true;
   
-  // யூசர் மெசேஜ் (படம் இருந்தால் அதையும் காட்டு)
   const userMsg = document.createElement('div');
   userMsg.className = 'msg-user';
   if (selectedImage) {
@@ -137,60 +176,41 @@ async function spark() {
     userMsg.appendChild(textNode);
   }
   chat.appendChild(userMsg);
-  window.scrollTo(0, document.body.scrollHeight);
 
-  // லோடர்
   const loaderMsg = document.createElement('div');
   loaderMsg.className = 'msg-ai';
   loaderMsg.innerHTML = '<div class="loader"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
   chat.appendChild(loaderMsg);
-  window.scrollTo(0, document.body.scrollHeight);
 
   try {
-    const payload = { notes, mode, lang };
-    if (selectedImage) {
-      payload.image = selectedImage;
-      payload.mimeType = selectedMime;
-    }
+    const payload = { notes, mode, lang, think: isThinking, search: isSearching };
+    if (selectedImage) { payload.image = selectedImage; payload.mimeType = selectedMime; }
 
     const res = await fetch('/api/summarize', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
     const data = await res.json();
-    
     if (!res.ok) throw new Error(data.error || 'ERROR');
     
     chat.removeChild(loaderMsg);
     const aiMsg = document.createElement('div');
     aiMsg.className = 'msg-ai';
-    
-    let html = '';
-    if (mode === 'ask') {
-      html = `<h3>${I18N[lang].answer}</h3><p>${esc(data.answer || '')}</p>`;
-    } else {
-      html += `<h3>${I18N[lang].summary}</h3><p>${esc(data.summary || '')}</p>`;
-      if(data.themes?.length) html += `<h3>${I18N[lang].themes}</h3><ul>${data.themes.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`;
-      if(data.overdue?.length) html += `<h3>${I18N[lang].overdue}</h3><ul>${data.overdue.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`;
-      if(data.priorities?.length) html += `<h3>${I18N[lang].priorities}</h3><ol>${data.priorities.map(t=>`<li>${esc(t)}</li>`).join('')}</ol>`;
-      if(data.checklist?.length) html += `<h3>${I18N[lang].checklist}</h3><ul>${data.checklist.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`;
-    }
-    aiMsg.innerHTML = html;
+    // பதிலைக் காட்டு (mode-ஐப் பொருத்து)
+    aiMsg.innerHTML = `<h3>பதில்</h3><p>${esc(data.answer || data.summary || JSON.stringify(data))}</p>`;
     chat.appendChild(aiMsg);
 
   } catch (e) {
     chat.removeChild(loaderMsg);
     const errMsg = document.createElement('div');
     errMsg.className = 'msg-ai';
-    errMsg.innerHTML = `<p style="color:#FF6B2C; font-weight:500; padding:12px; background:#FFF0E5; border-radius:12px;">${e.message || I18N[lang].error}</p>`;
+    errMsg.innerHTML = `<p style="color:#FF6B2C; font-weight:500; padding:12px; background:#FFF0E5; border-radius:12px;">${e.message}</p>`;
     chat.appendChild(errMsg);
   } finally {
     sendBtn.disabled = false;
     $('notes').value = ''; $('notes').style.height = '';
     $('notes').placeholder = I18N[lang].placeholder;
-    selectedImage = null;
-    selectedMime = null;
-    $('fileInput').value = '';
+    selectedImage = null; selectedMime = null; $('fileInput').value = '';
     window.scrollTo(0, document.body.scrollHeight);
   }
 }
