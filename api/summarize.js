@@ -16,17 +16,17 @@ module.exports = async function handler(req, res) {
     const { notes, projectName = 'General', image = null, mimeType = null, think = false, history = [] } = req.body || {};
     if (!notes && !image) return res.status(400).json({ error: 'INVALID_INPUT' });
 
-    // மிக முக்கியமான மொழி விதி
+    // மிக முக்கியமான மொழி விதி (Strict Rule)
     const langRule = `MANDATORY LANGUAGE RULE: 
-    1. You MUST respond in the EXACT SAME language the user used in their latest message.
-    2. If the user's latest message is in Tamil, reply ONLY in Tamil. 
-    3. If the user's latest message is in English, reply ONLY in English.
-    4. DO NOT mix languages. If the user asks to speak in a specific language, switch to it immediately.`;
+    1. You MUST respond in the EXACT SAME language as the user's LATEST message.
+    2. If the user's latest message is in English, you MUST reply in English ONLY.
+    3. If the user's latest message is in Tamil, you MUST reply in Tamil ONLY.
+    4. DO NOT be influenced by previous messages. ONLY look at the latest message's language.
+    5. If the user explicitly asks to switch languages (e.g., "speak English"), obey immediately.`;
 
     const memoryRule = `CRITICAL MEMORY RULE: 
-    1. You are in a continuous conversation. Review the ENTIRE history provided below.
-    2. Remember what the user said previously.
-    3. Do NOT forget previous context.`;
+    1. You are in a continuous conversation. Review the ENTIRE history.
+    2. Remember previous context, but apply the language rule based on the LATEST message.`;
 
     const thinkPrompt = think ? "Think step by step. " : "";
     const systemPrompt = `You are Zyra, a highly intelligent AI. ${langRule} ${memoryRule} ${thinkPrompt}`;
