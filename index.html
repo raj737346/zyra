@@ -370,7 +370,7 @@ function deleteChat(e, id) {
   renderCurrentChat();
 }
 
-// தலைப்பைத் தானாக மாற்றும் ஃபங்ஷன் (மிகச் சரியான லாஜிக்)
+// தலைப்பைத் தானாக மாற்றும் ஃபங்ஷன்
 function getAnswerHeader(text) {
   if (/[\u0B80-\u0BFF]/.test(text)) return 'பதில்'; // தமிழ் எழுத்துக்கள் இருந்தால்
   return 'ANSWER'; // இல்லையென்றால் ஆங்கிலம்
@@ -398,7 +398,6 @@ function renderCurrentChat() {
       if (msg.text) { const span = document.createElement('span'); span.textContent = msg.text; div.appendChild(span); }
     } else {
       div.className = 'msg-ai';
-      // இங்கே தான் Header-ஐ மாற்றுகிறோம்
       const headerTitle = getAnswerHeader(msg.text);
       div.innerHTML = `<h3>${headerTitle}</h3><p>${esc(msg.text)}</p>`;
     }
@@ -531,7 +530,6 @@ async function spark() {
     const aiMsg = document.createElement('div');
     aiMsg.className = 'msg-ai';
     
-    // இங்கே தான் AI பதிலுக்கு ஏற்ற தலைப்பை மாற்றுகிறோம்
     const headerTitle = getAnswerHeader(aiText);
     aiMsg.innerHTML = `<h3>${headerTitle}</h3><p>${esc(aiText)}</p>`;
     
