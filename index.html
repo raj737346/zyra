@@ -370,10 +370,10 @@ function deleteChat(e, id) {
   renderCurrentChat();
 }
 
-// தலைப்பைத் தானாக மாற்றும் ஃபங்ஷன் (Tamil -> பதில், English -> Answer)
+// தலைப்பைத் தானாக மாற்றும் ஃபங்ஷன் (மிகச் சரியான லாஜிக்)
 function getAnswerHeader(text) {
   if (/[\u0B80-\u0BFF]/.test(text)) return 'பதில்'; // தமிழ் எழுத்துக்கள் இருந்தால்
-  return 'Answer'; // இல்லையென்றால் ஆங்கிலம்
+  return 'ANSWER'; // இல்லையென்றால் ஆங்கிலம்
 }
 
 function renderCurrentChat() {
