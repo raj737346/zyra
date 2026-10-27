@@ -9,8 +9,8 @@ module.exports = async function handler(req, res) {
     ${mode === 'ask' ? '{"answer": "your answer"}' : '{"summary":"3-4 sentences","themes":["..."],"overdue":["..."],"priorities":["..."],"checklist":["..."]}'}
     Notes: ${notes}`;
 
-    // Fallback Models (முதல் மாடல் வேலை செய்யவில்லை என்றால் அடுத்ததற்கு மாறும்)
-    const models = ['gemini-3.8-flash', 'gemini-3-flash', 'gemini-pro'];
+    // சரியான மாடல் பெயர்கள்
+    const models = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-2.5-flash'];
     let data = null;
     let lastError = null;
 
