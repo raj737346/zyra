@@ -10,7 +10,7 @@
 :root { --bg: #FFFFFF; --text: #000000; --text-light: #666666; --surface: #F4F4F4; --accent: #FF6B2C; --blue: #E8F0FE; --blue-text: #1A73E8; --sidebar-bg: #F9F9F9; }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; padding: 0; height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; font-size: 16px; overflow: hidden; }
-body { display: flex; flex-direction: column; height: 100dvh; /* Mobile keyboard fix */ }
+body { display: flex; flex-direction: column; height: 100dvh; }
 
 /* Top Header */
 .top-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; padding-top: calc(10px + env(safe-area-inset-top)); background: #FFF; border-bottom: 1px solid #E5E5E5; z-index: 5; flex-shrink: 0; }
@@ -240,7 +240,6 @@ let isMuted = true;
 // Visual Viewport API for perfect mobile keyboard handling
 if (window.visualViewport) {
   window.visualViewport.addEventListener('resize', () => {
-    // Adjust the height of the body dynamically when keyboard opens/closes
     document.body.style.height = window.visualViewport.height + 'px';
     if (document.activeElement && document.activeElement.tagName === 'TEXTAREA') {
       scrollToBottom(true);
@@ -371,6 +370,12 @@ function deleteChat(e, id) {
   renderCurrentChat();
 }
 
+// தலைப்பைத் தானாக மாற்றும் ஃபங்ஷன் (Tamil -> பதில், English -> Answer)
+function getAnswerHeader(text) {
+  if (/[\u0B80-\u0BFF]/.test(text)) return 'பதில்'; // தமிழ் எழுத்துக்கள் இருந்தால்
+  return 'Answer'; // இல்லையென்றால் ஆங்கிலம்
+}
+
 function renderCurrentChat() {
   const chatArea = $('chatArea');
   chatArea.innerHTML = '';
@@ -393,7 +398,9 @@ function renderCurrentChat() {
       if (msg.text) { const span = document.createElement('span'); span.textContent = msg.text; div.appendChild(span); }
     } else {
       div.className = 'msg-ai';
-      div.innerHTML = `<h3>பதில்</h3><p>${esc(msg.text)}</p>`;
+      // இங்கே தான் Header-ஐ மாற்றுகிறோம்
+      const headerTitle = getAnswerHeader(msg.text);
+      div.innerHTML = `<h3>${headerTitle}</h3><p>${esc(msg.text)}</p>`;
     }
     chatArea.appendChild(div);
   });
@@ -523,7 +530,11 @@ async function spark() {
     $('chatArea').removeChild(loaderMsg);
     const aiMsg = document.createElement('div');
     aiMsg.className = 'msg-ai';
-    aiMsg.innerHTML = `<h3>பதில்</h3><p>${esc(aiText)}</p>`;
+    
+    // இங்கே தான் AI பதிலுக்கு ஏற்ற தலைப்பை மாற்றுகிறோம்
+    const headerTitle = getAnswerHeader(aiText);
+    aiMsg.innerHTML = `<h3>${headerTitle}</h3><p>${esc(aiText)}</p>`;
+    
     $('chatArea').appendChild(aiMsg);
     scrollToBottom(true);
 
