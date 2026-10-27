@@ -198,7 +198,7 @@ async function spark() {
     chat.removeChild(loaderMsg);
     const errMsg = document.createElement('div');
     errMsg.className = 'msg-ai';
-    errMsg.innerHTML = `<p style="color:#FF6B2C; font-weight:500; padding:12px; background:#FFF0E5; border-radius:12px;">${I18N[lang].error}</p>`;
+    errMsg.innerHTML = errMsg.innerHTML = `<p style="color:#FF6B2C; font-weight:500; padding:12px; background:#FFF0E5; border-radius:12px;">${e.message || I18N[lang].error}</p>`;
     chat.appendChild(errMsg);
   } finally {
     sendBtn.disabled = false;
