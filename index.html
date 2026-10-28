@@ -14,8 +14,13 @@ body { display: flex; flex-direction: column; height: 100dvh; }
 
 /* Login Screen */
 #loginScreen { position: fixed; inset: 0; background: #FFF; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-#loginScreen h1 { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 44px; margin: 0 0 10px; }
-#loginScreen p { color: #666; margin-bottom: 30px; }
+#loginScreen h1 { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 40px; margin: 0 0 10px; }
+#loginScreen p { color: var(--text-light); margin-bottom: 30px; }
+.login-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; max-width: 300px; background: #FFF; border: 1px solid #ddd; padding: 12px 24px; border-radius: 10px; font-size: 16px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 12px; }
+.login-btn svg { width: 20px; height: 20px; }
+.phone-input { display: flex; width: 100%; max-width: 300px; gap: 8px; margin-bottom: 12px; }
+.phone-input input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; }
+.phone-input button { padding: 12px 16px; background: var(--text); color: #FFF; border: none; border-radius: 10px; font-weight: 500; cursor: pointer; }
 
 /* Top Header */
 .top-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; padding-top: calc(10px + env(safe-area-inset-top)); background: #FFF; border-bottom: 1px solid #E5E5E5; z-index: 5; flex-shrink: 0; }
@@ -25,7 +30,6 @@ body { display: flex; flex-direction: column; height: 100dvh; }
 .header-title { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 22px; margin: 0; }
 .top-plus-btn { background: var(--surface); border: none; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; color: var(--text); }
 .new-chat-btn { background: var(--text); color: #FFF; border: none; border-radius: 8px; padding: 6px 12px; font-size: 13px; cursor: pointer; font-weight: 500; }
-.logout-btn { background: none; border: none; color: #FF6B2C; font-size: 14px; cursor: pointer; margin-left: 8px; }
 
 /* Sidebar Overlay */
 .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 15; display: none; opacity: 0; transition: opacity 0.3s; }
@@ -60,7 +64,7 @@ html[lang="ta"] .center-view h1 { font-family: 'Noto Serif Tamil', serif; font-s
 .msg-ai h3:first-child { margin-top: 0; }
 .msg-ai p { margin: 0 0 12px; }
 
-/* Action Sheet (Preview Options) */
+/* Single Button Modal (Bottom Sheet) */
 .action-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 150; display: none; align-items: flex-end; justify-content: center; }
 .action-sheet.open { display: flex; }
 .action-sheet-content { width: 100%; max-width: 600px; background: #FFF; border-radius: 24px 24px 0 0; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); animation: slideUp 0.3s ease-out; }
@@ -103,57 +107,7 @@ textarea::placeholder { color: var(--text-light); }
 .dot:nth-child(2) { animation-delay: 0.2s; }
 .dot:nth-child(3) { animation-delay: 0.4s; }
 @keyframes pulse { to { opacity: 0.2; transform: translateY(-3px); } }
-
-/* Top New Page Modal */
-.top-page-modal { position: fixed; inset: 0; background: #FFF; z-index: 100; display: none; flex-direction: column; padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); }
-.top-page-modal.open { display: flex; }
-.top-page-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
-.close-top-page { background: none; border: none; font-size: 24px; cursor: pointer; }
-.top-page-modal h2 { font-family: 'Instrument Serif', serif; font-style: italic; }
-
-/* Bottom Sheet (Attachment) */
-.attachment-page { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 60; display: none; align-items: flex-end; justify-content: center; }
-.attachment-page.open { display: flex; }
-.attachment-sheet { width: 100%; max-width: 600px; background: #FFF; border-radius: 24px 24px 0 0; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); animation: slideUp 0.3s ease-out; }
-.attachment-sheet h3 { margin: 0 0 20px 0; font-size: 18px; text-align: center; font-family: 'Instrument Serif', serif; font-style: italic; }
-.attachment-option { display: flex; align-items: center; gap: 16px; padding: 16px; border-radius: 16px; background: var(--surface); margin-bottom: 12px; cursor: pointer; font-weight: 500; font-size: 16px; }
-.attachment-option svg { width: 28px; height: 28px; stroke: var(--text); fill: none; stroke-width: 2; }
-.attachment-cancel { width: 100%; padding: 16px; border: none; background: transparent; font-size: 16px; font-weight: 600; color: var(--text-light); cursor: pointer; margin-top: 10px; }
-
-/* Voice Mode Overlay */
-.voice-mode { position: fixed; inset: 0; background: #000000; z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; color: #FFF; }
-.voice-mode.active { display: flex; }
-.voice-circle { width: 120px; height: 120px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 40px; animation: breathe 1.5s infinite alternate; }
-.voice-circle svg { width: 50px; height: 50px; stroke: #FFF; fill: none; stroke-width: 2; }
-@keyframes breathe { from { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 44, 0.7); } to { transform: scale(1.1); box-shadow: 0 0 0 30px rgba(255, 107, 44, 0); } }
-.voice-text { font-size: 18px; color: #DDD; margin-bottom: 20px; text-align: center; }
-.close-voice { position: absolute; bottom: 50px; background: rgba(255,255,255,0.2); border: none; color: #FFF; padding: 12px 24px; border-radius: 30px; font-size: 16px; cursor: pointer; }
 </style>
-<!-- Firebase SDK -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-  // ⚠️ இங்கே உங்கள் Firebase Config-ஐ மாற்றவும்
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const provider = new GoogleAuthProvider();
-
-  window.firebaseAuth = auth;
-  window.googleProvider = provider;
-  window.signInWithPopup = signInWithPopup;
-  window.signOut = signOut;
-  window.onAuthStateChanged = onAuthStateChanged;
-</script>
 </head>
 <body>
 
@@ -161,160 +115,216 @@ textarea::placeholder { color: var(--text-light); }
 <div id="loginScreen">
   <h1>Zyra</h1>
   <p>Sign in to continue</p>
-  <button onclick="loginWithGoogle()" style="display:flex; align-items:center; gap:10px; background:#FFF; border:1px solid #ddd; padding:12px 24px; border-radius:10px; font-size:16px; font-weight:500; cursor:pointer; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
-    <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+  
+  <button class="login-btn" onclick="loginWithGoogle()">
+    <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
     Continue with Google
   </button>
-</div>
 
-<!-- Single Action Sheet (Preview Options) -->
-<div class="action-sheet" id="actionSheet" onclick="closeActionSheet(event)">
-  <div class="action-sheet-content" onclick="event.stopPropagation()">
-    <h3>HTML Code Ready</h3>
-    <div class="action-option" onclick="doAction('live')">
-      <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      Live Preview (App-ல் பார்)
-    </div>
-    <div class="action-option" onclick="doAction('browser')">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      Open in Browser (Chrome-ல் திற)
-    </div>
-    <button class="action-cancel" onclick="closeActionSheet(event)">Cancel</button>
+  <div class="phone-input">
+    <input type="tel" id="phoneNumber" placeholder="+91 Phone Number" />
+    <button onclick="sendOTP()">Send OTP</button>
+  </div>
+  <div class="phone-input" id="otpDiv" style="display:none;">
+    <input type="text" id="otpCode" placeholder="Enter OTP" />
+    <button onclick="verifyOTP()">Verify</button>
   </div>
 </div>
 
-<!-- Preview Modal -->
-<div class="preview-modal" id="previewModal">
-  <div class="preview-header">
-    <span class="preview-title">Live Preview</span>
-    <button class="preview-close" onclick="closePreview()">✕</button>
-  </div>
-  <iframe class="preview-iframe" id="previewIframe"></iframe>
-</div>
-
-<!-- Top New Page -->
-<div class="top-page-modal" id="topPageModal">
-  <div class="top-page-header">
-    <button class="close-top-page" onclick="closeTopPage()">✕</button>
-    <h2>New Tools (புதிய வசதிகள்)</h2>
-  </div>
-  <p style="color: var(--text-light);">இந்தப் பக்கத்தில் புதிய வசதிகள் விரைவில் சேர்க்கப்படும்.</p>
-</div>
-
-<!-- Bottom Sheet (Attachment) -->
-<div class="attachment-page" id="attachmentPage" onclick="closeAttachmentPage(event)">
-  <div class="attachment-sheet" onclick="event.stopPropagation()">
-    <h3>Attach File</h3>
-    <div class="attachment-option" onclick="triggerFileInput('image/*')">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-      Photo Library (புகைப்படங்கள்)
+<!-- App Content -->
+<div id="appContent" style="display:none; flex-direction:column; height:100dvh;">
+  
+  <!-- Single Action Sheet -->
+  <div class="action-sheet" id="actionSheet" onclick="closeActionSheet(event)">
+    <div class="action-sheet-content" onclick="event.stopPropagation()">
+      <h3>HTML Code Ready</h3>
+      <div class="action-option" onclick="doAction('live')">
+        <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Live Preview (App-ல் பார்)
+      </div>
+      <div class="action-option" onclick="doAction('browser')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Open in Browser (Chrome-ல் திற)
+      </div>
+      <button class="action-cancel" onclick="closeActionSheet(event)">Cancel</button>
     </div>
-    <div class="attachment-option" onclick="triggerFileInput('image/*', true)">
-      <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      Camera (கேமரா)
-    </div>
-    <div class="attachment-option" onclick="triggerFileInput('application/pdf')">
-      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-      Document (ஆவணங்கள்)
-    </div>
-    <button class="attachment-cancel" onclick="closeAttachmentPage(event)">Cancel</button>
   </div>
-</div>
 
-<!-- Voice Mode Overlay -->
-<div class="voice-mode" id="voiceMode">
-  <div class="voice-circle">
-    <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-  </div>
-  <div class="voice-text" id="voiceStatus">பேசுங்கள் (Listening...)</div>
-  <button class="close-voice" onclick="stopVoice()">Cancel</button>
-</div>
-
-<!-- Sidebar Overlay -->
-<div class="overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-<!-- Sidebar -->
-<div class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <h2 style="margin:0;font-size:20px;">Chats</h2>
-    <button class="menu-btn" onclick="toggleSidebar()">✕</button>
-  </div>
-  <input type="text" id="searchInput" class="sidebar-search" placeholder="Search chat content..." oninput="renderSidebar()">
-  <div class="sidebar-list" id="sidebarList"></div>
-</div>
-
-<!-- Top Header -->
-<div class="top-header">
-  <div class="header-left">
-    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-    <h1 class="header-title">Zyra</h1>
-  </div>
-  <div class="header-right">
-    <button class="top-plus-btn" onclick="openTopPage()">+</button>
-    <button class="new-chat-btn" onclick="startNewChat()">+ New</button>
-    <button class="logout-btn" onclick="logout()">Logout</button>
-  </div>
-</div>
-
-<div class="center-view" id="centerView">
-  <h1 id="tagline">மனதில் ஒரு பொறி.</h1>
-  <p id="intro">உங்கள் எண்ணங்களைத் தெளிவாக்குங்கள்.</p>
-</div>
-
-<div class="chat-area" id="chatArea"></div>
-
-<div class="bottom-bar">
-  <div class="input-container">
-    <div class="image-preview" id="imagePreview">
-      <img id="previewImg" src="" alt="preview">
-      <div class="remove-img" onclick="removeImage()">×</div>
+  <!-- Preview Modal -->
+  <div class="preview-modal" id="previewModal">
+    <div class="preview-header">
+      <span class="preview-title">Live Preview</span>
+      <button class="preview-close" onclick="closePreview()">✕</button>
     </div>
+    <iframe class="preview-iframe" id="previewIframe"></iframe>
+  </div>
 
-    <div class="top-tools">
-      <button class="tool-btn" id="thinkBtn" onclick="toggleTool('think')">
-        <svg viewBox="0 0 24 24"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg> Think
-      </button>
-      <button class="tool-btn" id="searchBtn" onclick="toggleTool('search')">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Search
-      </button>
+  <div class="overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h2 style="margin:0;font-size:20px;">Chats</h2>
+      <button class="menu-btn" onclick="toggleSidebar()">✕</button>
     </div>
-
-    <div class="textarea-row">
-      <textarea id="notes" rows="1" placeholder="Message Zyra..." oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
+    <input type="text" id="searchInput" class="sidebar-search" placeholder="Search chat content..." oninput="renderSidebar()">
+    <div class="sidebar-list" id="sidebarList"></div>
+    <div style="padding: 16px; border-top: 1px solid #E5E5E5;">
+        <button onclick="logout()" style="width:100%; padding:12px; background:var(--surface); border:none; border-radius:8px; cursor:pointer; color:var(--accent); font-weight:600;">Logout</button>
     </div>
+  </div>
 
-    <div class="action-row">
-      <button class="icon-btn" id="speakerBtn" onclick="toggleSpeaker()">
-        <svg id="speakerIcon" viewBox="0 0 24 24">
-           <path d="M11 5L6 9H2v6h4l5 4V5z"/>
-           <line x1="22" y1="9" x2="16" y2="15"/>
-           <line x1="16" y1="9" x2="22" y2="15"/>
-        </svg>
-      </button>
+  <div class="top-header">
+    <div class="header-left">
+      <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+      <h1 class="header-title">Zyra</h1>
+    </div>
+    <div class="header-right">
+      <button class="top-plus-btn" onclick="openTopPage()">+</button>
+      <button class="new-chat-btn" onclick="startNewChat()">+ New</button>
+    </div>
+  </div>
 
-      <button class="icon-btn" onclick="openAttachmentPage()">
-        <svg viewBox="0 0 24 24">
-           <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-           <line x1="12" y1="8" x2="12" y2="16"/>
-           <line x1="8" y1="12" x2="16" y2="12"/>
-        </svg>
-      </button>
-      <input type="file" id="fileInput" accept="image/*" onchange="handleImage(event)" hidden>
-      <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleImage(event)" hidden>
-      <input type="file" id="docInput" accept=".pdf,.doc,.docx,.txt" onchange="handleImage(event)" hidden>
-      
-      <button class="icon-btn" id="micBtn" onclick="startVoiceMode()">
-        <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-      </button>
+  <div class="center-view" id="centerView">
+    <h1 id="tagline">மனதில் ஒரு பொறி.</h1>
+    <p id="intro">உங்கள் எண்ணங்களைத் தெளிவாக்குங்கள்.</p>
+  </div>
 
-      <button class="send-btn" id="sendBtn" onclick="spark()">
-        <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-      </button>
+  <div class="chat-area" id="chatArea"></div>
+
+  <div class="bottom-bar">
+    <div class="input-container">
+      <div class="image-preview" id="imagePreview">
+        <img id="previewImg" src="" alt="preview">
+        <div class="remove-img" onclick="removeImage()">×</div>
+      </div>
+
+      <div class="top-tools">
+        <button class="tool-btn" id="thinkBtn" onclick="toggleTool('think')">
+          <svg viewBox="0 0 24 24"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg> Think
+        </button>
+        <button class="tool-btn" id="searchBtn" onclick="toggleTool('search')">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Search
+        </button>
+      </div>
+
+      <div class="textarea-row">
+        <textarea id="notes" rows="1" placeholder="Message Zyra..." oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
+      </div>
+
+      <div class="action-row">
+        <button class="icon-btn" id="speakerBtn" onclick="toggleSpeaker()">
+          <svg id="speakerIcon" viewBox="0 0 24 24">
+             <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+             <line x1="22" y1="9" x2="16" y2="15"/>
+             <line x1="16" y1="9" x2="22" y2="15"/>
+          </svg>
+        </button>
+
+        <button class="icon-btn" onclick="openAttachmentPage()">
+          <svg viewBox="0 0 24 24">
+             <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+             <line x1="12" y1="8" x2="12" y2="16"/>
+             <line x1="8" y1="12" x2="16" y2="12"/>
+          </svg>
+        </button>
+        <input type="file" id="fileInput" accept="image/*" onchange="handleImage(event)" hidden>
+        <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleImage(event)" hidden>
+        <input type="file" id="docInput" accept=".pdf,.doc,.docx,.txt" onchange="handleImage(event)" hidden>
+        
+        <button class="icon-btn" id="micBtn" onclick="startVoiceMode()">
+          <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+        </button>
+
+        <button class="send-btn" id="sendBtn" onclick="spark()">
+          <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </button>
+      </div>
     </div>
   </div>
 </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+  // உங்கள் Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCm5upXc743dbF4OlnQI_v8ms4NGca58L0",
+    authDomain: "zyra-app-9ad7c.firebaseapp.com",
+    projectId: "zyra-app-9ad7c",
+    storageBucket: "zyra-app-9ad7c.firebasestorage.app",
+    messagingSenderId: "1004388332804",
+    appId: "1:1004388332804:web:96956db20616b332d30c51",
+    measurementId: "G-PXWM3N5FNE"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  window.loginWithGoogle = async function() {
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (e) {
+      alert("Google Login failed: " + e.message);
+    }
+  };
+
+  window.sendOTP = async function() {
+    const phone = document.getElementById('phoneNumber').value;
+    if (!phone) return alert("Please enter a phone number.");
+    
+    if (!window.recaptchaVerifier) {
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'phoneNumber', {
+        'size': 'invisible',
+        'callback': (response) => { }
+      });
+    }
+
+    try {
+      const confirmationResult = await signInWithPhoneNumber(auth, phone, window.recaptchaVerifier);
+      window.confirmationResult = confirmationResult;
+      document.getElementById('otpDiv').style.display = 'flex';
+      alert("OTP Sent!");
+    } catch (e) {
+      alert("Phone Login failed: " + e.message);
+    }
+  };
+
+  window.verifyOTP = async function() {
+    const code = document.getElementById('otpCode').value;
+    if (!code) return alert("Please enter OTP.");
+    try {
+      await window.confirmationResult.confirm(code);
+    } catch (e) {
+      alert("Invalid OTP!");
+    }
+  };
+
+  window.logout = function() {
+    signOut(auth).then(() => {
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('appContent').style.display = 'none';
+    });
+  };
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('appContent').style.display = 'flex';
+      if (typeof window.initApp === 'function' && !window.appInitialized) {
+        window.initApp();
+        window.appInitialized = true;
+      }
+    } else {
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('appContent').style.display = 'none';
+    }
+  });
+</script>
 
 <script>
+// App Logic
 const $ = id => document.getElementById(id);
 let selectedImage = null, selectedMime = null;
 let isThinking = false;
@@ -324,106 +334,9 @@ let allChats = [];
 let activeChatId = null;
 let recognition = null;
 let isMuted = true;
-let currentHTMLCode = ""; // To store the HTML for the action sheet
+let currentHTMLCode = "";
 
-// Visual Viewport API for perfect mobile keyboard handling
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', () => {
-    document.body.style.height = window.visualViewport.height + 'px';
-    if (document.activeElement && document.activeElement.tagName === 'TEXTAREA') {
-      scrollToBottom(true);
-    }
-  });
-}
-
-// 60 நாள் Auto-Delete ஃபங்ஷன்
-function cleanOldChats() {
-  try {
-    const savedChats = localStorage.getItem('zyra_chats');
-    if (!savedChats) return;
-    let allChats = JSON.parse(savedChats);
-    const sixtyDaysAgo = Date.now() - (60 * 24 * 60 * 60 * 1000);
-    const filteredChats = allChats.filter(chat => chat.timestamp > sixtyDaysAgo);
-    if (filteredChats.length !== allChats.length) {
-      localStorage.setItem('zyra_chats', JSON.stringify(filteredChats));
-    }
-  } catch (e) {}
-}
-
-// Login Functions
-window.loginWithGoogle = async function() {
-  try {
-    await signInWithPopup(firebaseAuth, googleProvider);
-  } catch (e) {
-    alert("Login failed: " + e.message);
-  }
-};
-
-window.logout = async function() {
-  try {
-    await signOut(firebaseAuth);
-    localStorage.removeItem('zyra_chats'); // Optional: Clear chats on logout
-    location.reload();
-  } catch (e) {
-    alert("Logout failed: " + e.message);
-  }
-};
-
-// App Init
-window.onload = function() {
-  onAuthStateChanged(firebaseAuth, (user) => {
-    if (user) {
-      $('loginScreen').style.display = 'none';
-      cleanOldChats(); // Auto-delete old chats
-      initApp();
-    } else {
-      $('loginScreen').style.display = 'flex';
-    }
-  });
-};
-
-function openTopPage() { $('topPageModal').classList.add('open'); }
-function closeTopPage() { $('topPageModal').classList.remove('open'); }
-
-function openAttachmentPage() { $('attachmentPage').classList.add('open'); }
-function closeAttachmentPage(e) {
-  if (e && e.target !== e.currentTarget && e.type === 'click' && e.target.className !== 'attachment-cancel') return;
-  $('attachmentPage').classList.remove('open');
-}
-function triggerFileInput(type, isCamera = false) {
-  closeAttachmentPage(); 
-  if (isCamera) $('cameraInput').click();
-  else if (type === 'application/pdf') $('docInput').click();
-  else $('fileInput').click();
-}
-
-function toggleSpeaker() {
-  isMuted = !isMuted;
-  const icon = $('speakerIcon');
-  if (isMuted) {
-    icon.innerHTML = `<path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/>`;
-    window.speechSynthesis.cancel();
-  } else {
-    icon.innerHTML = `<path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>`;
-  }
-}
-
-function speakText(text) {
-  if (isMuted) return;
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  if (/[\u0B80-\u0BFF]/.test(text)) utterance.lang = 'ta-IN';
-  else if (/[\u0900-\u097F]/.test(text)) utterance.lang = 'hi-IN';
-  else utterance.lang = 'en-US';
-  window.speechSynthesis.speak(utterance);
-}
-
-function toggleSidebar() {
-  $('sidebar').classList.toggle('open');
-  $('sidebarOverlay').classList.toggle('open');
-}
-
-function initApp() {
+window.initApp = function() {
   try {
     const savedChats = localStorage.getItem('zyra_chats');
     if (savedChats) allChats = JSON.parse(savedChats);
@@ -435,6 +348,20 @@ function initApp() {
     renderCurrentChat();
   }
   renderSidebar();
+  cleanOldChats();
+};
+
+function cleanOldChats() {
+  try {
+    const savedChats = localStorage.getItem('zyra_chats');
+    if (!savedChats) return;
+    let chats = JSON.parse(savedChats);
+    const sixtyDaysAgo = Date.now() - (60 * 24 * 60 * 60 * 1000);
+    const filteredChats = chats.filter(chat => chat.timestamp > sixtyDaysAgo);
+    if (filteredChats.length !== chats.length) {
+      localStorage.setItem('zyra_chats', JSON.stringify(filteredChats));
+    }
+  } catch (e) {}
 }
 
 function startNewChat() {
@@ -505,7 +432,6 @@ function deleteChat(e, id) {
   renderCurrentChat();
 }
 
-// --- Single Button Action Sheet Logic ---
 function openActionSheet(htmlCode) {
   currentHTMLCode = htmlCode;
   $('actionSheet').classList.add('open');
@@ -536,9 +462,7 @@ function closePreview() {
   $('previewModal').classList.remove('open');
   $('previewIframe').srcdoc = '';
 }
-// -----------------------------------------
 
-// தலைப்பைத் தானாக மாற்றும் ஃபங்ஷன்
 function getAnswerHeader(text) {
   if (/[\u0B80-\u0BFF]/.test(text)) return 'பதில்';
   return 'ANSWER';
@@ -639,7 +563,6 @@ function removeImage() {
 
 function esc(s) { return String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
 
-// Unlimited Scroll Logic
 function scrollToBottom(force = false) {
   if (!userScrolledUp || force) {
     const chat = $('chatArea');
@@ -688,17 +611,10 @@ async function spark() {
   scrollToBottom(true);
 
   try {
-    // Get the saved language preference
     let savedLang = localStorage.getItem('zyra_lang_pref') || 'auto';
-    
-    // Check if user asks to switch language
     if (/talk.*tamil|tamil.*talk|speak.*tamil/i.test(notes)) { savedLang = 'Tamil'; localStorage.setItem('zyra_lang_pref', savedLang); }
     else if (/talk.*english|english.*talk|speak.*english/i.test(notes)) { savedLang = 'English'; localStorage.setItem('zyra_lang_pref', savedLang); }
-    else if (/talk.*hindi|hindi.*talk|speak.*hindi/i.test(notes)) { savedLang = 'Hindi'; localStorage.setItem('zyra_lang_pref', savedLang); }
-    else if (/talk.*malayalam|malayalam.*talk|speak.*malayalam/i.test(notes)) { savedLang = 'Malayalam'; localStorage.setItem('zyra_lang_pref', savedLang); }
-    else if (/talk.*telugu|telugu.*talk|speak.*telugu/i.test(notes)) { savedLang = 'Telugu'; localStorage.setItem('zyra_lang_pref', savedLang); }
-    else if (/talk.*kannada|kannada.*talk|speak.*kannada/i.test(notes)) { savedLang = 'Kannada'; localStorage.setItem('zyra_lang_pref', savedLang); }
-    // Add more languages as needed...
+    // (Add other languages as needed)
 
     let finalNotes = notes;
     if (savedLang !== 'auto') {
@@ -765,6 +681,20 @@ async function spark() {
     removeImage(); 
   }
 }
+
+// Voice Mode elements
+const voiceModeHTML = `
+<div class="voice-mode" id="voiceMode">
+  <div class="voice-circle">
+    <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+  </div>
+  <div class="voice-text" id="voiceStatus">பேசுங்கள் (Listening...)</div>
+  <button class="close-voice" onclick="stopVoice()">Cancel</button>
+</div>
+`;
+document.body.insertAdjacentHTML('beforeend', voiceModeHTML);
+
+window.onload = initApp;
 </script>
 </body>
 </html>
