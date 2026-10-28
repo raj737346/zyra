@@ -10,54 +10,56 @@ function extractJSON(text) {
   }
 }
 
-// 1. DeepSeek API-ஐ அழைக்கும் ஃபங்ஷன்
-async function callDeepSeek(prompt, langRule) {
-  const apiKey = process.env.DEEPSEEK_API_KEY;
+// Gemini API-ஐ அழைக்கும் ஃபங்ஷன் (Search Grounding உடன்)
+async function callGemini(prompt, useSearch = false) {
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return null;
 
-  try {
-    const strictPrompt = `${prompt}\n\n(IMPORTANT: You must reply ONLY in the language specified above. Do not use English if the user asked in Tamil.)`;
+  const models = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-3.8-flash'];
+  for (const model of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      
+      const requestBody = {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { responseMimeType: 'application/json', temperature: 0.1, maxOutputTokens: 1500 }
+      };
 
-    const r = await fetch('https://api.deepseek.com/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'deepseek-flash',
-        messages: [
-          { role: 'system', content: `You are a helpful assistant. ${langRule} Return ONLY a valid JSON object.` },
-          { role: 'user', content: strictPrompt }
-        ],
-        response_format: { type: 'json_object' },
-        stream: false
-      })
-    });
+      // Search ON செய்திருந்தால், Google Search Grounding-ஐச் சேர்
+      if (useSearch) {
+        requestBody.tools = [{ googleSearch: {} }];
+      }
 
-    if (!r.ok) return null;
-    const data = await r.json();
-    const text = data.choices?.[0]?.message?.content;
-    if (!text) return null;
-    return JSON.parse(text);
-  } catch (e) {
-    return null;
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (r.ok) {
+        const data = await r.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) return JSON.parse(text);
+      }
+    } catch (e) {}
   }
+  return null;
 }
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   try {
-    const { notes, image = null, mimeType = null, think = false, history = [], isSearching = false } = req.body || {};
+    const { notes, image = null, mimeType = null, think = false, isSearching = false } = req.body || {};
     if (!notes && !image) return res.status(400).json({ error: 'INVALID_INPUT' });
 
-    // மொழி மற்றும் துல்லிய விதிகள்
+    // மொழி மற்றும் எழுத்துப்பிழை விதி
     const langRule = `MANDATORY LANGUAGE RULE: 
     1. You MUST detect the language of the user's LATEST message.
     2. You MUST reply in the EXACT SAME language the user used. 
     3. If the user asks in Tamil, reply in Tamil. If English, reply in English.
-    4. NEVER mix languages.
-    5. ACCURACY RULE: Check your spelling and grammar carefully. No typos.`;
+    4. If the user says "Please talk with me Tamil" or "Please tell me Tamil", you MUST switch to Tamil IMMEDIATELY and reply in 100% Tamil.
+    5. NEVER mix languages.
+    6. ACCURACY RULE: You must check your spelling and grammar carefully in ALL languages. Do NOT make spelling mistakes. Use proper words and sentence structure.`;
 
     const thinkPrompt = think ? "Think step by step. " : "";
     const systemPrompt = `You are Zyra, a highly intelligent AI. ${langRule} ${thinkPrompt}`;
@@ -67,12 +69,12 @@ module.exports = async function handler(req, res) {
     let prompt = `${systemPrompt}\n\nUser: ${notes || 'Analyze this image.'}\n\n${formatPrompt}`;
     let finalData = null;
 
-    // 1. முதலில் DeepSeek-ஐ முயற்சி செய் (படம் இல்லை என்றால் மட்டும்)
-    if (!image) {
-      finalData = await callDeepSeek(prompt, langRule);
+    // Search ON செய்திருந்தால், முதலில் Gemini-ஐ (Search Grounding உடன்) முயற்சி செய்
+    if (isSearching) {
+      finalData = await callGemini(prompt, true);
     }
 
-    // 2. DeepSeek வேலை செய்யவில்லை என்றால், Gemini-ஐ முயற்சி செய்
+    // Search OFF அல்லது Search தோல்வி என்றால், சாதாரண Gemini-ஐ முயற்சி செய்
     if (!finalData) {
       const contents = [{ parts: [{ text: prompt }] }];
       if (image && mimeType) {
@@ -85,18 +87,13 @@ module.exports = async function handler(req, res) {
         for (const model of models) {
           try {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-            const requestBody = {
-              contents: contents,
-              generationConfig: { responseMimeType: 'application/json', temperature: 0.1, maxOutputTokens: 1500 }
-            };
-            if (isSearching) {
-              requestBody.tools = [{ googleSearch: {} }];
-            }
-
             const r = await fetch(url, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(requestBody)
+              body: JSON.stringify({
+                contents: contents,
+                generationConfig: { responseMimeType: 'application/json', temperature: 0.1, maxOutputTokens: 1500 }
+              })
             });
             if (r.ok) {
               const data = await r.json();
@@ -109,7 +106,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (!finalData) {
-      return res.status(500).json({ error: 'API Error: Both DeepSeek and Gemini failed.' });
+      return res.status(500).json({ error: 'API Error: All models failed.' });
     }
     
     return res.status(200).json(finalData);
