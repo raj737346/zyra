@@ -284,10 +284,7 @@ textarea::placeholder { color: var(--text-light); }
     try {
       await signInWithPopup(auth, provider);
     } catch (e) {
-      // பயனர் பாப்-அப்-ஐ மூடிவிட்டால், எரர் காட்ட வேண்டாம்
-      if (e.code === 'auth/cancelled-popup-request' || e.code === 'auth/popup-closed-by-user') {
-        return; 
-      }
+      if (e.code === 'auth/cancelled-popup-request' || e.code === 'auth/popup-closed-by-user') return;
       alert("Google Login failed: " + e.message);
     }
   };
