@@ -107,6 +107,15 @@ textarea::placeholder { color: var(--text-light); }
 .dot:nth-child(2) { animation-delay: 0.2s; }
 .dot:nth-child(3) { animation-delay: 0.4s; }
 @keyframes pulse { to { opacity: 0.2; transform: translateY(-3px); } }
+
+/* Voice Mode Overlay */
+.voice-mode { position: fixed; inset: 0; background: #000000; z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; color: #FFF; }
+.voice-mode.active { display: flex; }
+.voice-circle { width: 120px; height: 120px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 40px; animation: breathe 1.5s infinite alternate; }
+.voice-circle svg { width: 50px; height: 50px; stroke: #FFF; fill: none; stroke-width: 2; }
+@keyframes breathe { from { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 44, 0.7); } to { transform: scale(1.1); box-shadow: 0 0 0 30px rgba(255, 107, 44, 0); } }
+.voice-text { font-size: 18px; color: #DDD; margin-bottom: 20px; text-align: center; }
+.close-voice { position: absolute; bottom: 50px; background: rgba(255,255,255,0.2); border: none; color: #FFF; padding: 12px 24px; border-radius: 30px; font-size: 16px; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -243,6 +252,15 @@ textarea::placeholder { color: var(--text-light); }
   </div>
 </div>
 
+<!-- Voice Mode Overlay -->
+<div class="voice-mode" id="voiceMode">
+  <div class="voice-circle">
+    <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+  </div>
+  <div class="voice-text" id="voiceStatus">பேசுங்கள் (Listening...)</div>
+  <button class="close-voice" onclick="stopVoice()">Cancel</button>
+</div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -266,6 +284,10 @@ textarea::placeholder { color: var(--text-light); }
     try {
       await signInWithPopup(auth, provider);
     } catch (e) {
+      // பயனர் பாப்-அப்-ஐ மூடிவிட்டால், எரர் காட்ட வேண்டாம்
+      if (e.code === 'auth/cancelled-popup-request' || e.code === 'auth/popup-closed-by-user') {
+        return; 
+      }
       alert("Google Login failed: " + e.message);
     }
   };
@@ -681,18 +703,6 @@ async function spark() {
     removeImage(); 
   }
 }
-
-// Voice Mode elements
-const voiceModeHTML = `
-<div class="voice-mode" id="voiceMode">
-  <div class="voice-circle">
-    <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-  </div>
-  <div class="voice-text" id="voiceStatus">பேசுங்கள் (Listening...)</div>
-  <button class="close-voice" onclick="stopVoice()">Cancel</button>
-</div>
-`;
-document.body.insertAdjacentHTML('beforeend', voiceModeHTML);
 
 window.onload = initApp;
 </script>
