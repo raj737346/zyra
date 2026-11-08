@@ -138,14 +138,12 @@ select.lang-select{background:var(--panel); border:1px solid var(--border); bord
       <h1 class="center-title">Where would you like to begin?</h1>
       
       <div class="suggestions">
-        <!-- Auto-search is enabled for news -->
         <button class="suggestion" onclick="enableSearch(); quickPrompt('இன்றைய தமிழ் நாளிதழ் செய்திகள் சொல்லுங்கள்')">
           <span>📰</span> இன்றைய செய்திகளைச் சொல்லுங்கள்
         </button>
         <button class="suggestion" onclick="quickPrompt('ஒரு சுவாரஸ்யமான கதை சொல்லுங்கள்')">
           <span>📖</span> ஒரு சுவாரஸ்யமான கதை சொல்
         </button>
-        <!-- Image generation prompt -->
         <button class="suggestion" onclick="quickPrompt('ஒரு அழகான இயற்கை காட்சியின் படத்தை உருவாக்கி எனக்குக் காட்டு')">
           <span>🖼️</span> ஒரு அழகான படத்தை உருவாக்கு
         </button>
@@ -223,7 +221,6 @@ let abortController = null;
 try { history = JSON.parse(localStorage.getItem('zyra_history') || '[]'); if(!Array.isArray(history)) history=[]; } catch { history=[]; }
 try { const savedTheme = localStorage.getItem('zyra_theme'); if(savedTheme) document.documentElement.dataset.theme = savedTheme; } catch {}
 
-// Utility to turn Search on automatically
 window.enableSearch = () => {
     if (!searching) {
         searching = true;
@@ -325,7 +322,6 @@ function loadChat(id){
 function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function renderMarkdown(text){
   let s = escapeHtml(text || '');
-  // Image Markdown syntax
   s = s.replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g, '<img src="$2" alt="$1">');
   s = s.replace(/```([\s\S]*?)```/g, (_,c) => '<pre><code>'+c+'</code></pre>');
   s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
@@ -411,11 +407,11 @@ async function send(){
   sendBtn.classList.add('stop-state');
   sendIcon.innerHTML = '<rect x="6" y="6" width="12" height="12" fill="currentColor"/>'; 
 
-  // Image Generation Feature
   const lowerText = text.toLowerCase();
+
+  // 1. Direct Image Generation via Pollinations (No Backend Needed)
   if (lowerText.includes('படம்') || lowerText.includes('image')) {
     try {
-      // Using a free public image generator endpoint (Pollinations.ai)
       const promptSeed = encodeURIComponent(text);
       const imgUrl = `https://image.pollinations.ai/prompt/${promptSeed}?width=600&height=600&nologo=true`;
       
@@ -425,9 +421,6 @@ async function send(){
       const img = document.createElement('img');
       img.src = imgUrl;
       img.alt = "Generated Image";
-      img.style.maxWidth = '100%';
-      img.style.borderRadius = '12px';
-      img.style.marginBottom = '10px';
       
       const txt = document.createElement('div');
       txt.textContent = "உங்கள் கேள்விக்கான படம் இதோ:";
@@ -447,7 +440,27 @@ async function send(){
     }
   }
 
-  // Standard Text API
+  // 2. Direct News Fetching (Bypasses AI Limit)
+  if ((lowerText.includes('செய்தி') || lowerText.includes('news')) && searching) {
+      const aiRow = document.createElement('div'); aiRow.className = 'message ai';
+      const bubble = document.createElement('div'); bubble.className = 'bubble';
+      bubble.innerHTML = `<p>இதோ இன்றைய தமிழ் செய்திகள் (Google News):</p>
+      <ul style="margin-left: 20px; margin-bottom: 10px;">
+        <li><a href="https://news.google.com/search?q=tamil%20news&hl=ta&gl=IN&ceid=IN:ta" target="_blank">தினமலர், தினத்தந்தி, விகடன் செய்திகள் பார்க்க இங்கே கிளிக் செய்யவும்</a></li>
+      </ul>
+      <p style="font-size: 13px; color: var(--muted);">(உங்கள் Backend API-ல் Search Grounding இல்லாததால், நேரடி இணைப்பு வழங்கப்படுகிறது).</p>`;
+      
+      aiRow.appendChild(bubble); chat.appendChild(aiRow);
+      currentMessages.push({ role: 'ai', text: "Google News தமிழ் இணைப்பு வழங்கப்பட்டது." });
+      saveHistory();
+      
+      busy = false; 
+      sendBtn.classList.remove('stop-state');
+      sendIcon.innerHTML = '<path d="M12 19V5M5 12l7-7 7 7"/>'; 
+      return;
+  }
+
+  // 3. Standard Text API
   const payload = {
     notes: text || 'Analyze this image.',
     think: think,
