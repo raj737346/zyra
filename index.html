@@ -10,14 +10,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#ffffff; --text:#111111; --muted:#777777;
-  --accent:#1f57ff; --accent2:#f4f4f5;
-  --panel:#ffffff; --border:#e5e5e5; --user-bg:#f4f4f5;
+  --bg:#ffffff; --text:#191918; --muted:#777671;
+  --accent:#f36b38; --accent2:#fff0e9; --panel:#f7f7f6;
+  --border:#e8e7e4; --user:#f4f1ed; --shadow:0 12px 40px rgba(0,0,0,0.07);
 }
 [data-theme="dark"]{
-  --bg:#111111; --text:#eeeeee; --muted:#aaaaaa;
-  --accent:#3b75ff; --accent2:#2a2a2a;
-  --panel:#111111; --border:#333333; --user-bg:#2a2a2a;
+  --bg:#101010; --text:#f4f2ee; --muted:#aaa7a0;
+  --accent:#ff7846; --accent2:#38231b; --panel:#191919;
+  --border:#30302e; --user:#242321; --shadow:0 12px 40px rgba(0,0,0,0.3);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:Inter,sans-serif;-webkit-font-smoothing:antialiased}
@@ -26,90 +26,96 @@ button{cursor:pointer;background:none;border:none}
 #app{height:100dvh;display:flex;flex-direction:column;max-width:1000px;margin:0 auto;position:relative}
 
 /* Header */
-header{height:60px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:var(--bg);position:sticky;top:0;z-index:5}
-.header-btn{width:38px;height:38px;border-radius:50%;background:var(--accent2);display:grid;place-items:center;color:var(--text);transition:background 0.2s}
-.header-btn:hover{filter:brightness(0.95)}
-.header-center{font-weight:600; font-size:16px; display:flex; align-items:center; gap:8px;}
-.header-center svg{width:20px;height:20px;}
+header{height:60px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:var(--bg)}
+.header-left{display:flex;align-items:center;gap:10px}
+.iconbtn{color:var(--text);display:grid;place-items:center;width:36px;height:36px;border-radius:50%;transition:background 0.2s}
+.iconbtn:hover{background:var(--panel)}
+.header-right{display:flex;align-items:center;gap:8px}
 
 /* Main Content */
 main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:20px;scroll-behavior:smooth}
 
-/* Welcome Screen (ChatGPT Style) */
-.welcome{max-width:760px; width:100%; margin-top:auto; margin-bottom:auto; display:flex; flex-direction:column; align-items:flex-start; padding-left:10px;}
-.welcome-logo{font-size:32px; font-weight:700; letter-spacing:-1px; color:var(--text); margin-bottom:40px;}
-.welcome-logo span{color:var(--accent);}
-.welcome-options{display:flex; flex-direction:column; gap:20px; width:100%;}
-.opt-btn{display:flex; align-items:center; gap:16px; font-size:16px; color:var(--text); background:none; border:none; cursor:pointer; width:100%; text-align:left; padding:8px 0;}
-.opt-btn:hover{color:var(--muted);}
-.opt-btn svg{width:22px; height:22px; color:var(--muted);}
+/* Welcome Screen */
+.welcome{max-width:650px;margin:20vh auto 25px;text-align:center; display:flex; flex-direction:column; align-items:center;}
+.welcome .spark{font-size:40px;color:var(--accent); margin-bottom:16px;}
+.welcome h1{font-size:clamp(32px,6vw,48px);letter-spacing:-1.8px;margin:0 0 5px; font-weight:700;}
+.welcome h1 em{font-family:"Instrument Serif",serif;font-weight:400;color:var(--accent); font-style: italic;}
+.welcome h2{font-size:38px; color:var(--text); font-weight:700; margin-top:10px;}
 
 /* Chat Messages */
-.chat-container{width:100%;max-width:760px;display:flex;flex-direction:column;gap:24px;padding-bottom:20px;}
-.message{display:flex;gap:16px;align-items:flex-start;width:100%}
+.chat-container{width:100%;max-width:760px;display:flex;flex-direction:column;gap:20px;padding-bottom:20px; margin-top:20px;}
+.message{display:flex;gap:10px;align-items:flex-start;width:100%}
 .message.user{justify-content:flex-end}
 .message.ai{justify-content:flex-start}
-.avatar{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:16px; font-weight:bold;}
-.message.user .avatar{background:var(--accent2); color:var(--muted); order:2; font-size:12px;}
-.message.ai .avatar{background:transparent; color:var(--accent); font-size:22px;}
-.bubble{min-width:0;max-width:calc(100% - 50px);font-size:16px;line-height:1.6;overflow-wrap:anywhere}
-.message.user .bubble{background:var(--user-bg); padding:10px 18px; border-radius:24px;}
-.message.ai .bubble{background:transparent; padding:0; margin-top:4px;}
-.bubble img{max-width:100%;border-radius:12px;display:block;margin-bottom:8px;}
+.avatar{flex:none;width:28px;height:28px;border-radius:9px;background:var(--accent2);color:var(--accent);display:grid;place-items:center;font-size:14px}
+.message.user .avatar{order:2;background:var(--panel);color:var(--muted)}
+.bubble{min-width:0;max-width:calc(100% - 40px);font-size:15px;line-height:1.7;overflow-wrap:anywhere}
+.message.user .bubble{background:var(--user);padding:12px 16px;border-radius:16px 4px 16px 16px}
+.message.ai .bubble{padding:2px 0}
+.bubble img{max-width:100%;border-radius:12px;display:block;margin-bottom:8px;box-shadow:var(--shadow)}
 
-/* Message Tools (ChatGPT style) */
+/* Message Tools */
 .msg-tools{display:flex;gap:12px;margin-top:12px;align-items:center;flex-wrap:wrap}
-.tool-btn{color:var(--muted);font-size:14px;display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;transition:all 0.2s;}
-.tool-btn:hover{background:var(--accent2); color:var(--text);}
-.tool-btn svg{width:16px; height:16px;}
-.speak-btn.active { color: var(--accent); }
+.tool-btn{color:var(--muted);font-size:13px;display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;transition:all 0.2s;}
+.tool-btn:hover{color:var(--text)}
+.speak-btn.active { color: var(--accent); font-weight: bold;}
 
 /* Markdown */
-.bubble pre{white-space:pre-wrap;overflow-x:auto;background:var(--accent2);padding:14px;border-radius:12px;margin:10px 0; font-family:monospace; font-size:14px;}
-.bubble code{background:var(--accent2);padding:2px 6px;border-radius:6px;font-size:14px; font-family:monospace;}
-.bubble pre code{background:none;padding:0;}
+.bubble pre{white-space:pre-wrap;overflow-x:auto;background:var(--panel);padding:12px;border-radius:10px;margin:10px 0}
+.bubble code{background:var(--panel);padding:2px 6px;border-radius:6px;font-size:13px}
 .bubble a{color:var(--accent);text-decoration:none}
-.bubble p{margin-bottom:16px}
+.bubble p{margin-bottom:12px}
 .bubble p:last-child{margin-bottom:0}
 
-/* Composer Area (ChatGPT style) */
-.composer-wrap{width:100%;padding:10px 16px 20px;display:flex;flex-direction:column;align-items:center;background:var(--bg)}
+/* Composer Area */
+.composer-wrap{width:100%;padding:10px 16px max(14px,env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;background:linear-gradient(transparent, var(--bg) 20%)}
 .composer{
-  width:100%; max-width:760px; background:var(--accent2); 
-  border-radius:28px; padding:10px 14px; display:flex; align-items:center; gap:10px;
-  transition:border-color 0.2s;
+  width:100%; max-width:760px; background:var(--bg); border:1px solid var(--border); 
+  border-radius:24px; padding:10px 14px 10px 18px; display:flex; 
+  flex-direction:column; gap:10px; box-shadow:0 2px 15px rgba(0,0,0,0.03); transition:border-color 0.2s;
 }
-.composer-input-row{display:flex; align-items:center; width:100%; gap:8px;}
+.composer:focus-within{border-color:#d0d0d0}
+[data-theme="dark"] .composer:focus-within{border-color:#444}
+
+.composer-input-row{display:flex; align-items:flex-start; width:100%; gap:10px;}
 .composer textarea {
   flex:1; border:none; background:transparent; font-size:16px; outline:none; 
   padding:8px 0; min-width:120px; resize:none; overflow-y:hidden; 
   line-height:1.5; max-height:200px; color:var(--text); font-family:inherit;
 }
 .composer textarea::placeholder{color:var(--muted)}
-.icon-plus { background:none; border:none; color:var(--text); cursor:pointer; display:grid; place-items:center; width:30px; height:30px; border-radius:50%; }
-.icon-plus:hover { background:rgba(0,0,0,0.05); }
-.icon-mic { background:none; border:none; color:var(--text); cursor:pointer; display:grid; place-items:center; width:30px; height:30px; border-radius:50%; }
-.icon-mic:hover { background:rgba(0,0,0,0.05); }
-.icon-send{background:var(--text); color:var(--bg); width:32px; height:32px; border-radius:50%; display:grid; place-items:center; transition:all 0.2s; margin-left:4px;}
-.icon-send:disabled{opacity:0.3; cursor:not-allowed;}
-.icon-send.stop-state{background:var(--muted);}
+
+.composer-bottom-row{display:flex; justify-content:space-between; align-items:center; width:100%;}
+.toggle-btns{display:flex; gap:6px;}
+.tbtn{border:1px solid transparent;background:var(--panel);color:var(--muted);padding:6px 12px;border-radius:20px;font-size:13px;display:flex;align-items:center;gap:6px;font-weight:500; transition:all 0.2s;}
+.tbtn.active{background:var(--accent2);color:var(--accent);border-color:#f36b3833}
+
+.composer-actions{display:flex;align-items:center;gap:8px}
+.preview-img{width:40px;height:40px;border-radius:8px;object-fit:cover;display:none;margin-right:5px}
+
+/* Buttons */
+.icon-send{background:var(--accent);color:white;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;transition:all 0.2s}
+.icon-send:disabled{opacity:0.6;cursor:not-allowed}
+.icon-send.stop-state{background:var(--text);color:var(--bg)}
+.icon-circle{color:var(--text);width:36px;height:36px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--border);background:var(--bg)}
+.icon-circle:hover{background:var(--panel)}
 
 /* Typing indicator */
 .typing{display:flex;gap:4px;align-items:center;height:24px}
-.typing span{width:6px;height:6px;background:var(--text);border-radius:50%;animation:bounce 1.4s infinite ease-in-out both}
+.typing span{width:6px;height:6px;background:var(--muted);border-radius:50%;animation:bounce 1.4s infinite ease-in-out both}
 .typing span:nth-child(1){animation-delay:-0.32s}
 .typing span:nth-child(2){animation-delay:-0.16s}
 @keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
 
 /* Drawer */
-.overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.4);z-index:10;}
+.overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.4);z-index:10;backdrop-filter:blur(2px)}
 .drawer{position:absolute;top:0;bottom:0;left:0;width:280px;background:var(--bg);border-right:1px solid var(--border);padding:20px;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform 0.3s ease}
 .overlay.show .drawer{transform:translateX(0)}
 .overlay.show{display:block}
 .history-list{margin-top:20px;flex:1;overflow-y:auto}
 .history-item{padding:12px;border-radius:8px;color:var(--text);font-size:14px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;justify-content:space-between;align-items:center}
-.history-item:hover{background:var(--accent2);}
-.del-btn{color:var(--muted);font-size:16px;padding:4px; background:none; border:none;}
+.history-item:hover{background:var(--panel)}
+.del-btn{color:var(--muted);font-size:16px;padding:4px}
 .del-btn:hover{color:red}
 </style>
 </head>
@@ -117,40 +123,28 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 <div id="app">
   <header>
     <div class="header-left">
-      <button class="header-btn" id="menuBtn" title="Menu">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      <button class="iconbtn" id="menuBtn" title="History">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
     </div>
-    <div class="header-center">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
-      Zyra 2.0
-    </div>
     <div class="header-right">
-      <button class="header-btn" id="newBtn" title="New Chat">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      <button class="iconbtn" id="exportBtn" title="Export Chat">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      </button>
+      <button class="iconbtn" id="themeBtn" title="Toggle Theme">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="iconbtn" id="newBtn" title="New Chat">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
       </button>
     </div>
   </header>
 
   <main id="chatArea">
-    <!-- வரவேற்புத் திரை (ChatGPT Style) -->
     <div id="welcomeScreen" class="welcome">
-      <div class="welcome-logo"><span>Zyra</span> — Spark your mind.</div>
-      
-      <div class="welcome-options">
-        <button class="opt-btn" onclick="quickPrompt('Generate an image of a beautiful sunset.')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          Create an image
-        </button>
-        <button class="opt-btn" onclick="quickPrompt('Help me write an email to my boss asking for leave.')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          Write or edit
-        </button>
-        <button class="opt-btn" onclick="quickPrompt('What are the latest global news headlines today?')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          Search the web
-        </button>
-      </div>
+      <div class="spark">✳</div>
+      <h1>Spark your <em>mind.</em></h1>
+      <h2>Zyra</h2>
     </div>
     
     <div class="chat-container" id="chat"></div>
@@ -158,20 +152,35 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 
   <div class="composer-wrap">
     <div class="composer">
+      
       <div class="composer-input-row">
-        <button class="icon-plus" id="attachBtn" title="Attach Image">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-        </button>
-        <img id="imgPreview" class="preview-img" src="" alt="preview" style="display:none; width:24px; height:24px; border-radius:4px; object-fit:cover;">
-        <textarea id="prompt" rows="1" placeholder="Ask Zyra..."></textarea>
-        
-        <button class="icon-mic" id="voiceBtn" title="Voice Input">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>
-        </button>
-        <button class="icon-send" id="sendBtn" title="Send">
-          <svg id="sendIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-        </button>
+        <img id="imgPreview" class="preview-img" src="" alt="preview">
+        <textarea id="prompt" rows="1" placeholder="Type a message or hold to speak..."></textarea>
       </div>
+
+      <div class="composer-bottom-row">
+        <div class="toggle-btns">
+          <button class="tbtn" id="thinkBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
+            Think
+          </button>
+          <button class="tbtn" id="searchBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            Search
+          </button>
+        </div>
+
+        <div class="composer-actions">
+          <input type="file" id="fileInput" accept="image/*" hidden>
+          <button class="icon-circle" id="attachBtn" title="Attach Image">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <button class="icon-send" id="sendBtn" title="Send">
+            <svg id="sendIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -179,10 +188,10 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
     <aside class="drawer">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
         <strong style="font-size:18px;">Zyra History</strong>
-        <button class="header-btn" id="closeDrawer">✕</button>
+        <button class="iconbtn" id="closeDrawer">✕</button>
       </div>
       <div class="history-list" id="historyList"></div>
-      <button id="clearAll" style="margin-top:auto; color:var(--muted); font-size:13px; text-align:left; padding:10px; background:none; border:none;">Clear all</button>
+      <button id="clearAll" style="margin-top:auto; color:var(--muted); font-size:13px; text-align:left; padding:10px;">Clear all</button>
     </aside>
   </div>
 </div>
@@ -195,7 +204,7 @@ const $ = id => document.getElementById(id);
 const chat = $('chat'), promptBox = $('prompt'), sendBtn = $('sendBtn'), sendIcon = $('sendIcon');
 const welcomeScreen = $('welcomeScreen');
 
-let busy = false, recognition = null;
+let think = false, searching = false, busy = false, recognition = null;
 let selectedImage = null; 
 let currentMessages = [];
 let currentChatId = null;
@@ -205,9 +214,14 @@ let abortController = null;
 try { history = JSON.parse(localStorage.getItem('zyra_history') || '[]'); if(!Array.isArray(history)) history=[]; } catch { history=[]; }
 try { const savedTheme = localStorage.getItem('zyra_theme'); if(savedTheme) document.documentElement.dataset.theme = savedTheme; } catch {}
 
-window.quickPrompt = (text) => {
-    promptBox.value = text;
-    send();
+$('thinkBtn').onclick = () => { think = !think; $('thinkBtn').classList.toggle('active', think); };
+$('searchBtn').onclick = () => { searching = !searching; $('searchBtn').classList.toggle('active', searching); };
+
+$('themeBtn').onclick = () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme !== 'dark';
+  root.dataset.theme = dark ? 'dark' : 'light';
+  try{ localStorage.setItem('zyra_theme', root.dataset.theme); }catch{}
 };
 
 $('attachBtn').onclick = () => $('fileInput').click();
@@ -217,11 +231,25 @@ $('fileInput').onchange = (e) => {
   const reader = new FileReader();
   reader.onload = (ev) => {
     selectedImage = ev.target.result;
-    const img = $('imgPreview');
-    img.src = selectedImage;
-    img.style.display = 'block';
+    $('imgPreview').src = selectedImage;
+    $('imgPreview').style.display = 'block';
   };
   reader.readAsDataURL(file);
+};
+
+$('exportBtn').onclick = () => {
+    if(currentMessages.length === 0) { alert('No chat to export'); return; }
+    let text = "Zyra Chat Export\n\n";
+    currentMessages.forEach(m => {
+        text += `[${m.role.toUpperCase()}]\n${m.text}\n\n`;
+    });
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Zyra_Chat_${new Date().getTime()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
 };
 
 function saveHistory(){
@@ -282,17 +310,19 @@ function renderMarkdown(text){
   return s;
 }
 
+const speakerSVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`;
+
 function createSpeakBtn(text) {
   const btn = document.createElement('button');
   btn.className = 'tool-btn speak-btn';
-  // ChatGPT Speaker Icon
-  btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`;
+  btn.innerHTML = speakerSVG + ' <span>Listen</span>';
   
   btn.onclick = () => {
      if('speechSynthesis' in window){
          if (btn.classList.contains('active')) {
              speechSynthesis.cancel();
              btn.classList.remove('active');
+             btn.querySelector('span').textContent = 'Listen';
          } else {
              speechSynthesis.cancel();
              const u = new SpeechSynthesisUtterance(text);
@@ -301,7 +331,11 @@ function createSpeakBtn(text) {
              else u.lang = 'en-US'; 
              speechSynthesis.speak(u);
              btn.classList.add('active');
-             u.onend = () => btn.classList.remove('active');
+             btn.querySelector('span').textContent = 'Stop';
+             u.onend = () => {
+                 btn.classList.remove('active');
+                 btn.querySelector('span').textContent = 'Listen';
+             };
          }
      }
   };
@@ -311,10 +345,7 @@ function createSpeakBtn(text) {
 function addMessage(role, text, image = null, store = true){
   welcomeScreen.style.display = 'none';
   const row = document.createElement('div'); row.className = 'message ' + (role === 'user' ? 'user' : 'ai');
-  
-  const avatar = document.createElement('div'); avatar.className = 'avatar'; 
-  avatar.innerHTML = role === 'user' ? 'You' : '✳'; // User icon or Spark icon
-  
+  const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.textContent = role === 'user' ? '●' : '✳';
   const bubble = document.createElement('div'); bubble.className = 'bubble';
   
   if(image){ const img = document.createElement('img'); img.src = image; bubble.appendChild(img); }
@@ -325,40 +356,17 @@ function addMessage(role, text, image = null, store = true){
 
   if(role === 'ai'){
     const tools = document.createElement('div'); tools.className = 'msg-tools';
-    
-    // Copy Icon
     const copy = document.createElement('button'); copy.className = 'tool-btn'; 
-    copy.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
-    copy.title = 'Copy';
+    copy.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span>Copy</span>';
     copy.onclick = () => { 
         navigator.clipboard?.writeText(text || ''); 
+        const span = copy.querySelector('span');
+        span.textContent = 'Copied!'; 
         copy.style.color = 'green'; 
-        setTimeout(()=>{ copy.style.color = 'var(--muted)'; }, 1500); 
+        setTimeout(()=>{ span.textContent = 'Copy'; copy.style.color = 'var(--muted)'; }, 1500); 
     };
-
-    // Thumbs Up / Down Icons (Just for UI look)
-    const thumbsUp = document.createElement('button'); thumbsUp.className = 'tool-btn'; 
-    thumbsUp.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>';
-    thumbsUp.title = 'Good response';
-    
-    const thumbsDown = document.createElement('button'); thumbsDown.className = 'tool-btn'; 
-    thumbsDown.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-2"></path></svg>';
-    thumbsDown.title = 'Bad response';
-
     const speak = createSpeakBtn(text);
-    
-    // Share Icon
-    const share = document.createElement('button'); share.className = 'tool-btn';
-    share.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>';
-    share.title = 'Share';
-
-    tools.appendChild(copy); 
-    tools.appendChild(thumbsUp);
-    tools.appendChild(thumbsDown);
-    tools.appendChild(speak); 
-    tools.appendChild(share);
-    
-    bubble.appendChild(tools);
+    tools.appendChild(copy); tools.appendChild(speak); bubble.appendChild(tools);
   }
 
   row.append(avatar, bubble); chat.appendChild(row);
@@ -385,20 +393,19 @@ async function send(){
   sendIcon.innerHTML = '<rect x="6" y="6" width="12" height="12" fill="currentColor"/>'; 
 
   const lowerText = text.toLowerCase();
-  
-  // Direct News fetching
-  if ((lowerText.includes('news') || lowerText.includes('headlines')) && lowerText.includes('search')) {
-      const searchQuery = text.replace(/news|headlines|give me|the latest|about|search/gi, '').trim() || 'Global';
+  if ((lowerText.includes('news') || lowerText.includes('headlines')) && searching) {
+      const searchQuery = text.replace(/news|headlines|give me|the latest|about/gi, '').trim() || 'Global';
       const googleNewsUrl = `https://news.google.com/search?q=${encodeURIComponent(searchQuery)}&hl=en-IN&gl=IN&ceid=IN:en`;
 
       const aiRow = document.createElement('div'); aiRow.className = 'message ai';
-      const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.innerHTML = '✳';
+      const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.textContent = '✳';
       const bubble = document.createElement('div'); bubble.className = 'bubble';
       bubble.innerHTML = `<p>Here are the latest headlines for "${searchQuery}":</p>
-      <p><a href="${googleNewsUrl}" target="_blank" style="font-weight:bold; font-size:16px; display:inline-block; padding:10px 15px; background:var(--accent2); border-radius:8px;">👉 Click here to read the latest news</a></p>`;
+      <p><a href="${googleNewsUrl}" target="_blank" style="font-weight:bold; font-size:16px; display:inline-block; padding:10px 15px; background:var(--accent2); color:var(--accent); border-radius:8px;">👉 Click here to read the latest news</a></p>
+      <p style="font-size: 13px; color: var(--muted); margin-top: 10px;">(Direct link provided because your Gemini API doesn't have Search Grounding enabled).</p>`;
       
       aiRow.append(avatar, bubble); chat.appendChild(aiRow);
-      currentMessages.push({ role: 'ai', text: `Provided direct Google News link.` });
+      currentMessages.push({ role: 'ai', text: `Provided direct Google News link for: ${searchQuery}` });
       saveHistory();
       
       busy = false; 
@@ -407,7 +414,6 @@ async function send(){
       return;
   }
 
-  // Force English if Tamil not requested
   let finalNotes = text;
   if (!lowerText.includes('tamil') && !/[\u0B80-\u0BFF]/.test(text)) {
       finalNotes = text + "\n\n(IMPORTANT INSTRUCTION: Reply strictly in English only.)";
@@ -415,8 +421,8 @@ async function send(){
 
   const payload = {
     notes: finalNotes || 'Analyze this image.',
-    think: false,
-    isSearching: lowerText.includes('search'),
+    think: think,
+    isSearching: searching,
     lang: 'en',
     history: currentMessages.slice(-10)
   };
@@ -427,7 +433,7 @@ async function send(){
   }
 
   const aiRow = document.createElement('div'); aiRow.className = 'message ai'; aiRow.id = 'streamMsg';
-  const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.innerHTML = '✳';
+  const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.textContent = '✳';
   const bubble = document.createElement('div'); bubble.className = 'bubble';
   const content = document.createElement('div'); content.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
   bubble.appendChild(content); aiRow.append(avatar, bubble); chat.appendChild(aiRow);
@@ -457,36 +463,19 @@ async function send(){
         } else {
             content.innerHTML = renderMarkdown(full);
             
-            // Add ChatGPT Style Tools
             const tools = document.createElement('div'); tools.className = 'msg-tools';
-            
             const copy = document.createElement('button'); copy.className='tool-btn'; 
-            copy.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
-            copy.title="Copy";
+            copy.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span>Copy</span>';
             copy.onclick = () => { 
                 navigator.clipboard?.writeText(full); 
-                copy.style.color='green'; 
-                setTimeout(()=>copy.style.color='var(--muted)', 1500); 
+                const span = copy.querySelector('span');
+                span.textContent = 'Copied!'; 
+                copy.style.color = 'green'; 
+                setTimeout(()=>{ span.textContent = 'Copy'; copy.style.color = 'var(--muted)'; }, 1500); 
             };
             
-            const thumbsUp = document.createElement('button'); thumbsUp.className='tool-btn'; 
-            thumbsUp.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>';
-            
-            const thumbsDown = document.createElement('button'); thumbsDown.className='tool-btn'; 
-            thumbsDown.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-2"></path></svg>';
-
             const speak = createSpeakBtn(full);
-            
-            const share = document.createElement('button'); share.className='tool-btn';
-            share.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>';
-
-            tools.appendChild(copy); 
-            tools.appendChild(thumbsUp);
-            tools.appendChild(thumbsDown);
-            tools.appendChild(speak); 
-            tools.appendChild(share);
-            
-            bubble.appendChild(tools);
+            tools.appendChild(copy); tools.appendChild(speak); bubble.appendChild(tools);
             
             currentMessages.push({ role: 'ai', text: full });
             saveHistory();
@@ -511,13 +500,11 @@ async function send(){
 
 sendBtn.onclick = send;
 
-// Textarea Auto-expand
 promptBox.addEventListener('input', function() {
     this.style.height = 'auto';
     this.style.height = (this.scrollHeight) + 'px';
 });
 
-// Shift+Enter for New Line, Enter for Send
 promptBox.addEventListener('keydown', e => { 
     if(e.key==='Enter' && !e.shiftKey){ 
         e.preventDefault(); 
