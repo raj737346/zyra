@@ -11,7 +11,7 @@
 <style>
 :root{
   --bg:#ffffff; --text:#191918; --muted:#777671;
-  --accent:#1f57ff; /* 🔵 நீல நிறம் (Blue Arrow) */
+  --accent:#1f57ff; /* 🔵 நீல நிற அம்பு */
   --accent2:#f3f6ff; 
   --panel:#f7f7f6;
   --border:#e8e7e4; --user:#f4f1ed; --shadow:0 12px 40px rgba(0,0,0,0.07);
@@ -502,11 +502,10 @@ async function send(){
       currentLanguage = 'en';
   }
 
-  // Persona & Language Logic (Fixed)
+  // 🔴 Custom Persona & Language logic combined safely into the prompt
   let finalNotes = text;
-  
-  // Combine custom persona and language instructions safely
   let sysInstruction = "";
+  
   if (customPersona) sysInstruction += `[System Persona: ${customPersona}]\n`;
   if (currentLanguage === 'en') sysInstruction += `(IMPORTANT INSTRUCTION: Reply strictly in English only.)\n`;
   else if (currentLanguage === 'ta') sysInstruction += `(IMPORTANT INSTRUCTION: Reply strictly in Tamil only.)\n`;
