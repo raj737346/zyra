@@ -1,371 +1,377 @@
 <!DOCTYPE html>
-<html lang="ta" data-theme="light">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
-<title>Zyra — Spark your mind</title>
+<title>Zyra — AI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@1&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Font family updated with fallback to fix square boxes */
-:root{--bg:#fff;--panel:#f7f7f6;--panel2:#efefed;--text:#191918;--muted:#777671;--line:#e8e7e4;--accent:#f36b38;--accent2:#fff0e9;--user:#f4f1ed;--shadow:0 12px 40px #00000012;--danger:#d93025}
-[data-theme="dark"]{--bg:#101010;--panel:#191919;--panel2:#242424;--text:#f4f2ee;--muted:#aaa7a0;--line:#30302e;--accent:#ff7846;--accent2:#38231b;--user:#242321;--shadow:0 12px 40px #0005}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:var(--bg);color:var(--text);font-family:Inter,"Noto Sans Tamil",sans-serif;-webkit-font-smoothing:antialiased}button,input,textarea{font:inherit}button{cursor:pointer}#app{height:100dvh;display:flex;flex-direction:column;max-width:1000px;margin:auto;position:relative}
-header{height:62px;flex:none;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:var(--bg)}
-.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.5px}.logo{width:30px;height:30px;border-radius:10px;background:var(--accent);color:white;display:grid;place-items:center;font-size:18px}.head-actions{display:flex;gap:8px;align-items:center}
-.iconbtn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:12px;width:38px;height:38px;font-size:17px;display:grid;place-items:center}
-.langselect{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:12px;padding:0 8px;height:38px;font-size:12px;cursor:pointer}
-main{flex:1;min-height:0;display:flex;flex-direction:column;position:relative}
-#chat{flex:1;overflow-y:auto;padding:28px 18px 20px;scroll-behavior:smooth}
-.welcome{max-width:650px;margin:8vh auto 25px;text-align:center}.welcome .spark{font-size:32px;color:var(--accent)}.welcome h1{font-size:clamp(28px,6vw,44px);letter-spacing:-1.8px;margin:12px 0 5px}.welcome h1 em{font-family:"Instrument Serif","Noto Sans Tamil",serif;font-weight:400;color:var(--accent)}.welcome p{color:var(--muted);font-size:14px;line-height:1.7;margin:8px 0 22px}
-.suggestions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;text-align:left}.suggestion{padding:14px;border:1px solid var(--line);border-radius:15px;background:var(--panel);color:var(--text);font-size:13px;line-height:1.5;text-align:left}.suggestion span{display:block;color:var(--muted);font-size:11px;margin-top:5px}
-.message{max-width:760px;margin:0 auto 20px;display:flex;gap:10px;align-items:flex-start}.avatar{flex:none;width:28px;height:28px;border-radius:9px;background:var(--accent2);color:var(--accent);display:grid;place-items:center;font-size:14px}.bubble{min-width:0;max-width:calc(100% - 40px);font-size:14px;line-height:1.75;overflow-wrap:anywhere}.message.user{justify-content:flex-end}.message.user .avatar{order:2;background:var(--panel2);color:var(--muted)}.message.user .bubble{background:var(--user);padding:11px 14px;border-radius:16px 4px 16px 16px}.message.ai .bubble{padding:2px 0}
-.bubble pre{white-space:pre-wrap;overflow-x:auto;background:var(--panel);padding:12px;border-radius:10px}.bubble code{background:var(--panel2);padding:1px 5px;border-radius:5px;font-size:13px}.bubble pre code{background:none;padding:0}.bubble strong{font-weight:700}.bubble a{color:var(--accent)}.bubble ul,.bubble ol{margin:6px 0;padding-left:22px}.bubble img{max-width:min(240px,100%);border-radius:12px;display:block;margin-bottom:8px}
-.msg-tools{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}.tiny{border:0;background:transparent;color:var(--muted);font-size:12px;padding:4px;border-radius:6px}.tiny:hover{color:var(--accent)}
-.cursor::after{content:'▍';animation:blink 1s infinite;color:var(--accent)}@keyframes blink{50%{opacity:0}}
-.composer-wrap{padding:10px 16px max(14px,env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 16%)}.composer{max-width:760px;margin:auto;border:1px solid var(--line);border-radius:20px;background:var(--panel);padding:10px 11px 8px;box-shadow:var(--shadow)}#prompt{width:100%;resize:none;border:0;outline:0;background:transparent;color:var(--text);font-size:14px;line-height:1.6;min-height:44px;max-height:150px;padding:5px 4px}#prompt::placeholder{color:var(--muted)}.composer-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px}.tools{display:flex;gap:5px;align-items:center;flex-wrap:wrap}.tool{border:1px solid transparent;background:transparent;color:var(--muted);border-radius:10px;padding:7px 9px;font-size:12px}.tool.active{background:var(--accent2);color:var(--accent);border-color:#f36b3833}
-.send{width:36px;height:36px;border:0;border-radius:12px;background:var(--accent);color:#fff;font-size:17px}.send:disabled{opacity:.45}.send.stop{background:var(--danger)}.hint{text-align:center;color:var(--muted);font-size:10px;margin:8px 0 0}
-#imagePreview{display:none;margin:4px 4px 8px;position:relative;width:max-content}#imagePreview img{max-width:100px;max-height:75px;border-radius:9px}#removeImage{position:absolute;right:-7px;top:-7px;border:0;border-radius:50%;background:var(--text);color:var(--bg);width:21px;height:21px}
-#status{max-width:760px;margin:0 auto 8px;color:var(--muted);font-size:12px;min-height:17px;padding:0 4px}
-.overlay{display:none;position:absolute;inset:0;background:#0006;z-index:5}.drawer{position:absolute;top:0;bottom:0;left:0;width:min(310px,85vw);background:var(--bg);border-right:1px solid var(--line);padding:18px;display:flex;flex-direction:column}.drawer-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.drawer button{color:var(--text)}.newchat{padding:11px;border:1px solid var(--line);background:var(--panel);border-radius:12px;text-align:left}.history-title{font-size:11px;color:var(--muted);margin:22px 0 8px;display:flex;justify-content:space-between}.history-list{overflow:auto;flex:1}.history-row{display:flex;align-items:center;border-radius:9px}.history-row:hover{background:var(--panel)}.history-item{flex:1;text-align:left;border:0;background:transparent;padding:10px 8px;color:var(--text);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.del-btn{border:0;background:transparent;color:var(--muted);padding:8px;font-size:14px}.del-btn:hover{color:var(--danger)}
-#voiceState{display:none;position:absolute;inset:0;background:var(--bg);z-index:6;align-items:center;justify-content:center;flex-direction:column;gap:18px}.pulse{width:76px;height:76px;border-radius:50%;background:var(--accent2);display:grid;place-items:center;color:var(--accent);font-size:30px}
-.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:9px 16px;border-radius:10px;font-size:13px;z-index:20;opacity:0;transition:opacity .25s;pointer-events:none}.toast.show{opacity:1}
-@media(max-width:520px){header{height:56px;padding:0 13px}#chat{padding:18px 13px}.welcome{margin-top:6vh}.suggestions{grid-template-columns:1fr}.composer-wrap{padding-left:10px;padding-right:10px}.tool{padding:7px 6px}.hint{font-size:9px}.langselect{padding:0 5px;font-size:11px}}
+:root{
+  --bg:#ffffff;
+  --text:#111111;
+  --muted:#888888;
+  --accent:#1f57ff;
+  --accent-bg:#eef2ff;
+  --panel:#f9f9f9;
+  --border:#e5e5e5;
+  --user-bg:#f3f4f6;
+  --shadow:0 4px 20px rgba(0,0,0,0.05);
+}
+[data-theme="dark"]{
+  --bg:#111111;
+  --text:#eeeeee;
+  --muted:#888888;
+  --accent:#3b75ff;
+  --accent-bg:#1a2235;
+  --panel:#1e1e1e;
+  --border:#333333;
+  --user-bg:#2a2a2a;
+  --shadow:0 4px 20px rgba(0,0,0,0.3);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:Inter,"Noto Sans Tamil",sans-serif;-webkit-font-smoothing:antialiased}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:none}
+#app{height:100dvh;display:flex;flex-direction:column;max-width:900px;margin:0 auto;position:relative}
+
+/* Header */
+header{height:60px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 20px}
+.header-left{display:flex;align-items:center;gap:12px}
+.iconbtn{color:var(--text);display:grid;place-items:center;width:36px;height:36px;border-radius:50%;transition:background 0.2s}
+.iconbtn:hover{background:var(--panel)}
+.header-right{display:flex;align-items:center;gap:10px}
+
+/* Main Content */
+main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:20px;scroll-behavior:smooth}
+.center-logo{width:50px;height:50px;color:var(--accent);margin-top:25vh;margin-bottom:16px}
+.center-title{font-size:24px;font-weight:600;color:var(--text);letter-spacing:-0.5px;margin-bottom:40px}
+
+/* Chat Messages */
+.chat-container{width:100%;max-width:700px;display:flex;flex-direction:column;gap:24px;padding-bottom:20px}
+.message{display:flex;gap:12px;align-items:flex-start;width:100%}
+.message.user{justify-content:flex-end}
+.message.ai{justify-content:flex-start}
+.bubble{max-width:85%;line-height:1.6;font-size:15px;overflow-wrap:anywhere}
+.message.user .bubble{background:var(--user-bg);padding:12px 18px;border-radius:20px 20px 4px 20px}
+.message.ai .bubble{background:transparent;padding:0;max-width:100%}
+.bubble img{max-width:min(250px,100%);border-radius:12px;display:block;margin-bottom:8px}
+.msg-tools{display:flex;gap:12px;margin-top:12px}
+.tool-btn{color:var(--muted);font-size:12px;display:flex;align-items:center;gap:4px}
+.tool-btn:hover{color:var(--accent)}
+
+/* Markdown */
+.bubble pre{white-space:pre-wrap;overflow-x:auto;background:var(--panel);padding:14px;border-radius:12px;margin:10px 0;border:1px solid var(--border)}
+.bubble code{background:var(--panel);padding:2px 6px;border-radius:6px;font-size:13px;border:1px solid var(--border)}
+.bubble pre code{background:none;padding:0;border:none}
+.bubble a{color:var(--accent);text-decoration:none}
+.bubble p{margin-bottom:12px}
+.bubble p:last-child{margin-bottom:0}
+
+/* Composer Area (The bottom search bar) */
+.composer-wrap{width:100%;padding:10px 20px 20px;display:flex;flex-direction:column;align-items:center;background:linear-gradient(transparent, var(--bg) 20%)}
+.composer{width:100%;max-width:700px;background:var(--bg);border:1px solid var(--border);border-radius:24px;padding:10px 14px 10px 18px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 15px rgba(0,0,0,0.03)}
+.composer:focus-within{border-color:#d0d0d0}
+[data-theme="dark"] .composer:focus-within{border-color:#444}
+.composer input{flex:1;border:none;background:transparent;font-size:16px;outline:none;padding:8px 0}
+.composer input::placeholder{color:var(--muted)}
+.composer-actions{display:flex;align-items:center;gap:8px}
+/* Toggles */
+.toggle-btns{display:flex;gap:6px;margin-bottom:8px;width:100%;max-width:700px}
+.tbtn{border:1px solid transparent;background:var(--panel);color:var(--muted);padding:6px 12px;border-radius:20px;font-size:13px;display:flex;align-items:center;gap:6px;font-weight:500}
+.tbtn.active{background:var(--accent-bg);color:var(--accent);border-color:#d0dfff}
+
+/* Buttons inside composer */
+.icon-send{background:var(--accent);color:white;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;transition:opacity 0.2s}
+.icon-send:disabled{opacity:0.5}
+.icon-circle{color:var(--text);width:36px;height:36px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--border)}
+.icon-circle:hover{background:var(--panel)}
+
+/* Typing indicator */
+.typing{display:flex;gap:4px;align-items:center;height:24px}
+.typing span{width:6px;height:6px;background:var(--muted);border-radius:50%;animation:bounce 1.4s infinite ease-in-out both}
+.typing span:nth-child(1){animation-delay:-0.32s}
+.typing span:nth-child(2){animation-delay:-0.16s}
+@keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+
+/* Drawer (Menu) */
+.overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.4);z-index:10;backdrop-filter:blur(2px)}
+.drawer{position:absolute;top:0;bottom:0;left:0;width:280px;background:var(--bg);border-right:1px solid var(--border);padding:20px;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform 0.3s ease}
+.overlay.show .drawer{transform:translateX(0)}
+.overlay.show{display:block}
+.history-list{margin-top:20px;flex:1;overflow-y:auto}
+.history-item{padding:12px;border-radius:8px;color:var(--text);font-size:14px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;justify-content:space-between;align-items:center}
+.history-item:hover{background:var(--panel)}
+.del-btn{color:var(--muted);font-size:16px;padding:4px}
+.del-btn:hover{color:red}
 </style>
 </head>
 <body>
 <div id="app">
-<header>
-  <div class="brand"><button class="iconbtn" id="menuBtn" aria-label="Menu">☰</button><div class="logo">✳</div><span>Zyra</span></div>
-  <div class="head-actions">
-    <select class="langselect" id="langSelect" title="Language">
-      <option value="auto">🌐 Auto</option>
-      <option value="ta">தமிழ்</option>
-      <option value="en">English</option>
-      <option value="hi">हिन्दी</option>
-    </select>
-    <button class="iconbtn" id="newBtn" title="New chat">＋</button>
-    <button class="iconbtn" id="themeBtn" title="Theme">☾</button>
-  </div>
-</header>
-<main>
-  <section id="chat" aria-live="polite">
-    <div class="welcome" id="welcome">
-      <div class="spark">✳</div>
-      <h1>மனதில் ஒரு <em>பொறி.</em></h1>
-      <p>வணக்கம்! நான் Zyra. உங்கள் எண்ணங்கள், கேள்விகள், திட்டங்கள் — எதையும் பகிரலாம்.<br>தமிழ் · English · हिन्दी</p>
-      <div class="suggestions">
-        <button class="suggestion" data-prompt="இந்த வாரம் நான் செய்தவற்றைச் சுருக்கமாகத் தொகுத்து, முக்கிய முன்னுரிமைகளைச் சொல்லுங்கள்.">◷ வாரச் சுருக்கம்<span>இந்த வாரத்தை ஒழுங்குபடுத்துங்கள்</span></button>
-        <button class="suggestion" data-prompt="எனது இன்றைய பணிகளுக்கான எளிய திட்டம் உருவாக்குங்கள்.">☼ தினசரி திட்டம்<span>இன்றைய நாளைத் திட்டமிடுங்கள்</span></button>
-        <button class="suggestion" data-prompt="ஒரு கடினமான விஷயத்தை எளிமையாக விளக்குங்கள்.">✳ கற்றுக்கொள்வோம்<span>எளிய விளக்கம் பெறுங்கள்</span></button>
-        <button class="suggestion" data-prompt="எனக்கு புதிய யோசனைகள் சொல்லுங்கள்.">◇ புதிய யோசனைகள்<span>சிந்தனையைத் தூண்டுங்கள்</span></button>
-      </div>
+  <header>
+    <div class="header-left">
+      <button class="iconbtn" id="menuBtn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
     </div>
-  </section>
-  <div id="status"></div>
+    <div class="header-right">
+      <button class="iconbtn" id="newBtn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="chatArea">
+    <div id="welcomeScreen" style="text-align:center; display:flex; flex-direction:column; align-items:center;">
+      <svg class="center-logo" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+      </svg>
+      <h1 class="center-title">Where would you like to begin?</h1>
+    </div>
+    <div class="chat-container" id="chat"></div>
+  </main>
+
   <div class="composer-wrap">
-    <div class="composer">
-      <div id="imagePreview"><img id="previewImg" alt="Selected image"><button id="removeImage" title="Remove image">×</button></div>
-      <textarea id="prompt" rows="1" placeholder="Zyra-விடம் எதையும் கேளுங்கள்..."></textarea>
-      <div class="composer-bottom">
-        <div class="tools">
-          <button class="tool" id="attachBtn" title="Attach image">＋ படம்</button>
-          <button class="tool" id="thinkBtn">✧ Think</button>
-          <button class="tool" id="searchBtn">⌕ Search</button>
-          <button class="tool" id="micBtn" title="Voice input">🎙</button>
-        </div>
-        <button class="send" id="sendBtn" aria-label="Send">↑</button>
-      </div>
-      <input type="file" id="imageInput" accept="image/*" hidden>
+    <div class="toggle-btns">
+      <button class="tbtn" id="thinkBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
+        Think
+      </button>
+      <button class="tbtn" id="searchBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        Search
+      </button>
     </div>
-    <p class="hint">Zyra தவறுகள் செய்யலாம். முக்கியமான தகவல்களைச் சரிபார்க்கவும்.</p>
+    <div class="composer">
+      <input type="text" id="prompt" placeholder="Type a message or hold to speak" autocomplete="off">
+      <div class="composer-actions">
+        <button class="icon-circle" id="voiceBtn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>
+        </button>
+        <button class="icon-send" id="sendBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
   </div>
+
   <div class="overlay" id="drawerOverlay">
     <aside class="drawer">
-      <div class="drawer-top"><strong>Zyra</strong><button class="iconbtn" id="closeDrawer">×</button></div>
-      <button class="newchat" id="drawerNew">＋ புதிய உரையாடல்</button>
-      <div class="history-title"><span>சமீபத்திய உரையாடல்கள்</span><button class="tiny" id="clearAll" style="display:none">Clear all</button></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <strong style="font-size:18px;">Zyra History</strong>
+        <button class="iconbtn" id="closeDrawer">✕</button>
+      </div>
       <div class="history-list" id="historyList"></div>
-      <div class="drawer-footer">உரையாடல் வரலாறு இந்தச் சாதனத்தில் மட்டும் சேமிக்கப்படும்.</div>
+      <button id="clearAll" style="margin-top:auto; color:var(--muted); font-size:13px; text-align:left; padding:10px;">Clear all</button>
     </aside>
   </div>
-  <div id="voiceState"><div class="pulse">🎙</div><strong>கேட்கிறேன்...</strong><button class="primary" id="stopVoice">நிறுத்து</button></div>
-  <div class="toast" id="toast"></div>
-</main>
 </div>
+
 <script>
 (() => {
 'use strict';
-const API_URL = '/api/chat'; // உங்கள் Backend URL
+const API_URL = '/api/chat'; 
 const $ = id => document.getElementById(id);
 const chat = $('chat'), promptBox = $('prompt'), sendBtn = $('sendBtn');
-let selectedImage = null, think = false, searching = false, busy = false, recognition = null;
+const welcomeScreen = $('welcomeScreen');
+
+let think = false, searching = false, busy = false, recognition = null;
 let currentMessages = [];
 let currentChatId = null;
 let history = [];
 let abortController = null;
 
 try { history = JSON.parse(localStorage.getItem('zyra_history') || '[]'); if(!Array.isArray(history)) history=[]; } catch { history=[]; }
-try { const l = localStorage.getItem('zyra_lang'); if(l) $('langSelect').value = l; } catch {}
 
-function toast(msg){
-  const t = $('toast'); t.textContent = msg; t.classList.add('show');
-  clearTimeout(window.toastTimer); window.toastTimer = setTimeout(()=>t.classList.remove('show'), 1800);
-}
+// UI Toggles
+$('thinkBtn').onclick = () => { think = !think; $('thinkBtn').classList.toggle('active', think); };
+$('searchBtn').onclick = () => { searching = !searching; $('searchBtn').classList.toggle('active', searching); };
 
-function getLang(){
-  const sel = $('langSelect').value;
-  if(sel !== 'auto') return sel;
-  const t = promptBox.value.trim();
-  if(/[அ-ஹ]/.test(t)) return 'ta';
-  if(/[ऀ-ॿ]/.test(t)) return 'hi';
-  return 'en';
-}
-$('langSelect').onchange = () => { try{ localStorage.setItem('zyra_lang', $('langSelect').value); }catch{} };
-
-function chatTitle(){
-  const u = currentMessages.find(m => m.role === 'user');
-  if(!u || !u.text) return 'புதிய உரையாடல்';
-  return Array.from(u.text).slice(0, 55).join('');
-}
+// History Functions
 function saveHistory(){
   if(!currentMessages.length) return;
   if(currentChatId === null) currentChatId = Date.now();
+  const u = currentMessages.find(m => m.role === 'user');
+  const title = u ? Array.from(u.text).slice(0, 40).join('') : 'New Chat';
+  
   const idx = history.findIndex(h => h.id === currentChatId);
-  const item = { id: currentChatId, title: chatTitle(), messages: currentMessages.slice(), updated: Date.now() };
+  const item = { id: currentChatId, title: title, messages: currentMessages.slice(), updated: Date.now() };
   if(idx >= 0) history[idx] = item;
   else history.unshift(item);
   history = history.slice(0, 20);
-  try{ localStorage.setItem('zyra_history', JSON.stringify(history)); }catch{ toast('சேமிப்பு நிரம்பியது — பழைய உரையாடலை நீக்கவும்.'); }
+  try{ localStorage.setItem('zyra_history', JSON.stringify(history)); }catch{}
   renderHistory();
 }
+
 function renderHistory(){
   const list = $('historyList'); list.innerHTML = '';
-  $('clearAll').style.display = history.length ? 'inline' : 'none';
   history.forEach(item => {
-    const row = document.createElement('div'); row.className = 'history-row';
-    const b = document.createElement('button'); b.className = 'history-item'; b.textContent = item.title || 'உரையாடல்';
-    b.onclick = () => loadChat(item.id);
-    const del = document.createElement('button'); del.className = 'del-btn'; del.textContent = '✕'; del.title = 'Delete';
+    const row = document.createElement('div'); row.className = 'history-item';
+    row.innerHTML = `<span>${item.title}</span>`;
+    row.onclick = () => loadChat(item.id);
+    const del = document.createElement('button'); del.className = 'del-btn'; del.textContent = '✕';
     del.onclick = (e) => { e.stopPropagation(); deleteChat(item.id); };
-    row.append(b, del); list.appendChild(row);
+    row.appendChild(del); list.appendChild(row);
   });
 }
+
 function deleteChat(id){
   history = history.filter(h => h.id !== id);
   try{ localStorage.setItem('zyra_history', JSON.stringify(history)); }catch{}
-  if(currentChatId === id){ currentMessages = []; currentChatId = null; }
-  renderHistory(); toast('நீக்கப்பட்டது');
+  if(currentChatId === id){ currentMessages = []; currentChatId = null; chat.innerHTML=''; welcomeScreen.style.display='flex'; }
+  renderHistory();
 }
-$('clearAll').onclick = () => { history = []; currentMessages = []; currentChatId = null; try{ localStorage.removeItem('zyra_history'); }catch{} renderHistory(); chat.innerHTML = ''; renderWelcome(); toast('வரலாறு அழிக்கப்பட்டது'); };
+
+$('clearAll').onclick = () => { 
+  history = []; currentMessages = []; currentChatId = null; 
+  try{ localStorage.removeItem('zyra_history'); }catch{} 
+  renderHistory(); chat.innerHTML = ''; welcomeScreen.style.display = 'flex'; 
+};
+
 function loadChat(id){
   const item = history.find(h => h.id === id); if(!item) return;
   currentMessages = (item.messages || []).slice(); currentChatId = id;
-  chat.innerHTML = '';
+  chat.innerHTML = ''; welcomeScreen.style.display = 'none';
   currentMessages.forEach(m => addMessage(m.role, m.text, m.image, false));
-  $('drawerOverlay').style.display = 'none';
+  $('drawerOverlay').classList.remove('show');
 }
 
+// Markdown (Simple)
 function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function renderMarkdown(text){
   let s = escapeHtml(text || '');
   s = s.replace(/```([\s\S]*?)```/g, (_,c) => '<pre><code>'+c+'</code></pre>');
   s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
   s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-  s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
   return s;
 }
 
+// Add Message to UI
 function addMessage(role, text, image = null, store = true){
-  $('welcome')?.remove();
-  const row = document.createElement('div'); row.className = 'message ' + (role === 'user' ? 'user' : 'ai');
-  const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.textContent = role === 'user' ? '●' : '✳';
+  welcomeScreen.style.display = 'none';
+  const row = document.createElement('div'); row.className = 'message ' + role;
   const bubble = document.createElement('div'); bubble.className = 'bubble';
-  if(image){ const img = document.createElement('img'); img.src = image; img.alt = 'Attached image'; bubble.appendChild(img); }
-  const content = document.createElement('div'); content.className = 'content';
+  
+  if(image){ const img = document.createElement('img'); img.src = image; bubble.appendChild(img); }
+  
+  const content = document.createElement('div');
   content.innerHTML = role === 'ai' ? renderMarkdown(text) : escapeHtml(text || '');
   bubble.appendChild(content);
+
   if(role === 'ai'){
     const tools = document.createElement('div'); tools.className = 'msg-tools';
-    const copy = document.createElement('button'); copy.className = 'tiny'; copy.textContent = 'Copy';
-    copy.onclick = () => { navigator.clipboard?.writeText(text || ''); toast('Copied ✓'); };
-    const speak = document.createElement('button'); speak.className = 'tiny'; speak.textContent = 'Read aloud';
-    speak.onclick = () => { if('speechSynthesis' in window){ speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text||''); u.lang = getLang()==='ta'?'ta-IN':getLang()==='hi'?'hi-IN':'en-US'; speechSynthesis.speak(u); } };
-    tools.append(copy, speak); bubble.appendChild(tools);
+    const copy = document.createElement('button'); copy.className = 'tool-btn'; copy.textContent = 'Copy';
+    copy.onclick = () => { navigator.clipboard?.writeText(text || ''); copy.textContent = 'Copied!'; setTimeout(()=>copy.textContent='Copy', 1500); };
+    tools.appendChild(copy); bubble.appendChild(tools);
   }
-  row.append(avatar, bubble); chat.appendChild(row); chat.scrollTop = chat.scrollHeight;
+
+  row.appendChild(bubble); chat.appendChild(row);
+  const main = $('chatArea'); main.scrollTop = main.scrollHeight;
   if(store) currentMessages.push({ role, text, image });
 }
 
-function setStatus(s){ $('status').textContent = s; }
-function setBusy(v){
-  busy = v; sendBtn.disabled = false;
-  sendBtn.classList.toggle('stop', v);
-  sendBtn.textContent = v ? '■' : '↑';
-  sendBtn.setAttribute('aria-label', v ? 'Stop' : 'Send');
-}
-function resetImage(){ selectedImage = null; $('imagePreview').style.display = 'none'; $('imageInput').value = ''; }
-
-let lastRequest = null;
+// Send Message
 async function send(){
   if(busy){ abortController?.abort(); return; }
   const text = promptBox.value.trim();
-  if(!text && !selectedImage) return;
+  if(!text) return;
 
-  const imageData = selectedImage;
-  addMessage('user', text, imageData);
-  promptBox.value = ''; promptBox.style.height = 'auto'; resetImage();
-  setBusy(true); setStatus('Zyra யோசிக்கிறது…');
+  addMessage('user', text);
+  promptBox.value = '';
+  busy = true; sendBtn.disabled = true;
+  sendBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12"/></svg>';
 
   const payload = {
-    notes: text || 'இந்தப் படத்தைப் பார்த்து விளக்குங்கள்.',
-    image: imageData ? imageData.split(',')[1] : null,
-    mimeType: imageData ? (imageData.match(/data:(.*?);/)||[])[1] || 'image/jpeg' : null,
-    think, searching, lang: getLang(),
-    history: currentMessages.slice(-12)
+    notes: text,
+    think, searching,
+    history: currentMessages.slice(-10)
   };
-  lastRequest = payload;
 
+  // AI Typing Indicator
   const aiRow = document.createElement('div'); aiRow.className = 'message ai'; aiRow.id = 'streamMsg';
-  aiRow.innerHTML = '<div class="avatar">✳</div>';
   const bubble = document.createElement('div'); bubble.className = 'bubble';
-  const content = document.createElement('div'); content.className = 'content cursor'; content.textContent = '';
-  bubble.appendChild(content);
-  aiRow.appendChild(bubble); chat.appendChild(aiRow); chat.scrollTop = chat.scrollHeight;
+  const content = document.createElement('div'); content.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+  bubble.appendChild(content); aiRow.appendChild(bubble); chat.appendChild(aiRow);
+  const main = $('chatArea'); main.scrollTop = main.scrollHeight;
 
   let full = '';
   abortController = new AbortController();
 
   try{
     const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      signal: abortController.signal
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload), signal: abortController.signal
     });
     if(!res.ok) throw new Error(`Server error (${res.status})`);
 
     const data = await res.json();
-    full = data.answer || data.response || data.summary || data.text || 'பதில் கிடைக்கவில்லை.';
+    full = data.answer || data.response || data.summary || data.text || 'No response.';
     
-    // Typewriter effect to simulate streaming
-    content.classList.remove('cursor');
+    // Simulate streaming (typewriter)
     let i = 0;
-    const speed = 15;
+    content.innerHTML = '';
     function typeWriter() {
         if (i < full.length) {
-            content.innerHTML = renderMarkdown(full.substring(0, i + 1)) + '<span class="cursor"></span>';
-            chat.scrollTop = chat.scrollHeight;
-            i++;
-            setTimeout(typeWriter, speed);
+            content.innerHTML = renderMarkdown(full.substring(0, i + 1));
+            main.scrollTop = main.scrollHeight;
+            i += 2; 
+            setTimeout(typeWriter, 10);
         } else {
             content.innerHTML = renderMarkdown(full);
             const tools = document.createElement('div'); tools.className = 'msg-tools';
-            const copy = document.createElement('button'); copy.className='tiny'; copy.textContent='Copy';
-            copy.onclick = () => { navigator.clipboard?.writeText(full); toast('Copied ✓'); };
-            const speak = document.createElement('button'); speak.className='tiny'; speak.textContent='Read aloud';
-            speak.onclick = () => { if('speechSynthesis' in window){ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(full); u.lang=getLang()==='ta'?'ta-IN':getLang()==='hi'?'hi-IN':'en-US'; speechSynthesis.speak(u);} };
-            tools.append(copy, speak); bubble.appendChild(tools);
+            const copy = document.createElement('button'); copy.className='tool-btn'; copy.textContent='Copy';
+            copy.onclick = () => { navigator.clipboard?.writeText(full); copy.textContent='Copied!'; setTimeout(()=>copy.textContent='Copy', 1500); };
+            tools.appendChild(copy); bubble.appendChild(tools);
             
             currentMessages.push({ role: 'ai', text: full });
             saveHistory();
-            setStatus('');
-            setBusy(false);
-            promptBox.focus();
+            busy = false; sendBtn.disabled = false;
+            sendBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
         }
     }
     typeWriter();
 
   }catch(err){
     aiRow.remove();
-    setBusy(false);
-    if(err.name === 'AbortError'){
-      setStatus('');
-    } else {
-      const errRow = document.createElement('div'); errRow.className = 'message ai';
-      errRow.innerHTML = '<div class="avatar">✳</div>';
-      const eb = document.createElement('div'); eb.className='bubble';
-      eb.textContent = 'இணைப்பில் சிக்கல்: ' + (err.message || 'Unknown error');
-      const retry = document.createElement('button'); retry.className='tiny'; retry.textContent='↻ Retry';
-      retry.onclick = () => { errRow.remove(); promptBox.value = lastRequest?.notes || ''; send(); };
-      eb.appendChild(document.createElement('br')); eb.appendChild(retry);
-      errRow.appendChild(eb); chat.appendChild(errRow); chat.scrollTop = chat.scrollHeight;
-      setStatus('');
+    busy = false; sendBtn.disabled = false;
+    sendBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+    if(err.name !== 'AbortError'){
+      addMessage('ai', 'Error: ' + (err.message || 'Connection failed'));
     }
   }
 }
 
-sendBtn.addEventListener('click', send);
-promptBox.addEventListener('input', () => { promptBox.style.height='auto'; promptBox.style.height=Math.min(promptBox.scrollHeight,150)+'px'; });
-promptBox.addEventListener('keydown', e => { if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); } });
-$('thinkBtn').onclick = () => { think = !think; $('thinkBtn').classList.toggle('active', think); };
-$('searchBtn').onclick = () => { searching = !searching; $('searchBtn').classList.toggle('active', searching); };
-$('attachBtn').onclick = () => $('imageInput').click();
-$('imageInput').onchange = async e => {
-  const file = e.target.files?.[0]; if(!file) return;
-  if(!file.type.startsWith('image/')){ toast('படக் கோப்பைத் தேர்ந்தெடுக்கவும்.'); return; }
-  if(file.size > 8*1024*1024){ toast('படம் 8 MB-ஐ விடச் சிறியதாக இருக்க வேண்டும்.'); return; }
-  const reader = new FileReader();
-  reader.onload = () => { selectedImage = reader.result; $('previewImg').src = selectedImage; $('imagePreview').style.display='block'; };
-  reader.readAsDataURL(file);
-};
-$('removeImage').onclick = resetImage;
+sendBtn.onclick = send;
+promptBox.addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); send(); } });
 
-function renderWelcome(){
-  chat.innerHTML = `
-    <div class="welcome" id="welcome">
-      <div class="spark">✳</div>
-      <h1>மனதில் ஒரு <em>பொறி.</em></h1>
-      <p>வணக்கம்! நான் Zyra. உங்கள் எண்ணங்கள், கேள்விகள், திட்டங்கள் — எதையும் பகிரலாம்.<br>தமிழ் · English · हिन्दी</p>
-      <div class="suggestions">
-        <button class="suggestion" data-prompt="இந்த வாரம் நான் செய்தவற்றைச் சுருக்கமாகத் தொகுத்து, முக்கிய முன்னுரிமைகளைச் சொல்லுங்கள்.">◷ வாரச் சுருக்கம்<span>இந்த வாரத்தை ஒழுங்குபடுத்துங்கள்</span></button>
-        <button class="suggestion" data-prompt="எனது இன்றைய பணிகளுக்கான எளிய திட்டம் உருவாக்குங்கள்.">☼ தினசரி திட்டம்<span>இன்றைய நாளைத் திட்டமிடுங்கள்</span></button>
-        <button class="suggestion" data-prompt="ஒரு கடினமான விஷயத்தை எளிமையாக விளக்குங்கள்.">✳ கற்றுக்கொள்வோம்<span>எளிய விளக்கம் பெறுங்கள்</span></button>
-        <button class="suggestion" data-prompt="எனக்கு புதிய யோசனைகள் சொல்லுங்கள்.">◇ புதிய யோசனைகள்<span>சிந்தனையைத் தூண்டுங்கள்</span></button>
-      </div>
-    </div>`;
-  bindSuggestions();
-}
-function bindSuggestions(){
-  document.querySelectorAll('[data-prompt]').forEach(b => b.onclick = () => { promptBox.value = b.dataset.prompt; send(); });
-}
-function newChat(){
+// New Chat
+$('newBtn').onclick = () => {
   if(currentMessages.length) saveHistory();
   currentMessages = []; currentChatId = null;
-  renderWelcome(); promptBox.focus();
-}
-
-$('newBtn').onclick = newChat;
-$('drawerNew').onclick = () => { $('drawerOverlay').style.display='none'; newChat(); };
-$('menuBtn').onclick = () => { $('drawerOverlay').style.display='block'; };
-$('closeDrawer').onclick = () => { $('drawerOverlay').style.display='none'; };
-$('drawerOverlay').addEventListener('click', e => { if(e.target === $('drawerOverlay')){ $('drawerOverlay').style.display='none'; } });
-$('themeBtn').onclick = () => {
-  const root = document.documentElement;
-  const dark = root.dataset.theme !== 'dark';
-  root.dataset.theme = dark ? 'dark' : 'light';
-  $('themeBtn').textContent = dark ? '☀' : '☾';
-  try{ localStorage.setItem('zyra_theme', root.dataset.theme); }catch{}
+  chat.innerHTML = ''; welcomeScreen.style.display = 'flex'; promptBox.focus();
 };
-try{ const saved = localStorage.getItem('zyra_theme'); if(saved){ document.documentElement.dataset.theme = saved; $('themeBtn').textContent = saved==='dark'?'☀':'☾'; } }catch{}
 
-$('micBtn').onclick = () => {
+// Drawer
+$('menuBtn').onclick = () => $('drawerOverlay').classList.add('show');
+$('closeDrawer').onclick = () => $('drawerOverlay').classList.remove('show');
+$('drawerOverlay').onclick = (e) => { if(e.target === $('drawerOverlay')) $('drawerOverlay').classList.remove('show'); };
+
+// Voice Input
+$('voiceBtn').onclick = () => {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!SR){ setStatus('இந்த browser-ல் voice input ஆதரிக்கப்படவில்லை.'); return; }
+  if(!SR){ alert('Voice not supported'); return; }
   if(recognition){ recognition.stop(); return; }
   recognition = new SR();
-  const l = getLang();
-  recognition.lang = l==='ta'?'ta-IN':l==='hi'?'hi-IN':'en-IN';
+  recognition.lang = 'en-IN'; // Change to ta-IN for Tamil
   recognition.interimResults = false;
-  $('voiceState').style.display = 'flex';
-  recognition.onresult = e => { promptBox.value += (promptBox.value?' ':'') + e.results[0][0].transcript; promptBox.dispatchEvent(new Event('input')); };
-  recognition.onerror = () => setStatus('Voice input செயல்படவில்லை.');
-  recognition.onend = () => { $('voiceState').style.display = 'none'; recognition = null; };
+  recognition.onresult = e => { promptBox.value += e.results[0][0].transcript; };
+  recognition.onend = () => recognition = null;
   recognition.start();
+  $('voiceBtn').style.color = 'red';
+  recognition.onend = () => { recognition = null; $('voiceBtn').style.color = 'var(--text)'; };
 };
-$('stopVoice').onclick = () => recognition?.stop();
 
 renderHistory();
 })();
