@@ -11,12 +11,16 @@
 <style>
 :root{
   --bg:#ffffff; --text:#191918; --muted:#777671;
-  --accent:#1f57ff; --accent2:#f3f6ff; --panel:#f7f7f6;
+  --accent:#f36b38; /* 🔴 ஆரஞ்சு நிறம் (Orange) */
+  --accent2:#fff0e9; 
+  --panel:#f7f7f6;
   --border:#e8e7e4; --user:#f4f1ed; --shadow:0 12px 40px rgba(0,0,0,0.07);
 }
 [data-theme="dark"]{
   --bg:#101010; --text:#f4f2ee; --muted:#aaa7a0;
-  --accent:#3b75ff; --accent2:#1a2235; --panel:#191919;
+  --accent:#ff7846; 
+  --accent2:#38231b; 
+  --panel:#191919;
   --border:#30302e; --user:#242321; --shadow:0 12px 40px rgba(0,0,0,0.3);
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -40,7 +44,7 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 .welcome .spark{font-size:40px;color:var(--accent); margin-bottom:16px;}
 .welcome h1{font-size:clamp(32px,6vw,48px);letter-spacing:-1.8px;margin:0 0 5px; font-weight:700;}
 .welcome h1 em{font-family:"Instrument Serif",serif;font-weight:400;color:var(--accent); font-style: italic;}
-.welcome h2{font-size:38px; color:var(--text); font-weight:700; margin-top:10px;}
+.welcome h2{font-size:38px; color:var(--accent); font-weight:700; margin-top:10px;}
 
 /* Chat Messages */
 .chat-container{width:100%;max-width:760px;display:flex;flex-direction:column;gap:20px;padding-bottom:20px; margin-top:20px;}
@@ -88,7 +92,7 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 .composer-bottom-row{display:flex; justify-content:space-between; align-items:center; width:100%;}
 .toggle-btns{display:flex; gap:6px; align-items:center; flex-wrap:wrap;}
 .tbtn{border:1px solid transparent;background:var(--panel);color:var(--muted);padding:6px 12px;border-radius:20px;font-size:13px;display:flex;align-items:center;gap:6px;font-weight:500; transition:all 0.2s;}
-.tbtn.active{background:var(--accent2);color:var(--accent);border-color:#1f57ff33}
+.tbtn.active{background:var(--accent2);color:var(--accent);border-color:#f36b3833}
 
 .composer-actions{display:flex;align-items:center;gap:8px}
 .preview-img{width:40px;height:40px;border-radius:8px;object-fit:cover;display:none;margin-right:5px}
