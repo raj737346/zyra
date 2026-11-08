@@ -160,10 +160,17 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 
       <div class="composer-bottom-row">
         <div class="toggle-btns">
+          <!-- Auto-Speak (First) -->
+          <button class="tbtn" id="autoSpeakBtn" title="Auto-Speak">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+            Speak
+          </button>
+          
           <button class="tbtn" id="thinkBtn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
             Think
           </button>
+          
           <button class="tbtn" id="searchBtn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
             Search
@@ -204,14 +211,13 @@ const $ = id => document.getElementById(id);
 const chat = $('chat'), promptBox = $('prompt'), sendBtn = $('sendBtn'), sendIcon = $('sendIcon');
 const welcomeScreen = $('welcomeScreen');
 
-let think = false, searching = false, busy = false, recognition = null;
+let think = false, searching = false, autoSpeak = false, busy = false, recognition = null;
 let selectedImage = null; 
 let currentMessages = [];
 let currentChatId = null;
 let history = [];
 let abortController = null;
 
-// 🧠 இங்கே தான் நினைவாற்றல் (Memory Power) வேலை செய்கிறது
 let currentLanguage = 'en'; 
 
 try { history = JSON.parse(localStorage.getItem('zyra_history') || '[]'); if(!Array.isArray(history)) history=[]; } catch { history=[]; }
@@ -219,6 +225,7 @@ try { const savedTheme = localStorage.getItem('zyra_theme'); if(savedTheme) docu
 
 $('thinkBtn').onclick = () => { think = !think; $('thinkBtn').classList.toggle('active', think); };
 $('searchBtn').onclick = () => { searching = !searching; $('searchBtn').classList.toggle('active', searching); };
+$('autoSpeakBtn').onclick = () => { autoSpeak = !autoSpeak; $('autoSpeakBtn').classList.toggle('active', autoSpeak); };
 
 $('themeBtn').onclick = () => {
   const root = document.documentElement;
@@ -383,6 +390,34 @@ function addMessage(role, text, image = null, store = true){
   if(store) currentMessages.push({ role, text, image });
 }
 
+// Share Chat Functionality
+window.shareChat = () => {
+    if(currentMessages.length === 0) return;
+    let url = window.location.origin + window.location.pathname + '?share=' + encodeURIComponent(btoa(JSON.stringify(currentMessages)));
+    navigator.clipboard.writeText(url).then(() => {
+        alert('Chat link copied to clipboard! You can share it now.');
+    });
+}
+
+// Load Shared Chat from URL
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const shareData = urlParams.get('share');
+    if (shareData) {
+        try {
+            const msgs = JSON.parse(atob(decodeURIComponent(shareData)));
+            if (msgs && msgs.length > 0) {
+                welcomeScreen.style.display = 'none';
+                currentMessages = msgs;
+                msgs.forEach(m => addMessage(m.role, m.text, m.image, false));
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        } catch (e) {
+            console.error("Invalid share link");
+        }
+    }
+});
+
 async function send(){
   if(busy){ abortController?.abort(); return; }
   const text = promptBox.value.trim();
@@ -424,11 +459,10 @@ async function send(){
       return;
   }
 
-  // 🧠 மொழியை நினைவில் வைத்துக்கொள்ளும் லாஜிக் (Memory Logic)
   if (lowerText.includes('tamil') || /[\u0B80-\u0BFF]/.test(text)) {
-      currentLanguage = 'ta'; // தமிழ் மொழிக்கு மாற்று
+      currentLanguage = 'ta';
   } else if (lowerText.includes('english')) {
-      currentLanguage = 'en'; // ஆங்கில மொழிக்கு மாற்று
+      currentLanguage = 'en';
   }
 
   let finalNotes = text;
@@ -442,7 +476,7 @@ async function send(){
     notes: finalNotes || 'Analyze this image.',
     think: think,
     isSearching: searching,
-    lang: currentLanguage, // தேர்ந்தெடுத்த மொழியை Backend-க்கு அனுப்பு
+    lang: currentLanguage, 
     history: currentMessages.slice(-10)
   };
   
@@ -494,7 +528,25 @@ async function send(){
             };
             
             const speak = createSpeakBtn(full);
-            tools.appendChild(copy); tools.appendChild(speak); bubble.appendChild(tools);
+            tools.appendChild(copy); tools.appendChild(speak); 
+            
+            // 🔴 Share Button
+            const shareBtn = document.createElement('button'); shareBtn.className='tool-btn';
+            shareBtn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> <span>Share</span>';
+            shareBtn.onclick = window.shareChat;
+            tools.appendChild(shareBtn);
+            
+            bubble.appendChild(tools);
+            
+            // 🔴 Auto Speak
+            if (autoSpeak && 'speechSynthesis' in window) {
+                speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(full);
+                if (/[\u0B80-\u0BFF]/.test(full)) u.lang = 'ta-IN';
+                else if (/[\u0900-\u097F]/.test(full)) u.lang = 'hi-IN';
+                else u.lang = 'en-US';
+                speechSynthesis.speak(u);
+            }
             
             currentMessages.push({ role: 'ai', text: full });
             saveHistory();
