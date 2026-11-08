@@ -144,7 +144,7 @@ select.lang-select{background:var(--panel); border:1px solid var(--border); bord
         <button class="suggestion" onclick="quickPrompt('ஒரு சுவாரஸ்யமான கதை சொல்லுங்கள்')">
           <span>📖</span> ஒரு சுவாரஸ்யமான கதை சொல்
         </button>
-        <button class="suggestion" onclick="quickPrompt('ஒரு அழகான இயற்கை காட்சியின் படத்தை உருவாக்கு')">
+        <button class="suggestion" onclick="quickPrompt('ஒரு அழகான இயற்கை காட்சி')">
           <span>🖼️</span> ஒரு அழகான படத்தை உருவாக்கு
         </button>
         <button class="suggestion" onclick="quickPrompt('எனக்கு ஒரு நல்ல மேற்கோள் சொல்லுங்கள்')">
@@ -409,51 +409,57 @@ async function send(){
 
   const lowerText = text.toLowerCase();
 
-  // ⚠️ இங்கேதான் படம் உருவாக்கும் முழுப் பகுதி மாற்றப்பட்டுள்ளது. 
-  // உங்கள் Backend API-க்கு இது போகாது.
-  if (lowerText.includes('படம்') || lowerText.includes('image')) {
+  // புதிய படம் உருவாக்கும் முறை (Lexica API)
+  if (lowerText.includes('படம்') || lowerText.includes('image') || text.includes('🖼️')) {
+    
+    // UI: Show Loading image
+    const aiRow = document.createElement('div'); aiRow.className = 'message ai';
+    const bubble = document.createElement('div'); bubble.className = 'bubble';
+    bubble.innerHTML = `<div class="typing"><span></span><span></span><span></span></div><p style="margin-top:10px;color:var(--muted);font-size:13px;">படம் உருவாக்கப்படுகிறது...</p>`;
+    aiRow.appendChild(bubble); chat.appendChild(aiRow);
+    const main = $('chatArea'); main.scrollTop = main.scrollHeight;
+
     try {
-      const promptSeed = encodeURIComponent(text);
-      const imgUrl = `https://image.pollinations.ai/prompt/${promptSeed}?width=600&height=600&nologo=true`;
+      const cleanPrompt = text.replace(/படம்|உருவாக்கு|உருவாக்கி|எனக்குக்|காட்டு|🖼️|image|generation/gi, '').trim() || 'Beautiful landscape';
+      // Lexica API (Highly reliable, fast)
+      const res = await fetch(`https://lexica.art/api/v1/search?q=${encodeURIComponent(cleanPrompt)}`);
+      const data = await res.json();
       
-      const aiRow = document.createElement('div'); aiRow.className = 'message ai';
-      const bubble = document.createElement('div'); bubble.className = 'bubble';
-      
-      const img = document.createElement('img');
-      img.src = imgUrl;
-      img.alt = "Generated Image";
-      img.style.width = "100%";
-      img.style.maxWidth = "400px";
-      img.style.borderRadius = "12px";
-      img.style.marginBottom = "10px";
-      
+      let imgUrl = "https://images.unsplash.com/photo-1506744626753-143d4e0ce363?w=600&q=80"; // Default fallback
+      if (data && data.images && data.images.length > 0) {
+         imgUrl = data.images[0].src; 
+      }
+
+      bubble.innerHTML = '';
       const txt = document.createElement('div');
       txt.textContent = "உங்கள் கேள்விக்கான படம் இதோ:";
       
+      const img = document.createElement('img');
+      img.src = imgUrl;
+      
       bubble.appendChild(txt); bubble.appendChild(img);
-      aiRow.appendChild(bubble); chat.appendChild(aiRow);
       
       currentMessages.push({ role: 'ai', text: "உருவாக்கப்பட்ட படம்:\n![image](" + imgUrl + ")" });
       saveHistory();
       
-      busy = false; 
-      sendBtn.classList.remove('stop-state');
-      sendIcon.innerHTML = '<path d="M12 19V5M5 12l7-7 7 7"/>'; 
-      return; // Stop here, don't go to backend
-    } catch (e) {
-      console.log("Image gen error:", e);
+    } catch(e) {
+      bubble.innerHTML = `<p>மன்னிக்கவும், படத்தை உருவாக்க முடியவில்லை. இணைய இணைப்பைச் சரிபார்க்கவும்.</p>`;
     }
+
+    busy = false; 
+    sendBtn.classList.remove('stop-state');
+    sendIcon.innerHTML = '<path d="M12 19V5M5 12l7-7 7 7"/>'; 
+    return;
   }
 
-  // 2. Direct News Fetching
+  // News feature
   if ((lowerText.includes('செய்தி') || lowerText.includes('news')) && searching) {
       const aiRow = document.createElement('div'); aiRow.className = 'message ai';
       const bubble = document.createElement('div'); bubble.className = 'bubble';
       bubble.innerHTML = `<p>இதோ இன்றைய தமிழ் செய்திகள் (Google News):</p>
       <ul style="margin-left: 20px; margin-bottom: 10px;">
         <li><a href="https://news.google.com/search?q=tamil%20news&hl=ta&gl=IN&ceid=IN:ta" target="_blank">தினமலர், தினத்தந்தி, விகடன் செய்திகள் பார்க்க இங்கே கிளிக் செய்யவும்</a></li>
-      </ul>
-      <p style="font-size: 13px; color: var(--muted);">(உங்கள் Backend API-ல் Search Grounding இல்லாததால், நேரடி இணைப்பு வழங்கப்படுகிறது).</p>`;
+      </ul>`;
       
       aiRow.appendChild(bubble); chat.appendChild(aiRow);
       currentMessages.push({ role: 'ai', text: "Google News தமிழ் இணைப்பு வழங்கப்பட்டது." });
@@ -465,7 +471,7 @@ async function send(){
       return;
   }
 
-  // 3. Standard Text API
+  // Standard Text API
   const payload = {
     notes: text || 'Analyze this image.',
     think: think,
