@@ -11,7 +11,7 @@
 <style>
 :root{
   --bg:#ffffff; --text:#111111; --muted:#888888;
-  --accent:#1f57ff; --accent-bg:#eef2ff; --panel:#f9f9f9;
+  --accent:#1f57ff; --accent-bg:#f3f6ff; --panel:#f9f9f9;
   --border:#e5e5e5; --user-bg:#f3f4f6; --shadow:0 4px 20px rgba(0,0,0,0.05);
 }
 [data-theme="dark"]{
@@ -35,12 +35,18 @@ header{height:60px;flex:none;display:flex;align-items:center;justify-content:spa
 /* Main Content */
 main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:20px;scroll-behavior:smooth}
 .center-logo{font-size:40px;font-weight:700;color:var(--accent);margin-top:20vh;margin-bottom:16px;letter-spacing:-1px}
-.center-title{font-size:24px;font-weight:600;color:var(--text);letter-spacing:-0.5px;margin-bottom:20px}
+.center-title{font-size:24px;font-weight:600;color:var(--text);letter-spacing:-0.5px;margin-bottom:30px}
 
-/* Quick Prompts */
-.suggestions{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:600px;margin-bottom:20px}
-.suggestion{padding:12px;background:var(--panel);border:1px solid var(--border);border-radius:12px;font-size:13px;text-align:left;color:var(--text);transition:all 0.2s}
-.suggestion:hover{background:var(--accent-bg);border-color:var(--accent);color:var(--accent)}
+/* 🔴 New Minimalist Suggestions Style */
+.suggestions{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:540px;margin-bottom:30px}
+.suggestion{
+  display:flex; flex-direction:column; align-items:flex-start; justify-content:center;
+  padding:18px; background:var(--panel); border:1px solid var(--border); 
+  border-radius:16px; font-size:15px; color:var(--text); transition:all 0.2s;
+  cursor:pointer; text-align:left; gap:10px; font-weight:500;
+}
+.suggestion:hover{background:var(--accent-bg); border-color:var(--accent); color:var(--accent); transform:translateY(-2px)}
+.suggestion .icon{font-size:24px; margin-bottom:2px}
 
 /* Chat Messages */
 .chat-container{width:100%;max-width:700px;display:flex;flex-direction:column;gap:24px;padding-bottom:20px}
@@ -136,12 +142,20 @@ select.lang-select{background:var(--panel); border:1px solid var(--border); bord
       <div class="center-logo">Zyra</div>
       <h1 class="center-title">Where would you like to begin?</h1>
       
-      <!-- Quick Prompts -->
+      <!-- 🔴 New Minimalist Suggestions -->
       <div class="suggestions">
-        <button class="suggestion" onclick="quickPrompt('இன்றைய தமிழ் நாளிதழ் செய்திகள் சொல்லுங்கள்')">📰 இன்றைய செய்திகள்</button>
-        <button class="suggestion" onclick="quickPrompt('ஒரு சுவாரஸ்யமான கதை சொல்லுங்கள்')">📖 ஒரு கதை சொல்</button>
-        <button class="suggestion" onclick="quickPrompt('ஒரு அழகான இயற்கை காட்சியின் படத்தை உருவாக்குங்கள்')">🖼️ படம் உருவாக்கு</button>
-        <button class="suggestion" onclick="quickPrompt('எனக்கு ஒரு நல்ல மேற்கோள் சொல்லுங்கள்')">✨ மேற்கோள்</button>
+        <button class="suggestion" onclick="quickPrompt('இன்றைய தமிழ் நாளிதழ் செய்திகள் சொல்லுங்கள்')">
+          <span class="icon">📰</span> இன்றைய செய்திகள்
+        </button>
+        <button class="suggestion" onclick="quickPrompt('ஒரு சுவாரஸ்யமான கதை சொல்லுங்கள்')">
+          <span class="icon">📖</span> ஒரு கதை சொல்
+        </button>
+        <button class="suggestion" onclick="quickPrompt('ஒரு அழகான இயற்கை காட்சியின் படத்தை உருவாக்குங்கள்')">
+          <span class="icon">🖼️</span> படம் உருவாக்கு
+        </button>
+        <button class="suggestion" onclick="quickPrompt('எனக்கு ஒரு நல்ல மேற்கோள் சொல்லுங்கள்')">
+          <span class="icon">✨</span> மேற்கோள்
+        </button>
       </div>
     </div>
     <div class="chat-container" id="chat"></div>
@@ -241,7 +255,6 @@ $('fileInput').onchange = (e) => {
   reader.readAsDataURL(file);
 };
 
-// Export Chat to Text File
 $('exportBtn').onclick = () => {
     if(currentMessages.length === 0) { alert('No chat to export'); return; }
     let text = "Zyra Chat Export\n\n";
@@ -308,7 +321,6 @@ function loadChat(id){
 function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function renderMarkdown(text){
   let s = escapeHtml(text || '');
-  // Support for Markdown Images ![alt](url)
   s = s.replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g, '<img src="$2" alt="$1">');
   s = s.replace(/```([\s\S]*?)```/g, (_,c) => '<pre><code>'+c+'</code></pre>');
   s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
