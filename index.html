@@ -70,7 +70,7 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 .bubble p{margin-bottom:12px}
 .bubble p:last-child{margin-bottom:0}
 
-/* Composer Area (The bottom search bar) */
+/* Composer Area */
 .composer-wrap{width:100%;padding:10px 20px 20px;display:flex;flex-direction:column;align-items:center;background:linear-gradient(transparent, var(--bg) 20%)}
 .composer{width:100%;max-width:700px;background:var(--bg);border:1px solid var(--border);border-radius:24px;padding:10px 14px 10px 18px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 15px rgba(0,0,0,0.03)}
 .composer:focus-within{border-color:#d0d0d0}
@@ -78,6 +78,7 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 .composer input{flex:1;border:none;background:transparent;font-size:16px;outline:none;padding:8px 0}
 .composer input::placeholder{color:var(--muted)}
 .composer-actions{display:flex;align-items:center;gap:8px}
+
 /* Toggles */
 .toggle-btns{display:flex;gap:6px;margin-bottom:8px;width:100%;max-width:700px}
 .tbtn{border:1px solid transparent;background:var(--panel);color:var(--muted);padding:6px 12px;border-radius:20px;font-size:13px;display:flex;align-items:center;gap:6px;font-weight:500}
@@ -172,7 +173,8 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 <script>
 (() => {
 'use strict';
-const API_URL = '/api/chat'; 
+// ⚠️ முக்கியம்: உங்கள் Backend ஃபைலின் பெயர் 'summarize.js' என்பதால் URL இப்படி மாற்றப்பட்டுள்ளது
+const API_URL = '/api/summarize'; 
 const $ = id => document.getElementById(id);
 const chat = $('chat'), promptBox = $('prompt'), sendBtn = $('sendBtn');
 const welcomeScreen = $('welcomeScreen');
@@ -283,9 +285,11 @@ async function send(){
   busy = true; sendBtn.disabled = true;
   sendBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12"/></svg>';
 
+  // ⚠️ உங்கள் Backend 'isSearching' என்று எதிர்பார்ப்பதால் அதை மாற்றியுள்ளேன்
   const payload = {
     notes: text,
-    think, searching,
+    think: think,
+    isSearching: searching,
     history: currentMessages.slice(-10)
   };
 
@@ -307,9 +311,11 @@ async function send(){
     if(!res.ok) throw new Error(`Server error (${res.status})`);
 
     const data = await res.json();
-    full = data.answer || data.response || data.summary || data.text || 'No response.';
     
-    // Simulate streaming (typewriter)
+    // உங்கள் Backend 'answer' அல்லது 'summary' என்று அனுப்பலாம்
+    full = data.answer || data.summary || data.response || data.text || 'பதில் கிடைக்கவில்லை.';
+    
+    // Typewriter effect
     let i = 0;
     content.innerHTML = '';
     function typeWriter() {
@@ -364,7 +370,7 @@ $('voiceBtn').onclick = () => {
   if(!SR){ alert('Voice not supported'); return; }
   if(recognition){ recognition.stop(); return; }
   recognition = new SR();
-  recognition.lang = 'en-IN'; // Change to ta-IN for Tamil
+  recognition.lang = 'ta-IN'; // தமிழ் குரலுக்கு
   recognition.interimResults = false;
   recognition.onresult = e => { promptBox.value += e.results[0][0].transcript; };
   recognition.onend = () => recognition = null;
