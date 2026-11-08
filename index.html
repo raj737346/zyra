@@ -46,10 +46,20 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 .message.user .bubble{background:var(--user-bg);padding:12px 18px;border-radius:20px 20px 4px 20px}
 .message.ai .bubble{background:transparent;padding:0;max-width:100%}
 .bubble img{max-width:min(250px,100%);border-radius:12px;display:block;margin-bottom:8px}
-.msg-tools{display:flex;gap:12px;margin-top:12px}
-.tool-btn{color:var(--muted);font-size:12px;display:flex;align-items:center;gap:4px}
-.tool-btn:hover{color:var(--accent)}
-.msg-tools button.active{color:var(--accent); font-weight:bold;}
+
+/* Message Tools (Copy & Speak) */
+.msg-tools{display:flex;gap:16px;margin-top:12px;align-items:center}
+.tool-btn{color:var(--muted);font-size:13px;display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:8px;transition:background 0.2s}
+.tool-btn:hover{background:var(--panel);color:var(--text)}
+
+/* Wave Icon Animation */
+.speak-btn svg { width: 18px; height: 18px; }
+.speak-btn.active { color: var(--accent); }
+.speak-btn.active svg path { animation: wave 1s infinite alternate; }
+.speak-btn.active svg path:nth-child(1) { animation-delay: 0s; }
+.speak-btn.active svg path:nth-child(2) { animation-delay: 0.2s; }
+.speak-btn.active svg path:nth-child(3) { animation-delay: 0.4s; }
+@keyframes wave { from { opacity: 0.3; } to { opacity: 1; } }
 
 /* Markdown */
 .bubble pre{white-space:pre-wrap;overflow-x:auto;background:var(--panel);padding:14px;border-radius:12px;margin:10px 0;border:1px solid var(--border)}
@@ -142,21 +152,17 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
       <img id="imgPreview" class="preview-img" src="" alt="preview">
       <input type="text" id="prompt" placeholder="Type a message or hold to speak" autocomplete="off">
       
-      <!-- இங்கேதான் ஐகான்கள் மாற்றப்பட்டுள்ளன -->
       <div class="composer-actions">
         <input type="file" id="fileInput" accept="image/*" hidden>
         
-        <!-- Attach Image (+) Icon -->
         <button class="icon-circle" id="attachBtn" title="Attach Image">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>
         </button>
         
-        <!-- Voice Input (Waves) Icon -->
         <button class="icon-circle" id="voiceBtn" title="Voice Input">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 10v4m4-7v10m4-7v4"/></svg>
         </button>
         
-        <!-- Send Arrow Icon -->
         <button class="icon-send" id="sendBtn" title="Send">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
@@ -274,6 +280,34 @@ function renderMarkdown(text){
   return s;
 }
 
+// 🔊 சவுண்ட் வேவ் ஐகான் HTML
+const waveSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9v6"></path><path d="M12 5v14"></path><path d="M18 9v6"></path></svg>`;
+
+// Create Speak Button with Wave Animation
+function createSpeakBtn(text) {
+  const btn = document.createElement('button');
+  btn.className = 'tool-btn speak-btn';
+  btn.innerHTML = waveSVG;
+  btn.title = "Listen";
+  
+  btn.onclick = () => {
+     if('speechSynthesis' in window){
+         if (btn.classList.contains('active')) {
+             speechSynthesis.cancel();
+             btn.classList.remove('active');
+         } else {
+             speechSynthesis.cancel();
+             const u = new SpeechSynthesisUtterance(text);
+             u.lang = /[\u0B80-\u0BFF]/.test(text) ? 'ta-IN' : 'en-US'; 
+             speechSynthesis.speak(u);
+             btn.classList.add('active');
+             u.onend = () => btn.classList.remove('active');
+         }
+     }
+  };
+  return btn;
+}
+
 function addMessage(role, text, image = null, store = true){
   welcomeScreen.style.display = 'none';
   const row = document.createElement('div'); row.className = 'message ' + role;
@@ -287,20 +321,19 @@ function addMessage(role, text, image = null, store = true){
 
   if(role === 'ai'){
     const tools = document.createElement('div'); tools.className = 'msg-tools';
-    const copy = document.createElement('button'); copy.className = 'tool-btn'; copy.innerHTML = '📋 Copy';
-    copy.onclick = () => { navigator.clipboard?.writeText(text || ''); copy.innerHTML = '✅ Copied!'; setTimeout(()=>copy.innerHTML='📋 Copy', 1500); };
-    const speak = document.createElement('button'); speak.className = 'tool-btn'; speak.innerHTML = '🔊 Listen';
-    speak.onclick = () => {
-       if('speechSynthesis' in window){
-           speechSynthesis.cancel();
-           const u = new SpeechSynthesisUtterance(text);
-           u.lang = /[\u0B80-\u0BFF]/.test(text) ? 'ta-IN' : 'en-US'; 
-           speechSynthesis.speak(u);
-           speak.innerHTML = '⏹ Stop';
-           u.onend = () => speak.innerHTML = '🔊 Listen';
-       }
-    };
-    tools.appendChild(copy); tools.appendChild(speak); bubble.appendChild(tools);
+    
+    // Copy Button (New look)
+    const copy = document.createElement('button'); copy.className = 'tool-btn'; 
+    copy.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+    copy.title = "Copy";
+    copy.onclick = () => { navigator.clipboard?.writeText(text || ''); copy.style.color = 'green'; setTimeout(()=>copy.style.color = 'var(--muted)', 1500); };
+    
+    // Speak Button (Wave)
+    const speak = createSpeakBtn(text);
+
+    tools.appendChild(copy); 
+    tools.appendChild(speak); 
+    bubble.appendChild(tools);
   }
 
   row.appendChild(bubble); chat.appendChild(row);
@@ -365,20 +398,17 @@ async function send(){
             setTimeout(typeWriter, 10);
         } else {
             content.innerHTML = renderMarkdown(full);
+            
+            // Show Tools after typing finishes
             const tools = document.createElement('div'); tools.className = 'msg-tools';
-            const copy = document.createElement('button'); copy.className='tool-btn'; copy.innerHTML='📋 Copy';
-            copy.onclick = () => { navigator.clipboard?.writeText(full); copy.innerHTML='✅ Copied!'; setTimeout(()=>copy.innerHTML='📋 Copy', 1500); };
-            const speak = document.createElement('button'); speak.className='tool-btn'; speak.innerHTML='🔊 Listen';
-            speak.onclick = () => {
-               if('speechSynthesis' in window){
-                   speechSynthesis.cancel();
-                   const u = new SpeechSynthesisUtterance(full);
-                   u.lang = /[\u0B80-\u0BFF]/.test(full) ? 'ta-IN' : 'en-US';
-                   speechSynthesis.speak(u);
-                   speak.innerHTML = '⏹ Stop';
-                   u.onend = () => speak.innerHTML = '🔊 Listen';
-               }
-            };
+            
+            const copy = document.createElement('button'); copy.className='tool-btn'; 
+            copy.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+            copy.title="Copy";
+            copy.onclick = () => { navigator.clipboard?.writeText(full); copy.style.color='green'; setTimeout(()=>copy.style.color='var(--muted)', 1500); };
+            
+            const speak = createSpeakBtn(full);
+            
             tools.appendChild(copy); tools.appendChild(speak); bubble.appendChild(tools);
             
             currentMessages.push({ role: 'ai', text: full });
