@@ -11,7 +11,7 @@
 <style>
 :root{
   --bg:#ffffff; --text:#191918; --muted:#777671;
-  --accent:#1f57ff; 
+  --accent:#1f57ff; /* 🔵 நீல நிற அம்பு */
   --accent2:#f3f6ff; 
   --panel:#f7f7f6;
   --border:#e8e7e4; --user:#f4f1ed; --shadow:0 12px 40px rgba(0,0,0,0.07);
@@ -218,7 +218,6 @@ let currentMessages = [];
 let currentChatId = null;
 let history = [];
 let abortController = null;
-
 let currentLanguage = 'en'; 
 
 try { history = JSON.parse(localStorage.getItem('zyra_history') || '[]'); if(!Array.isArray(history)) history=[]; } catch { history=[]; }
@@ -412,6 +411,26 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// 🔴 Auto Location Function
+function getLocation() {
+    return new Promise((resolve) => {
+        if (!navigator.geolocation) {
+            resolve(null);
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                resolve({ lat: position.coords.latitude, lon: position.coords.longitude });
+            },
+            (error) => {
+                console.error("Location error:", error);
+                resolve(null); // If denied, just continue without location
+            },
+            { timeout: 5000 }
+        );
+    });
+}
+
 async function send(){
   if(busy){ abortController?.abort(); return; }
   const text = promptBox.value.trim();
@@ -439,11 +458,26 @@ async function send(){
   }
 
   let finalNotes = text;
-  if (currentLanguage === 'en') {
-      finalNotes = text + "\n\n(IMPORTANT INSTRUCTION: Reply strictly in English only.)";
-  } else if (currentLanguage === 'ta') {
-      finalNotes = text + "\n\n(IMPORTANT INSTRUCTION: Reply strictly in Tamil only.)";
+  let sysInstruction = "";
+
+  // 🔴 Location Logic
+  const locationWords = ['nearby', 'near me', 'restaurant', 'hotel', 'hospital', 'location', 'weather', 'map'];
+  if (locationWords.some(word => lowerText.includes(word))) {
+      const loc = await getLocation();
+      if (loc) {
+          sysInstruction += `[User's Current Location: Lat ${loc.lat}, Lon ${loc.lon}]\n`;
+      } else {
+          sysInstruction += `[User Location: Unknown (Unable to access GPS)]\n`;
+      }
   }
+
+  if (currentLanguage === 'en') {
+      sysInstruction += `(IMPORTANT INSTRUCTION: Reply strictly in English only.)\n`;
+  } else if (currentLanguage === 'ta') {
+      sysInstruction += `(IMPORTANT INSTRUCTION: Reply strictly in Tamil only.)\n`;
+  }
+
+  if (sysInstruction) finalNotes = sysInstruction + "\n" + finalNotes;
 
   const payload = {
     notes: finalNotes,
