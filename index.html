@@ -174,7 +174,7 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
           </button>
           <button class="tbtn" id="searchBtn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-            Search
+            <span id="searchBtnText">Search</span>
           </button>
         </div>
 
@@ -224,7 +224,11 @@ try { history = JSON.parse(localStorage.getItem('zyra_history') || '[]'); if(!Ar
 try { const savedTheme = localStorage.getItem('zyra_theme'); if(savedTheme) document.documentElement.dataset.theme = savedTheme; } catch {}
 
 $('thinkBtn').onclick = () => { think = !think; $('thinkBtn').classList.toggle('active', think); };
-$('searchBtn').onclick = () => { searching = !searching; $('searchBtn').classList.toggle('active', searching); };
+$('searchBtn').onclick = () => { 
+    searching = !searching; 
+    $('searchBtn').classList.toggle('active', searching); 
+    $('searchBtnText').textContent = searching ? 'Search ON' : 'Search';
+};
 $('autoSpeakBtn').onclick = () => { autoSpeak = !autoSpeak; $('autoSpeakBtn').classList.toggle('active', autoSpeak); };
 
 $('themeBtn').onclick = () => {
@@ -234,7 +238,6 @@ $('themeBtn').onclick = () => {
   try{ localStorage.setItem('zyra_theme', root.dataset.theme); }catch{}
 };
 
-// Attach Image Logic
 $('attachBtn').onclick = () => $('fileInput').click();
 $('fileInput').onchange = (e) => {
   const file = e.target.files[0];
@@ -469,28 +472,15 @@ async function send(){
   }
 
   let finalNotes = text;
-  let sysInstruction = "";
-
-  // Auto Location Logic
-  const locationWords = ['nearby', 'near me', 'restaurant', 'hotel', 'hospital', 'location', 'weather', 'map'];
-  if (locationWords.some(word => lowerText.includes(word))) {
-      const loc = await getLocation();
-      if (loc) {
-          sysInstruction += `[User's Current Location: Lat ${loc.lat}, Lon ${loc.lon}]\n`;
-      } else {
-          sysInstruction += `[User Location: Unknown (Unable to access GPS)]\n`;
-      }
-  }
-
+  let sysInstruction = "(IMPORTANT INSTRUCTION: Reply strictly in the requested language. Ensure 100% accurate spelling and grammar. Do not drop any letters, vowels, or accents.)\n";
   if (currentLanguage === 'en') {
-      sysInstruction += `(IMPORTANT INSTRUCTION: Reply strictly in English only.)\n`;
+      sysInstruction += "(Reply in English only.)\n";
   } else if (currentLanguage === 'ta') {
-      sysInstruction += `(IMPORTANT INSTRUCTION: Reply strictly in Tamil only.)\n`;
+      sysInstruction += "(Reply in Tamil only.)\n";
   }
 
   if (sysInstruction) finalNotes = sysInstruction + "\n" + finalNotes;
 
-  // 🔴 Real Search Integration (DuckDuckGo)
   if (searching) {
       const searchResult = await searchWeb(text);
       if (searchResult) {
