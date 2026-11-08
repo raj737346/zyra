@@ -11,7 +11,7 @@
 <style>
 :root{
   --bg:#ffffff; --text:#191918; --muted:#777671;
-  --accent:#1f57ff; /* 🔵 நீல நிற அம்பு */
+  --accent:#1f57ff; 
   --accent2:#f3f6ff; 
   --panel:#f7f7f6;
   --border:#e8e7e4; --user:#f4f1ed; --shadow:0 12px 40px rgba(0,0,0,0.07);
@@ -432,27 +432,6 @@ async function send(){
 
   const lowerText = text.toLowerCase();
   
-  if ((lowerText.includes('news') || lowerText.includes('headlines')) && searching) {
-      const searchQuery = text.replace(/news|headlines|give me|the latest|about/gi, '').trim() || 'Global';
-      const googleNewsUrl = `https://news.google.com/search?q=${encodeURIComponent(searchQuery)}&hl=en-IN&gl=IN&ceid=IN:en`;
-
-      const aiRow = document.createElement('div'); aiRow.className = 'message ai';
-      const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.textContent = '✳';
-      const bubble = document.createElement('div'); bubble.className = 'bubble';
-      bubble.innerHTML = `<p>Here are the latest headlines for "${searchQuery}":</p>
-      <p><a href="${googleNewsUrl}" target="_blank" style="font-weight:bold; font-size:16px; display:inline-block; padding:10px 15px; background:var(--accent2); color:var(--accent); border-radius:8px;">👉 Click here to read the latest news</a></p>
-      <p style="font-size: 13px; color: var(--muted); margin-top: 10px;">(Direct link provided because your Gemini API doesn't have Search Grounding enabled).</p>`;
-      
-      aiRow.append(avatar, bubble); chat.appendChild(aiRow);
-      currentMessages.push({ role: 'ai', text: `Provided direct Google News link for: ${searchQuery}` });
-      saveHistory();
-      
-      busy = false; 
-      sendBtn.classList.remove('stop-state');
-      sendIcon.innerHTML = '<path d="M12 19V5M5 12l7-7 7 7"/>'; 
-      return;
-  }
-
   if (lowerText.includes('tamil') || /[\u0B80-\u0BFF]/.test(text)) {
       currentLanguage = 'ta';
   } else if (lowerText.includes('english')) {
