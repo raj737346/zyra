@@ -11,7 +11,7 @@
 <style>
 :root{
   --bg:#ffffff; --text:#191918; --muted:#777671;
-  --accent:#f36b38; /* 🔴 ஆரஞ்சு நிறம் (Orange) */
+  --accent:#f36b38; 
   --accent2:#fff0e9; 
   --panel:#f7f7f6;
   --border:#e8e7e4; --user:#f4f1ed; --shadow:0 12px 40px rgba(0,0,0,0.07);
@@ -466,7 +466,6 @@ async function send(){
   // 🔴 Real Search Integration (DuckDuckGo)
   if (searching) {
       let searchQuery = text;
-      // If user asks for restaurants/theatres without a city, add a generic search
       if (lowerText.includes('restaurant') || lowerText.includes('food') || lowerText.includes('eat')) {
           if (!lowerText.includes('in')) searchQuery = `Best restaurants near me`;
       } else if (lowerText.includes('theatre') || lowerText.includes('movie') || lowerText.includes('cinema')) {
