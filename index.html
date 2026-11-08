@@ -211,7 +211,8 @@ let currentChatId = null;
 let history = [];
 let abortController = null;
 
-let currentLanguage = 'en'; 
+// 🔴 முக்கிய மாற்றம்: தொடக்கத்தில் மொழி 'Auto' (தானாகக் கண்டறி) என்று இருக்கும்
+let currentLanguage = 'auto'; 
 
 try { history = JSON.parse(localStorage.getItem('zyra_history') || '[]'); if(!Array.isArray(history)) history=[]; } catch { history=[]; }
 try { const savedTheme = localStorage.getItem('zyra_theme'); if(savedTheme) document.documentElement.dataset.theme = savedTheme; } catch {}
@@ -299,11 +300,7 @@ function loadChat(id){
   currentMessages = (item.messages || []).slice(); currentChatId = id;
   chat.innerHTML = ''; welcomeScreen.style.display = 'none';
   
-  currentLanguage = 'en';
-  for (let m of currentMessages) {
-      if (m.text && /[\u0B80-\u0BFF]/.test(m.text)) { currentLanguage = 'ta'; break; }
-  }
-
+  currentLanguage = 'auto'; // Load செய்யும்போது Auto-வாக மாற்று
   currentMessages.forEach(m => addMessage(m.role, m.text, m.image, false));
   $('drawerOverlay').classList.remove('show');
 }
@@ -423,12 +420,17 @@ async function send(){
       return;
   }
 
-  if (lowerText.includes('tamil') || /[\u0B80-\u0BFF]/.test(text)) {
-      currentLanguage = 'ta';
-  } else if (lowerText.includes('hindi') || /[\u0900-\u097F]/.test(text)) {
-      currentLanguage = 'hi';
+  // 🔴 மொழி கண்டறிதல் (Auto-detection Logic)
+  if (/[\u0B80-\u0BFF]/.test(text)) {
+      currentLanguage = 'ta'; // தமிழ் எழுத்துக்கள் இருந்தால் -> தமிழ்
+  } else if (/[\u0900-\u097F]/.test(text)) {
+      currentLanguage = 'hi'; // இந்தி எழுத்துக்கள் இருந்தால் -> இந்தி
+  } else if (lowerText.includes('tamil')) {
+      currentLanguage = 'ta'; // "Tamil" என்ற வார்த்தை இருந்தால் -> தமிழ்
   } else if (lowerText.includes('english')) {
-      currentLanguage = 'en';
+      currentLanguage = 'en'; // "English" என்ற வார்த்தை இருந்தால் -> ஆங்கிலம்
+  } else {
+      currentLanguage = 'en'; // வேறு எதுவும் இல்லையென்றால் -> ஆங்கிலம்
   }
 
   let finalNotes = text;
@@ -529,7 +531,7 @@ promptBox.addEventListener('keydown', e => {
 
 $('newBtn').onclick = () => {
   if(currentMessages.length) saveHistory();
-  currentMessages = []; currentChatId = null; currentLanguage = 'en'; 
+  currentMessages = []; currentChatId = null; currentLanguage = 'auto'; 
   chat.innerHTML = ''; welcomeScreen.style.display = 'flex'; promptBox.focus();
 };
 
