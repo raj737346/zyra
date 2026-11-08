@@ -86,7 +86,7 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 .composer textarea::placeholder{color:var(--muted)}
 
 .composer-bottom-row{display:flex; justify-content:space-between; align-items:center; width:100%;}
-.toggle-btns{display:flex; gap:6px; align-items:center;}
+.toggle-btns{display:flex; gap:6px; align-items:center; flex-wrap:wrap;}
 .tbtn{border:1px solid transparent;background:var(--panel);color:var(--muted);padding:6px 12px;border-radius:20px;font-size:13px;display:flex;align-items:center;gap:6px;font-weight:500; transition:all 0.2s;}
 .tbtn.active{background:var(--accent2);color:var(--accent);border-color:#f36b3833}
 
@@ -117,6 +117,21 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 .history-item:hover{background:var(--panel)}
 .del-btn{color:var(--muted);font-size:16px;padding:4px}
 .del-btn:hover{color:red}
+
+/* Settings Modal */
+.settings-modal {
+  display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.5); z-index: 20; align-items: center; justify-content: center;
+}
+.settings-content {
+  background: var(--bg); border-radius: 16px; padding: 24px; width: 90%; max-width: 400px; box-shadow: var(--shadow);
+}
+.settings-content h3 { margin-bottom: 16px; font-size: 18px; }
+.settings-content label { display: block; font-size: 14px; margin-bottom: 8px; color: var(--muted); }
+.settings-content textarea {
+  width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 14px; 
+  background: var(--panel); color: var(--text); outline: none; resize: vertical; min-height: 100px;
+}
+.settings-content .btn-row { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
 </style>
 </head>
 <body>
@@ -128,6 +143,9 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
       </button>
     </div>
     <div class="header-right">
+      <button class="iconbtn" id="settingsBtn" title="Custom Persona">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      </button>
       <button class="iconbtn" id="exportBtn" title="Export Chat">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
       </button>
@@ -160,17 +178,14 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 
       <div class="composer-bottom-row">
         <div class="toggle-btns">
-          <!-- Auto-Speak (First) -->
           <button class="tbtn" id="autoSpeakBtn" title="Auto-Speak">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
             Speak
           </button>
-          
           <button class="tbtn" id="thinkBtn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
             Think
           </button>
-          
           <button class="tbtn" id="searchBtn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
             Search
@@ -201,6 +216,20 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
       <button id="clearAll" style="margin-top:auto; color:var(--muted); font-size:13px; text-align:left; padding:10px;">Clear all</button>
     </aside>
   </div>
+
+  <!-- 🎭 Custom Persona Settings Modal -->
+  <div class="settings-modal" id="settingsModal">
+    <div class="settings-content">
+      <h3>🎭 Custom Persona</h3>
+      <p style="font-size:13px; color:var(--muted); margin-bottom:12px;">Zyra-வை எப்படி நடந்துகொள்ளச் சொல்ல வேண்டும்? (உ.ம்: "நீ ஒரு கவிஞர்", "நீ ஒரு தமிழ் ஆசிரியர்").</p>
+      <label>System Instructions</label>
+      <textarea id="personaInput" placeholder="Example: You are a helpful coding assistant. Answer briefly."></textarea>
+      <div class="btn-row">
+        <button class="tbtn" onclick="document.getElementById('settingsModal').style.display='none'">Cancel</button>
+        <button class="tbtn active" onclick="savePersona()">Save</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -210,6 +239,7 @@ const API_URL = '/api/summarize';
 const $ = id => document.getElementById(id);
 const chat = $('chat'), promptBox = $('prompt'), sendBtn = $('sendBtn'), sendIcon = $('sendIcon');
 const welcomeScreen = $('welcomeScreen');
+const personaInput = $('personaInput');
 
 let think = false, searching = false, autoSpeak = false, busy = false, recognition = null;
 let selectedImage = null; 
@@ -217,11 +247,21 @@ let currentMessages = [];
 let currentChatId = null;
 let history = [];
 let abortController = null;
-
-let currentLanguage = 'en'; 
+let customPersona = ''; 
 
 try { history = JSON.parse(localStorage.getItem('zyra_history') || '[]'); if(!Array.isArray(history)) history=[]; } catch { history=[]; }
 try { const savedTheme = localStorage.getItem('zyra_theme'); if(savedTheme) document.documentElement.dataset.theme = savedTheme; } catch {}
+try { customPersona = localStorage.getItem('zyra_persona') || ''; personaInput.value = customPersona; } catch {}
+
+window.savePersona = () => {
+    customPersona = personaInput.value.trim();
+    try { localStorage.setItem('zyra_persona', customPersona); } catch {}
+    $('settingsModal').style.display = 'none';
+    alert('Persona saved! Zyra will act like this from now on.');
+};
+
+$('settingsBtn').onclick = () => { $('settingsModal').style.display = 'flex'; };
+$('settingsModal').onclick = (e) => { if(e.target === $('settingsModal')) $('settingsModal').style.display = 'none'; };
 
 $('thinkBtn').onclick = () => { think = !think; $('thinkBtn').classList.toggle('active', think); };
 $('searchBtn').onclick = () => { searching = !searching; $('searchBtn').classList.toggle('active', searching); };
@@ -307,11 +347,6 @@ function loadChat(id){
   currentMessages = (item.messages || []).slice(); currentChatId = id;
   chat.innerHTML = ''; welcomeScreen.style.display = 'none';
   
-  currentLanguage = 'en';
-  for (let m of currentMessages) {
-      if (m.text && /[\u0B80-\u0BFF]/.test(m.text)) { currentLanguage = 'ta'; break; }
-  }
-
   currentMessages.forEach(m => addMessage(m.role, m.text, m.image, false));
   $('drawerOverlay').classList.remove('show');
 }
@@ -390,7 +425,6 @@ function addMessage(role, text, image = null, store = true){
   if(store) currentMessages.push({ role, text, image });
 }
 
-// Share Chat Functionality
 window.shareChat = () => {
     if(currentMessages.length === 0) return;
     let url = window.location.origin + window.location.pathname + '?share=' + encodeURIComponent(btoa(JSON.stringify(currentMessages)));
@@ -399,7 +433,6 @@ window.shareChat = () => {
     });
 }
 
-// Load Shared Chat from URL
 window.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const shareData = urlParams.get('share');
@@ -465,11 +498,14 @@ async function send(){
       currentLanguage = 'en';
   }
 
+  // Add Custom Persona to instructions
   let finalNotes = text;
+  if (customPersona) finalNotes = `[System Persona: ${customPersona}]\n\n` + finalNotes;
+  
   if (currentLanguage === 'en') {
-      finalNotes = text + "\n\n(IMPORTANT INSTRUCTION: Reply strictly in English only.)";
+      finalNotes += "\n\n(IMPORTANT INSTRUCTION: Reply strictly in English only.)";
   } else if (currentLanguage === 'ta') {
-      finalNotes = text + "\n\n(IMPORTANT INSTRUCTION: Reply strictly in Tamil only.)";
+      finalNotes += "\n\n(IMPORTANT INSTRUCTION: Reply strictly in Tamil only.)";
   }
 
   const payload = {
@@ -530,7 +566,6 @@ async function send(){
             const speak = createSpeakBtn(full);
             tools.appendChild(copy); tools.appendChild(speak); 
             
-            // 🔴 Share Button
             const shareBtn = document.createElement('button'); shareBtn.className='tool-btn';
             shareBtn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> <span>Share</span>';
             shareBtn.onclick = window.shareChat;
@@ -538,7 +573,6 @@ async function send(){
             
             bubble.appendChild(tools);
             
-            // 🔴 Auto Speak
             if (autoSpeak && 'speechSynthesis' in window) {
                 speechSynthesis.cancel();
                 const u = new SpeechSynthesisUtterance(full);
