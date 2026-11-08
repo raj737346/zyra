@@ -34,17 +34,33 @@ header{height:60px;flex:none;display:flex;align-items:center;justify-content:spa
 
 /* Main Content */
 main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:20px;scroll-behavior:smooth}
-.center-logo{font-size:42px;font-weight:700;color:var(--accent);margin-top:20vh;margin-bottom:10px;letter-spacing:-1px}
-.center-title{font-size:22px;font-weight:500;color:var(--muted);letter-spacing:-0.5px;margin-bottom:40px}
 
-/* Minimalist Text Suggestions */
-.suggestions{display:flex;flex-direction:column;gap:16px;width:100%;max-width:500px;margin-bottom:30px;text-align:left}
-.suggestion{font-size:16px; color:var(--muted); transition:color 0.2s; cursor:pointer; background:none; border:none; padding:0; text-align:left;}
-.suggestion:hover{color:var(--accent)}
-.suggestion span { margin-right: 8px; }
+/* 🔴 Zyra Logo (New Gradient Style) */
+.center-logo{
+  font-size: 56px; 
+  font-weight: 700; 
+  letter-spacing: -2px;
+  margin-top: 18vh;
+  margin-bottom: 40px;
+  background: linear-gradient(135deg, #1f57ff, #b52aff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Suggestions */
+.welcome-screen{display:flex; flex-direction:column; gap:20px; width:100%; max-width:500px;}
+.suggestion{display:flex; align-items:center; gap:16px; font-size:17px; color:var(--muted); cursor:pointer; background:none; border:none; padding:12px 16px; text-align:left; transition:all 0.2s; font-weight:500; border-radius:12px;}
+.suggestion:hover{background:var(--panel); color:var(--accent); transform: translateX(5px);}
+.suggestion span.icon{font-size:24px;}
 
 /* Chat Messages */
-.chat-container{width:100%;max-width:700px;display:flex;flex-direction:column;gap:24px;padding-bottom:20px}
+.chat-container{width:100%;max-width:700px;display:flex;flex-direction:column;gap:24px;padding-bottom:20px; margin-top:20px;}
 .message{display:flex;gap:12px;align-items:flex-start;width:100%}
 .message.user{justify-content:flex-end}
 .message.ai{justify-content:flex-start}
@@ -132,25 +148,26 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
   </header>
 
   <main id="chatArea">
-    <div id="welcomeScreen" style="text-align:center; display:flex; flex-direction:column; align-items:center; width:100%;">
+    <div id="welcomeScreen" style="display:flex; flex-direction:column; align-items:center; width:100%;">
+      <!-- புதிய அழகான Zyra லோகோ -->
       <div class="center-logo">Zyra</div>
-      <h1 class="center-title">Where would you like to begin?</h1>
       
-      <div class="suggestions">
+      <div class="welcome-screen">
         <button class="suggestion" onclick="enableSearch(); quickPrompt('Give me the latest global and Indian news')">
-          <span>📰</span> Latest Global News
+          <span class="icon">📰</span> Latest Global News
         </button>
         <button class="suggestion" onclick="quickPrompt('Tell me a short, interesting story')">
-          <span>📖</span> Tell me a story
+          <span class="icon">📖</span> Tell me a story
         </button>
         <button class="suggestion" onclick="quickPrompt('What are some good tips for productivity?')">
-          <span>💡</span> Productivity tips
+          <span class="icon">💡</span> Productivity tips
         </button>
         <button class="suggestion" onclick="quickPrompt('Give me an inspiring quote for today')">
-          <span>✨</span> Daily Inspiration
+          <span class="icon">✨</span> Daily Inspiration
         </button>
       </div>
     </div>
+    
     <div class="chat-container" id="chat"></div>
   </main>
 
@@ -338,7 +355,6 @@ function createSpeakBtn(text) {
          } else {
              speechSynthesis.cancel();
              const u = new SpeechSynthesisUtterance(text);
-             // Force English voice for English UI
              u.lang = 'en-US'; 
              speechSynthesis.speak(u);
              btn.classList.add('active');
@@ -401,7 +417,6 @@ async function send(){
   sendBtn.classList.add('stop-state');
   sendIcon.innerHTML = '<rect x="6" y="6" width="12" height="12" fill="currentColor"/>'; 
 
-  // Direct News fetching (Bypass Gemini for latest news)
   const lowerText = text.toLowerCase();
   if ((lowerText.includes('news') || lowerText.includes('headlines')) && searching) {
       const aiRow = document.createElement('div'); aiRow.className = 'message ai';
@@ -424,12 +439,11 @@ async function send(){
       return;
   }
 
-  // Standard Text API
   const payload = {
     notes: text || 'Analyze this image.',
     think: think,
     isSearching: searching,
-    lang: 'en', // Forced English
+    lang: 'en',
     history: currentMessages.slice(-10)
   };
   
@@ -521,7 +535,7 @@ $('voiceBtn').onclick = () => {
   if(!SR){ alert('Voice not supported'); return; }
   if(recognition){ recognition.stop(); return; }
   recognition = new SR();
-  recognition.lang = 'en-US'; // Forced English Voice
+  recognition.lang = 'en-US'; 
   recognition.interimResults = false;
   recognition.onresult = e => { promptBox.value += e.results[0][0].transcript; };
   recognition.onend = () => recognition = null;
