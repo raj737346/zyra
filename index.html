@@ -7,7 +7,7 @@
 <title>Zyra — AI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#ffffff; --text:#111111; --muted:#888888;
@@ -20,7 +20,7 @@
   --border:#333333; --user-bg:#2a2a2a; --shadow:0 4px 20px rgba(0,0,0,0.3);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:Inter,"Noto Sans Tamil",sans-serif;-webkit-font-smoothing:antialiased}
+html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:Inter,sans-serif;-webkit-font-smoothing:antialiased}
 button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer;background:none;border:none}
 #app{height:100dvh;display:flex;flex-direction:column;max-width:900px;margin:0 auto;position:relative}
@@ -83,7 +83,6 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 .toggle-btns{display:flex;gap:6px;margin-bottom:8px;width:100%;max-width:700px;flex-wrap:wrap}
 .tbtn{border:1px solid transparent;background:var(--panel);color:var(--muted);padding:6px 12px;border-radius:20px;font-size:13px;display:flex;align-items:center;gap:6px;font-weight:500}
 .tbtn.active{background:var(--accent-bg);color:var(--accent);border-color:#d0dfff}
-select.lang-select{background:var(--panel); border:1px solid var(--border); border-radius:20px; padding:6px 12px; font-size:13px; color:var(--muted); outline:none;}
 
 /* Buttons */
 .icon-send{background:var(--accent);color:white;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;transition:all 0.2s}
@@ -138,17 +137,17 @@ select.lang-select{background:var(--panel); border:1px solid var(--border); bord
       <h1 class="center-title">Where would you like to begin?</h1>
       
       <div class="suggestions">
-        <button class="suggestion" onclick="enableSearch(); quickPrompt('இன்றைய தமிழ் நாளிதழ் செய்திகள் சொல்லுங்கள்')">
-          <span>📰</span> இன்றைய செய்திகளைச் சொல்லுங்கள்
+        <button class="suggestion" onclick="enableSearch(); quickPrompt('Give me the latest global and Indian news')">
+          <span>📰</span> Latest Global News
         </button>
-        <button class="suggestion" onclick="quickPrompt('ஒரு சுவாரஸ்யமான கதை சொல்லுங்கள்')">
-          <span>📖</span> ஒரு சுவாரஸ்யமான கதை சொல்
+        <button class="suggestion" onclick="quickPrompt('Tell me a short, interesting story')">
+          <span>📖</span> Tell me a story
         </button>
-        <button class="suggestion" onclick="quickPrompt('ஒரு அழகான இயற்கை காட்சி')">
-          <span>🖼️</span> ஒரு அழகான படத்தை உருவாக்கு
+        <button class="suggestion" onclick="quickPrompt('What are some good tips for productivity?')">
+          <span>💡</span> Productivity tips
         </button>
-        <button class="suggestion" onclick="quickPrompt('எனக்கு ஒரு நல்ல மேற்கோள் சொல்லுங்கள்')">
-          <span>✨</span> இன்றைய மேற்கோளைச் சொல்
+        <button class="suggestion" onclick="quickPrompt('Give me an inspiring quote for today')">
+          <span>✨</span> Daily Inspiration
         </button>
       </div>
     </div>
@@ -165,16 +164,10 @@ select.lang-select{background:var(--panel); border:1px solid var(--border); bord
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
         Search
       </button>
-      <select id="langSelect" class="lang-select">
-        <option value="auto">🌐 Auto</option>
-        <option value="ta">தமிழ்</option>
-        <option value="en">English</option>
-        <option value="hi">हिन्दी</option>
-      </select>
     </div>
     <div class="composer">
       <img id="imgPreview" class="preview-img" src="" alt="preview">
-      <input type="text" id="prompt" placeholder="Type a message or hold to speak" autocomplete="off">
+      <input type="text" id="prompt" placeholder="Type a message or hold to speak..." autocomplete="off">
       
       <div class="composer-actions">
         <input type="file" id="fileInput" accept="image/*" hidden>
@@ -345,7 +338,8 @@ function createSpeakBtn(text) {
          } else {
              speechSynthesis.cancel();
              const u = new SpeechSynthesisUtterance(text);
-             u.lang = /[\u0B80-\u0BFF]/.test(text) ? 'ta-IN' : 'en-US'; 
+             // Force English voice for English UI
+             u.lang = 'en-US'; 
              speechSynthesis.speak(u);
              btn.classList.add('active');
              btn.querySelector('span').textContent = 'Stop';
@@ -407,62 +401,21 @@ async function send(){
   sendBtn.classList.add('stop-state');
   sendIcon.innerHTML = '<rect x="6" y="6" width="12" height="12" fill="currentColor"/>'; 
 
+  // Direct News fetching (Bypass Gemini for latest news)
   const lowerText = text.toLowerCase();
-
-  // புதிய படம் உருவாக்கும் முறை (Lexica API)
-  if (lowerText.includes('படம்') || lowerText.includes('image') || text.includes('🖼️')) {
-    
-    // UI: Show Loading image
-    const aiRow = document.createElement('div'); aiRow.className = 'message ai';
-    const bubble = document.createElement('div'); bubble.className = 'bubble';
-    bubble.innerHTML = `<div class="typing"><span></span><span></span><span></span></div><p style="margin-top:10px;color:var(--muted);font-size:13px;">படம் உருவாக்கப்படுகிறது...</p>`;
-    aiRow.appendChild(bubble); chat.appendChild(aiRow);
-    const main = $('chatArea'); main.scrollTop = main.scrollHeight;
-
-    try {
-      const cleanPrompt = text.replace(/படம்|உருவாக்கு|உருவாக்கி|எனக்குக்|காட்டு|🖼️|image|generation/gi, '').trim() || 'Beautiful landscape';
-      // Lexica API (Highly reliable, fast)
-      const res = await fetch(`https://lexica.art/api/v1/search?q=${encodeURIComponent(cleanPrompt)}`);
-      const data = await res.json();
-      
-      let imgUrl = "https://images.unsplash.com/photo-1506744626753-143d4e0ce363?w=600&q=80"; // Default fallback
-      if (data && data.images && data.images.length > 0) {
-         imgUrl = data.images[0].src; 
-      }
-
-      bubble.innerHTML = '';
-      const txt = document.createElement('div');
-      txt.textContent = "உங்கள் கேள்விக்கான படம் இதோ:";
-      
-      const img = document.createElement('img');
-      img.src = imgUrl;
-      
-      bubble.appendChild(txt); bubble.appendChild(img);
-      
-      currentMessages.push({ role: 'ai', text: "உருவாக்கப்பட்ட படம்:\n![image](" + imgUrl + ")" });
-      saveHistory();
-      
-    } catch(e) {
-      bubble.innerHTML = `<p>மன்னிக்கவும், படத்தை உருவாக்க முடியவில்லை. இணைய இணைப்பைச் சரிபார்க்கவும்.</p>`;
-    }
-
-    busy = false; 
-    sendBtn.classList.remove('stop-state');
-    sendIcon.innerHTML = '<path d="M12 19V5M5 12l7-7 7 7"/>'; 
-    return;
-  }
-
-  // News feature
-  if ((lowerText.includes('செய்தி') || lowerText.includes('news')) && searching) {
+  if ((lowerText.includes('news') || lowerText.includes('headlines')) && searching) {
       const aiRow = document.createElement('div'); aiRow.className = 'message ai';
       const bubble = document.createElement('div'); bubble.className = 'bubble';
-      bubble.innerHTML = `<p>இதோ இன்றைய தமிழ் செய்திகள் (Google News):</p>
+      bubble.innerHTML = `<p>Here are the latest global and Indian news headlines. Click below to read:</p>
       <ul style="margin-left: 20px; margin-bottom: 10px;">
-        <li><a href="https://news.google.com/search?q=tamil%20news&hl=ta&gl=IN&ceid=IN:ta" target="_blank">தினமலர், தினத்தந்தி, விகடன் செய்திகள் பார்க்க இங்கே கிளிக் செய்யவும்</a></li>
-      </ul>`;
+        <li><a href="https://news.google.com/" target="_blank">Google News (Global & India)</a></li>
+        <li><a href="https://www.reuters.com/" target="_blank">Reuters (World News)</a></li>
+        <li><a href="https://www.bbc.com/news" target="_blank">BBC News</a></li>
+      </ul>
+      <p style="font-size: 13px; color: var(--muted);">(Note: To fetch summaries directly from AI, your Gemini API needs the Search Grounding feature enabled).</p>`;
       
       aiRow.appendChild(bubble); chat.appendChild(aiRow);
-      currentMessages.push({ role: 'ai', text: "Google News தமிழ் இணைப்பு வழங்கப்பட்டது." });
+      currentMessages.push({ role: 'ai', text: "Provided direct links to global news." });
       saveHistory();
       
       busy = false; 
@@ -476,7 +429,7 @@ async function send(){
     notes: text || 'Analyze this image.',
     think: think,
     isSearching: searching,
-    lang: $('langSelect').value,
+    lang: 'en', // Forced English
     history: currentMessages.slice(-10)
   };
   
@@ -502,7 +455,7 @@ async function send(){
     if(!res.ok) throw new Error(`Server error (${res.status})`);
 
     const data = await res.json();
-    full = data.answer || data.summary || data.response || data.text || 'பதில் கிடைக்கவில்லை.';
+    full = data.answer || data.summary || data.response || data.text || 'No response received.';
     
     let i = 0;
     content.innerHTML = '';
@@ -568,7 +521,7 @@ $('voiceBtn').onclick = () => {
   if(!SR){ alert('Voice not supported'); return; }
   if(recognition){ recognition.stop(); return; }
   recognition = new SR();
-  recognition.lang = 'ta-IN'; 
+  recognition.lang = 'en-US'; // Forced English Voice
   recognition.interimResults = false;
   recognition.onresult = e => { promptBox.value += e.results[0][0].transcript; };
   recognition.onend = () => recognition = null;
