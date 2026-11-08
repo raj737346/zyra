@@ -121,21 +121,6 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 .history-item:hover{background:var(--panel)}
 .del-btn{color:var(--muted);font-size:16px;padding:4px}
 .del-btn:hover{color:red}
-
-/* Settings Modal */
-.settings-modal {
-  display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.5); z-index: 20; align-items: center; justify-content: center;
-}
-.settings-content {
-  background: var(--bg); border-radius: 16px; padding: 24px; width: 90%; max-width: 400px; box-shadow: var(--shadow);
-}
-.settings-content h3 { margin-bottom: 16px; font-size: 18px; }
-.settings-content label { display: block; font-size: 14px; margin-bottom: 8px; color: var(--muted); }
-.settings-content textarea {
-  width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 14px; 
-  background: var(--panel); color: var(--text); outline: none; resize: vertical; min-height: 100px;
-}
-.settings-content .btn-row { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
 </style>
 </head>
 <body>
@@ -147,9 +132,6 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
       </button>
     </div>
     <div class="header-right">
-      <button class="iconbtn" id="settingsBtn" title="Custom Persona">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-      </button>
       <button class="iconbtn" id="exportBtn" title="Export Chat">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
       </button>
@@ -220,20 +202,6 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
       <button id="clearAll" style="margin-top:auto; color:var(--muted); font-size:13px; text-align:left; padding:10px;">Clear all</button>
     </aside>
   </div>
-
-  <!-- 🎭 Custom Persona Settings Modal -->
-  <div class="settings-modal" id="settingsModal">
-    <div class="settings-content">
-      <h3>🎭 Custom Persona</h3>
-      <p style="font-size:13px; color:var(--muted); margin-bottom:12px;">Zyra-வை எப்படி நடந்துகொள்ளச் சொல்ல வேண்டும்? (உ.ம்: "நீ ஒரு கவிஞர்", "நீ ஒரு தமிழ் ஆசிரியர்").</p>
-      <label>System Instructions</label>
-      <textarea id="personaInput" placeholder="Example: You are a helpful coding assistant. Answer briefly."></textarea>
-      <div class="btn-row">
-        <button class="tbtn" onclick="document.getElementById('settingsModal').style.display='none'">Cancel</button>
-        <button class="tbtn active" onclick="savePersona()">Save</button>
-      </div>
-    </div>
-  </div>
 </div>
 
 <script>
@@ -243,7 +211,6 @@ const API_URL = '/api/summarize';
 const $ = id => document.getElementById(id);
 const chat = $('chat'), promptBox = $('prompt'), sendBtn = $('sendBtn'), sendIcon = $('sendIcon');
 const welcomeScreen = $('welcomeScreen');
-const personaInput = $('personaInput');
 
 let think = false, searching = false, autoSpeak = false, busy = false, recognition = null;
 let selectedImage = null; 
@@ -251,21 +218,11 @@ let currentMessages = [];
 let currentChatId = null;
 let history = [];
 let abortController = null;
-let customPersona = ''; 
+
+let currentLanguage = 'en'; 
 
 try { history = JSON.parse(localStorage.getItem('zyra_history') || '[]'); if(!Array.isArray(history)) history=[]; } catch { history=[]; }
 try { const savedTheme = localStorage.getItem('zyra_theme'); if(savedTheme) document.documentElement.dataset.theme = savedTheme; } catch {}
-try { customPersona = localStorage.getItem('zyra_persona') || ''; personaInput.value = customPersona; } catch {}
-
-window.savePersona = () => {
-    customPersona = personaInput.value.trim();
-    try { localStorage.setItem('zyra_persona', customPersona); } catch {}
-    $('settingsModal').style.display = 'none';
-    alert('Persona saved! Zyra will act like this from now on.');
-};
-
-$('settingsBtn').onclick = () => { $('settingsModal').style.display = 'flex'; };
-$('settingsModal').onclick = (e) => { if(e.target === $('settingsModal')) $('settingsModal').style.display = 'none'; };
 
 $('thinkBtn').onclick = () => { think = !think; $('thinkBtn').classList.toggle('active', think); };
 $('searchBtn').onclick = () => { searching = !searching; $('searchBtn').classList.toggle('active', searching); };
@@ -502,15 +459,12 @@ async function send(){
       currentLanguage = 'en';
   }
 
-  // 🔴 Custom Persona & Language logic combined safely into the prompt
   let finalNotes = text;
-  let sysInstruction = "";
-  
-  if (customPersona) sysInstruction += `[System Persona: ${customPersona}]\n`;
-  if (currentLanguage === 'en') sysInstruction += `(IMPORTANT INSTRUCTION: Reply strictly in English only.)\n`;
-  else if (currentLanguage === 'ta') sysInstruction += `(IMPORTANT INSTRUCTION: Reply strictly in Tamil only.)\n`;
-
-  if (sysInstruction) finalNotes = sysInstruction + "\n" + finalNotes;
+  if (currentLanguage === 'en') {
+      finalNotes = text + "\n\n(IMPORTANT INSTRUCTION: Reply strictly in English only.)";
+  } else if (currentLanguage === 'ta') {
+      finalNotes = text + "\n\n(IMPORTANT INSTRUCTION: Reply strictly in Tamil only.)";
+  }
 
   const payload = {
     notes: finalNotes,
