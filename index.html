@@ -144,7 +144,7 @@ select.lang-select{background:var(--panel); border:1px solid var(--border); bord
         <button class="suggestion" onclick="quickPrompt('ஒரு சுவாரஸ்யமான கதை சொல்லுங்கள்')">
           <span>📖</span> ஒரு சுவாரஸ்யமான கதை சொல்
         </button>
-        <button class="suggestion" onclick="quickPrompt('ஒரு அழகான இயற்கை காட்சியின் படத்தை உருவாக்கி எனக்குக் காட்டு')">
+        <button class="suggestion" onclick="quickPrompt('ஒரு அழகான இயற்கை காட்சியின் படத்தை உருவாக்கு')">
           <span>🖼️</span> ஒரு அழகான படத்தை உருவாக்கு
         </button>
         <button class="suggestion" onclick="quickPrompt('எனக்கு ஒரு நல்ல மேற்கோள் சொல்லுங்கள்')">
@@ -409,7 +409,8 @@ async function send(){
 
   const lowerText = text.toLowerCase();
 
-  // 1. Direct Image Generation via Pollinations (No Backend Needed)
+  // ⚠️ இங்கேதான் படம் உருவாக்கும் முழுப் பகுதி மாற்றப்பட்டுள்ளது. 
+  // உங்கள் Backend API-க்கு இது போகாது.
   if (lowerText.includes('படம்') || lowerText.includes('image')) {
     try {
       const promptSeed = encodeURIComponent(text);
@@ -421,6 +422,10 @@ async function send(){
       const img = document.createElement('img');
       img.src = imgUrl;
       img.alt = "Generated Image";
+      img.style.width = "100%";
+      img.style.maxWidth = "400px";
+      img.style.borderRadius = "12px";
+      img.style.marginBottom = "10px";
       
       const txt = document.createElement('div');
       txt.textContent = "உங்கள் கேள்விக்கான படம் இதோ:";
@@ -434,13 +439,13 @@ async function send(){
       busy = false; 
       sendBtn.classList.remove('stop-state');
       sendIcon.innerHTML = '<path d="M12 19V5M5 12l7-7 7 7"/>'; 
-      return;
+      return; // Stop here, don't go to backend
     } catch (e) {
       console.log("Image gen error:", e);
     }
   }
 
-  // 2. Direct News Fetching (Bypasses AI Limit)
+  // 2. Direct News Fetching
   if ((lowerText.includes('செய்தி') || lowerText.includes('news')) && searching) {
       const aiRow = document.createElement('div'); aiRow.className = 'message ai';
       const bubble = document.createElement('div'); bubble.className = 'bubble';
