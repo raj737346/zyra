@@ -86,7 +86,7 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 .composer textarea::placeholder{color:var(--muted)}
 
 .composer-bottom-row{display:flex; justify-content:space-between; align-items:center; width:100%;}
-.toggle-btns{display:flex; gap:6px;}
+.toggle-btns{display:flex; gap:6px; align-items:center;}
 .tbtn{border:1px solid transparent;background:var(--panel);color:var(--muted);padding:6px 12px;border-radius:20px;font-size:13px;display:flex;align-items:center;gap:6px;font-weight:500; transition:all 0.2s;}
 .tbtn.active{background:var(--accent2);color:var(--accent);border-color:#f36b3833}
 
@@ -211,8 +211,8 @@ let currentChatId = null;
 let history = [];
 let abortController = null;
 
-// 🔴 முக்கிய மாற்றம்: தொடக்கத்தில் மொழி 'Auto' (தானாகக் கண்டறி) என்று இருக்கும்
-let currentLanguage = 'auto'; 
+// 🧠 இங்கே தான் நினைவாற்றல் (Memory Power) வேலை செய்கிறது
+let currentLanguage = 'en'; 
 
 try { history = JSON.parse(localStorage.getItem('zyra_history') || '[]'); if(!Array.isArray(history)) history=[]; } catch { history=[]; }
 try { const savedTheme = localStorage.getItem('zyra_theme'); if(savedTheme) document.documentElement.dataset.theme = savedTheme; } catch {}
@@ -300,7 +300,11 @@ function loadChat(id){
   currentMessages = (item.messages || []).slice(); currentChatId = id;
   chat.innerHTML = ''; welcomeScreen.style.display = 'none';
   
-  currentLanguage = 'auto'; // Load செய்யும்போது Auto-வாக மாற்று
+  currentLanguage = 'en';
+  for (let m of currentMessages) {
+      if (m.text && /[\u0B80-\u0BFF]/.test(m.text)) { currentLanguage = 'ta'; break; }
+  }
+
   currentMessages.forEach(m => addMessage(m.role, m.text, m.image, false));
   $('drawerOverlay').classList.remove('show');
 }
@@ -420,27 +424,25 @@ async function send(){
       return;
   }
 
-  // 🔴 மொழி கண்டறிதல் (Auto-detection Logic)
-  if (/[\u0B80-\u0BFF]/.test(text)) {
-      currentLanguage = 'ta'; // தமிழ் எழுத்துக்கள் இருந்தால் -> தமிழ்
-  } else if (/[\u0900-\u097F]/.test(text)) {
-      currentLanguage = 'hi'; // இந்தி எழுத்துக்கள் இருந்தால் -> இந்தி
-  } else if (lowerText.includes('tamil')) {
-      currentLanguage = 'ta'; // "Tamil" என்ற வார்த்தை இருந்தால் -> தமிழ்
+  // 🧠 மொழியை நினைவில் வைத்துக்கொள்ளும் லாஜிக் (Memory Logic)
+  if (lowerText.includes('tamil') || /[\u0B80-\u0BFF]/.test(text)) {
+      currentLanguage = 'ta'; // தமிழ் மொழிக்கு மாற்று
   } else if (lowerText.includes('english')) {
-      currentLanguage = 'en'; // "English" என்ற வார்த்தை இருந்தால் -> ஆங்கிலம்
-  } else {
-      currentLanguage = 'en'; // வேறு எதுவும் இல்லையென்றால் -> ஆங்கிலம்
+      currentLanguage = 'en'; // ஆங்கில மொழிக்கு மாற்று
   }
 
   let finalNotes = text;
-  finalNotes = text + "\n\n(IMPORTANT INSTRUCTION: Reply strictly in the requested language. Ensure 100% accurate spelling and grammar in that language. Double-check all characters and do not drop any letters or accents.)";
+  if (currentLanguage === 'en') {
+      finalNotes = text + "\n\n(IMPORTANT INSTRUCTION: Reply strictly in English only.)";
+  } else if (currentLanguage === 'ta') {
+      finalNotes = text + "\n\n(IMPORTANT INSTRUCTION: Reply strictly in Tamil only.)";
+  }
 
   const payload = {
     notes: finalNotes || 'Analyze this image.',
     think: think,
     isSearching: searching,
-    lang: currentLanguage, 
+    lang: currentLanguage, // தேர்ந்தெடுத்த மொழியை Backend-க்கு அனுப்பு
     history: currentMessages.slice(-10)
   };
   
@@ -531,7 +533,7 @@ promptBox.addEventListener('keydown', e => {
 
 $('newBtn').onclick = () => {
   if(currentMessages.length) saveHistory();
-  currentMessages = []; currentChatId = null; currentLanguage = 'auto'; 
+  currentMessages = []; currentChatId = null; currentLanguage = 'en'; 
   chat.innerHTML = ''; welcomeScreen.style.display = 'flex'; promptBox.focus();
 };
 
@@ -544,7 +546,7 @@ $('voiceBtn').onclick = () => {
   if(!SR){ alert('Voice not supported'); return; }
   if(recognition){ recognition.stop(); return; }
   recognition = new SR();
-  recognition.lang = currentLanguage === 'ta' ? 'ta-IN' : currentLanguage === 'hi' ? 'hi-IN' : 'en-US'; 
+  recognition.lang = currentLanguage === 'ta' ? 'ta-IN' : 'en-US'; 
   recognition.interimResults = false;
   recognition.onresult = e => { promptBox.value += e.results[0][0].transcript; promptBox.dispatchEvent(new Event('input')); };
   recognition.onend = () => recognition = null;
