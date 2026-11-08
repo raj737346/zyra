@@ -48,18 +48,14 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 .bubble img{max-width:min(250px,100%);border-radius:12px;display:block;margin-bottom:8px}
 
 /* Message Tools (Copy & Speak) */
-.msg-tools{display:flex;gap:16px;margin-top:12px;align-items:center}
-.tool-btn{color:var(--muted);font-size:13px;display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:8px;transition:background 0.2s}
-.tool-btn:hover{background:var(--panel);color:var(--text)}
+.msg-tools{display:flex;gap:12px;margin-top:14px;align-items:center}
+.tool-btn{color:var(--muted);font-size:13px;display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;transition:all 0.2s;border:1px solid transparent}
+.tool-btn:hover{background:var(--panel);color:var(--text);border-color:var(--border)}
 
-/* Wave Icon Animation */
-.speak-btn svg { width: 18px; height: 18px; }
-.speak-btn.active { color: var(--accent); }
-.speak-btn.active svg path { animation: wave 1s infinite alternate; }
-.speak-btn.active svg path:nth-child(1) { animation-delay: 0s; }
-.speak-btn.active svg path:nth-child(2) { animation-delay: 0.2s; }
-.speak-btn.active svg path:nth-child(3) { animation-delay: 0.4s; }
-@keyframes wave { from { opacity: 0.3; } to { opacity: 1; } }
+/* Speak Button Animation */
+.speak-btn.active { color: var(--accent); background: var(--accent-bg); border-color: var(--accent); }
+.speak-btn.active svg { animation: pulse 1s infinite alternate; }
+@keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
 
 /* Markdown */
 .bubble pre{white-space:pre-wrap;overflow-x:auto;background:var(--panel);padding:14px;border-radius:12px;margin:10px 0;border:1px solid var(--border)}
@@ -85,8 +81,9 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 .tbtn.active{background:var(--accent-bg);color:var(--accent);border-color:#d0dfff}
 
 /* Buttons inside composer */
-.icon-send{background:var(--accent);color:white;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;transition:opacity 0.2s}
-.icon-send:disabled{opacity:0.5}
+.icon-send{background:var(--accent);color:white;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;transition:all 0.2s}
+.icon-send:disabled{opacity:0.6;background:var(--muted);cursor:not-allowed}
+.icon-send.stop-state{background:var(--text);color:var(--bg)}
 .icon-circle{color:var(--text);width:36px;height:36px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--border)}
 .icon-circle:hover{background:var(--panel)}
 
@@ -163,8 +160,9 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 10v4m4-7v10m4-7v4"/></svg>
         </button>
         
+        <!-- Send Button (Fixed) -->
         <button class="icon-send" id="sendBtn" title="Send">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <svg id="sendIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
         </button>
       </div>
     </div>
@@ -187,7 +185,7 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 'use strict';
 const API_URL = '/api/summarize'; 
 const $ = id => document.getElementById(id);
-const chat = $('chat'), promptBox = $('prompt'), sendBtn = $('sendBtn');
+const chat = $('chat'), promptBox = $('prompt'), sendBtn = $('sendBtn'), sendIcon = $('sendIcon');
 const welcomeScreen = $('welcomeScreen');
 
 let think = false, searching = false, busy = false, recognition = null;
@@ -280,28 +278,31 @@ function renderMarkdown(text){
   return s;
 }
 
-// 🔊 சவுண்ட் வேவ் ஐகான் HTML
-const waveSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9v6"></path><path d="M12 5v14"></path><path d="M18 9v6"></path></svg>`;
+const speakerSVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`;
 
-// Create Speak Button with Wave Animation
 function createSpeakBtn(text) {
   const btn = document.createElement('button');
   btn.className = 'tool-btn speak-btn';
-  btn.innerHTML = waveSVG;
-  btn.title = "Listen";
+  btn.innerHTML = speakerSVG + ' <span>Listen</span>';
+  btn.title = "Listen to this reply";
   
   btn.onclick = () => {
      if('speechSynthesis' in window){
          if (btn.classList.contains('active')) {
              speechSynthesis.cancel();
              btn.classList.remove('active');
+             btn.querySelector('span').textContent = 'Listen';
          } else {
              speechSynthesis.cancel();
              const u = new SpeechSynthesisUtterance(text);
              u.lang = /[\u0B80-\u0BFF]/.test(text) ? 'ta-IN' : 'en-US'; 
              speechSynthesis.speak(u);
              btn.classList.add('active');
-             u.onend = () => btn.classList.remove('active');
+             btn.querySelector('span').textContent = 'Stop';
+             u.onend = () => {
+                 btn.classList.remove('active');
+                 btn.querySelector('span').textContent = 'Listen';
+             };
          }
      }
   };
@@ -322,13 +323,17 @@ function addMessage(role, text, image = null, store = true){
   if(role === 'ai'){
     const tools = document.createElement('div'); tools.className = 'msg-tools';
     
-    // Copy Button (New look)
     const copy = document.createElement('button'); copy.className = 'tool-btn'; 
-    copy.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+    copy.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span>Copy</span>';
     copy.title = "Copy";
-    copy.onclick = () => { navigator.clipboard?.writeText(text || ''); copy.style.color = 'green'; setTimeout(()=>copy.style.color = 'var(--muted)', 1500); };
+    copy.onclick = () => { 
+        navigator.clipboard?.writeText(text || ''); 
+        const span = copy.querySelector('span');
+        span.textContent = 'Copied!'; 
+        copy.style.color = 'green'; 
+        setTimeout(()=>{ span.textContent = 'Copy'; copy.style.color = 'var(--muted)'; }, 1500); 
+    };
     
-    // Speak Button (Wave)
     const speak = createSpeakBtn(text);
 
     tools.appendChild(copy); 
@@ -354,8 +359,10 @@ async function send(){
   $('imgPreview').style.display = 'none';
   $('fileInput').value = '';
 
-  busy = true; sendBtn.disabled = true;
-  sendBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12"/></svg>';
+  // UI State: Loading (Stop icon appears)
+  busy = true; 
+  sendBtn.classList.add('stop-state');
+  sendIcon.innerHTML = '<rect x="6" y="6" width="12" height="12" fill="currentColor"/>'; // Stop square icon
 
   const payload = {
     notes: text || 'Analyze this image.',
@@ -399,30 +406,36 @@ async function send(){
         } else {
             content.innerHTML = renderMarkdown(full);
             
-            // Show Tools after typing finishes
             const tools = document.createElement('div'); tools.className = 'msg-tools';
-            
             const copy = document.createElement('button'); copy.className='tool-btn'; 
-            copy.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
-            copy.title="Copy";
-            copy.onclick = () => { navigator.clipboard?.writeText(full); copy.style.color='green'; setTimeout(()=>copy.style.color='var(--muted)', 1500); };
+            copy.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span>Copy</span>';
+            copy.onclick = () => { 
+                navigator.clipboard?.writeText(full); 
+                const span = copy.querySelector('span');
+                span.textContent = 'Copied!'; 
+                copy.style.color = 'green'; 
+                setTimeout(()=>{ span.textContent = 'Copy'; copy.style.color = 'var(--muted)'; }, 1500); 
+            };
             
             const speak = createSpeakBtn(full);
-            
             tools.appendChild(copy); tools.appendChild(speak); bubble.appendChild(tools);
             
             currentMessages.push({ role: 'ai', text: full });
             saveHistory();
-            busy = false; sendBtn.disabled = false;
-            sendBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+            
+            // Reset UI State
+            busy = false; 
+            sendBtn.classList.remove('stop-state');
+            sendIcon.innerHTML = '<path d="M12 19V5M5 12l7-7 7 7"/>'; // Arrow Up icon
         }
     }
     typeWriter();
 
   }catch(err){
     aiRow.remove();
-    busy = false; sendBtn.disabled = false;
-    sendBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+    busy = false; 
+    sendBtn.classList.remove('stop-state');
+    sendIcon.innerHTML = '<path d="M12 19V5M5 12l7-7 7 7"/>';
     if(err.name !== 'AbortError'){
       addMessage('ai', 'Error: ' + (err.message || 'Connection failed'));
     }
