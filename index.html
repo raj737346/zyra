@@ -34,7 +34,7 @@ header{height:60px;flex:none;display:flex;align-items:center;justify-content:spa
 
 /* Main Content */
 main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:20px;scroll-behavior:smooth}
-.center-logo{width:50px;height:50px;color:var(--accent);margin-top:25vh;margin-bottom:16px}
+.center-logo{font-size:40px;font-weight:700;color:var(--accent);margin-top:25vh;margin-bottom:16px;letter-spacing:-1px}
 .center-title{font-size:24px;font-weight:600;color:var(--text);letter-spacing:-0.5px;margin-bottom:40px}
 
 /* Chat Messages */
@@ -126,9 +126,8 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 
   <main id="chatArea">
     <div id="welcomeScreen" style="text-align:center; display:flex; flex-direction:column; align-items:center;">
-      <svg class="center-logo" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-      </svg>
+      <!-- இங்கேதான் அந்த ! ஐகான் நீக்கப்பட்டு Zyra லோகோ வந்துள்ளது -->
+      <div class="center-logo">Zyra</div>
       <h1 class="center-title">Where would you like to begin?</h1>
     </div>
     <div class="chat-container" id="chat"></div>
@@ -160,7 +159,6 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 10v4m4-7v10m4-7v4"/></svg>
         </button>
         
-        <!-- Send Button (Fixed) -->
         <button class="icon-send" id="sendBtn" title="Send">
           <svg id="sendIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
         </button>
@@ -359,10 +357,9 @@ async function send(){
   $('imgPreview').style.display = 'none';
   $('fileInput').value = '';
 
-  // UI State: Loading (Stop icon appears)
   busy = true; 
   sendBtn.classList.add('stop-state');
-  sendIcon.innerHTML = '<rect x="6" y="6" width="12" height="12" fill="currentColor"/>'; // Stop square icon
+  sendIcon.innerHTML = '<rect x="6" y="6" width="12" height="12" fill="currentColor"/>'; 
 
   const payload = {
     notes: text || 'Analyze this image.',
@@ -423,10 +420,9 @@ async function send(){
             currentMessages.push({ role: 'ai', text: full });
             saveHistory();
             
-            // Reset UI State
             busy = false; 
             sendBtn.classList.remove('stop-state');
-            sendIcon.innerHTML = '<path d="M12 19V5M5 12l7-7 7 7"/>'; // Arrow Up icon
+            sendIcon.innerHTML = '<path d="M12 19V5M5 12l7-7 7 7"/>'; 
         }
     }
     typeWriter();
