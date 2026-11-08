@@ -7,7 +7,7 @@
 <title>Zyra — Spark your mind</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#ffffff; --text:#191918; --muted:#777671;
@@ -36,18 +36,11 @@ header{height:60px;flex:none;display:flex;align-items:center;justify-content:spa
 /* Main Content */
 main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:20px;scroll-behavior:smooth}
 
-/* Welcome Screen (No Boxes, Old Logo) */
-.welcome{max-width:650px;margin:12vh auto 25px;text-align:center; display:flex; flex-direction:column; align-items:center;}
+/* Welcome Screen (Only Logo) */
+.welcome{max-width:650px;margin:25vh auto 25px;text-align:center; display:flex; flex-direction:column; align-items:center;}
 .welcome .spark{font-size:36px;color:var(--accent); margin-bottom:16px;}
-.welcome h1{font-size:clamp(32px,6vw,48px);letter-spacing:-1.8px;margin:0 0 10px; font-weight:700;}
+.welcome h1{font-size:clamp(32px,6vw,48px);letter-spacing:-1.8px;margin:0; font-weight:700;}
 .welcome h1 em{font-family:"Instrument Serif",serif;font-weight:400;color:var(--accent); font-style: italic;}
-.welcome p{color:var(--muted);font-size:15px;line-height:1.7;margin:8px 0 32px}
-
-/* Text Only Suggestions */
-.suggestions{display:flex; flex-direction:column; gap:20px; width:100%; max-width:500px; text-align:left;}
-.suggestion{display:flex; align-items:center; gap:12px; font-size:16px; color:var(--muted); transition:color 0.2s; cursor:pointer; background:none; border:none; padding:8px 0; text-align:left;}
-.suggestion:hover{color:var(--accent)}
-.suggestion span.icon{font-size:22px;}
 
 /* Chat Messages */
 .chat-container{width:100%;max-width:760px;display:flex;flex-direction:column;gap:20px;padding-bottom:20px; margin-top:20px;}
@@ -138,27 +131,10 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
   </header>
 
   <main id="chatArea">
-    <!-- Old Logo Style Welcome Screen (No Boxes) -->
+    <!-- பழைய ஸ்டைல் Zyra லோகோ மட்டும் (வேறு எந்த எழுத்துக்களும் இல்லை) -->
     <div id="welcomeScreen" class="welcome">
       <div class="spark">✳</div>
-      <h1>Spark your <em>mind.</em></h1>
-      <p>Hello! I am Zyra. Share your thoughts, questions, or plans.<br>Any language is fine.</p>
-      
-      <!-- Text Only Suggestions -->
-      <div class="suggestions">
-        <button class="suggestion" onclick="enableSearch(); quickPrompt('Give me the latest global and Indian news')">
-          <span class="icon">📰</span> Latest Global News
-        </button>
-        <button class="suggestion" onclick="quickPrompt('Tell me a short, interesting story')">
-          <span class="icon">📖</span> Tell me a story
-        </button>
-        <button class="suggestion" onclick="quickPrompt('What are some good tips for productivity?')">
-          <span class="icon">💡</span> Productivity tips
-        </button>
-        <button class="suggestion" onclick="quickPrompt('Give me an inspiring quote for today')">
-          <span class="icon">✨</span> Daily Inspiration
-        </button>
-      </div>
+      <h1>Zyra</h1>
     </div>
     
     <div class="chat-container" id="chat"></div>
@@ -223,18 +199,6 @@ let abortController = null;
 
 try { history = JSON.parse(localStorage.getItem('zyra_history') || '[]'); if(!Array.isArray(history)) history=[]; } catch { history=[]; }
 try { const savedTheme = localStorage.getItem('zyra_theme'); if(savedTheme) document.documentElement.dataset.theme = savedTheme; } catch {}
-
-window.enableSearch = () => {
-    if (!searching) {
-        searching = true;
-        $('searchBtn').classList.add('active');
-    }
-};
-
-window.quickPrompt = (text) => {
-    promptBox.value = text;
-    send();
-};
 
 $('thinkBtn').onclick = () => { think = !think; $('thinkBtn').classList.toggle('active', think); };
 $('searchBtn').onclick = () => { searching = !searching; $('searchBtn').classList.toggle('active', searching); };
