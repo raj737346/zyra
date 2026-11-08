@@ -1,685 +1,374 @@
 <!DOCTYPE html>
-<html lang="ta">
+<html lang="ta" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
-<meta name="theme-color" content="#FFFFFF">
-<title>Zyra</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Instrument+Serif:ital@1&family=Noto+Serif+Tamil:wght@400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>Zyra — Spark your mind</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@1&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root { --bg: #FFFFFF; --text: #000000; --text-light: #666666; --surface: #F4F4F4; --accent: #FF6B2C; --blue: #E8F0FE; --blue-text: #1A73E8; --sidebar-bg: #F9F9F9; }
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { margin: 0; padding: 0; height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; font-size: 16px; overflow: hidden; }
-body { display: flex; flex-direction: column; height: 100dvh; }
-
-/* Top Header */
-.top-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; padding-top: calc(10px + env(safe-area-inset-top)); background: #FFF; border-bottom: 1px solid #E5E5E5; z-index: 5; flex-shrink: 0; }
-.header-left { display: flex; align-items: center; gap: 8px; }
-.header-right { display: flex; align-items: center; gap: 8px; }
-.menu-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text); padding: 4px; }
-.header-title { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 22px; margin: 0; }
-.top-plus-btn { background: var(--surface); border: none; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; color: var(--text); }
-.new-chat-btn { background: var(--text); color: #FFF; border: none; border-radius: 8px; padding: 6px 12px; font-size: 13px; cursor: pointer; font-weight: 500; }
-
-/* Sidebar Overlay */
-.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 15; display: none; opacity: 0; transition: opacity 0.3s; }
-.overlay.open { display: block; opacity: 1; }
-
-/* Sidebar */
-.sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; height: 100dvh; background: var(--sidebar-bg); z-index: 20; transition: left 0.3s ease; display: flex; flex-direction: column; box-shadow: 2px 0 10px rgba(0,0,0,0.1); padding-top: env(safe-area-inset-top); }
-.sidebar.open { left: 0; }
-.sidebar-header { padding: 16px; display: flex; align-items: center; justify-content: space-between; }
-.sidebar-search { margin: 0 16px 16px 16px; padding: 10px 14px; border-radius: 8px; border: 1px solid #E5E5E5; font-size: 14px; outline: none; font-family: inherit; background: #FFF; }
-.sidebar-list { flex: 1; overflow-y: auto; padding: 0 12px 20px 12px; }
-.sidebar-group-title { font-size: 11px; font-weight: 600; color: var(--text-light); margin: 16px 8px 8px 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-.sidebar-item { padding: 10px 12px; border-radius: 8px; font-size: 14px; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
-.sidebar-item:hover, .sidebar-item.active { background: #E8E8E8; }
-.sidebar-item .text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
-.delete-icon { color: var(--text-light); font-size: 16px; padding: 0 4px; opacity: 0.5; }
-.delete-icon:hover { opacity: 1; color: #FF0000; }
-
-/* Center View */
-.center-view { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
-.center-view h1 { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 44px; font-weight: 400; margin: 0 0 8px 0; }
-.center-view p { color: var(--text-light); font-size: 15px; margin: 0; }
-html[lang="ta"] .center-view h1 { font-family: 'Noto Serif Tamil', serif; font-size: 38px; }
-
-/* Chat Area */
-.chat-area { display: none; flex: 1; overflow-y: auto; padding: 20px 16px 20px 16px; flex-direction: column; -webkit-overflow-scrolling: touch; }
-.chat-area.active { display: flex; }
-.msg-user { align-self: flex-end; background: var(--surface); padding: 12px 18px; border-radius: 20px; max-width: 85%; margin-bottom: 24px; font-size: 16px; display: flex; flex-direction: column; gap: 8px; }
-.msg-user img { max-width: 100%; border-radius: 12px; max-height: 200px; object-fit: cover; }
-.msg-ai { align-self: flex-start; width: 100%; margin-bottom: 30px; line-height: 1.6; font-size: 16px; }
-.msg-ai h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin: 20px 0 6px; }
-.msg-ai h3:first-child { margin-top: 0; }
-.msg-ai p { margin: 0 0 12px; }
-
-/* Single Button Modal (Bottom Sheet) */
-.action-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 150; display: none; align-items: flex-end; justify-content: center; }
-.action-sheet.open { display: flex; }
-.action-sheet-content { width: 100%; max-width: 600px; background: #FFF; border-radius: 24px 24px 0 0; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); animation: slideUp 0.3s ease-out; }
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.action-sheet-content h3 { margin: 0 0 20px 0; font-size: 18px; text-align: center; font-family: 'Instrument Serif', serif; font-style: italic; }
-.action-option { display: flex; align-items: center; gap: 16px; padding: 16px; border-radius: 16px; background: var(--surface); margin-bottom: 12px; cursor: pointer; font-weight: 500; font-size: 16px; }
-.action-option svg { width: 28px; height: 28px; stroke: var(--text); fill: none; stroke-width: 2; }
-.action-cancel { width: 100%; padding: 16px; border: none; background: transparent; font-size: 16px; font-weight: 600; color: var(--text-light); cursor: pointer; margin-top: 10px; }
-
-/* Preview Modal */
-.preview-modal { position: fixed; inset: 0; background: #FFF; z-index: 200; display: none; flex-direction: column; }
-.preview-modal.open { display: flex; }
-.preview-header { padding: 10px 16px; padding-top: calc(10px + env(safe-area-inset-top)); background: #F9F9F9; border-bottom: 1px solid #E5E5E5; display: flex; justify-content: space-between; align-items: center; }
-.preview-title { font-weight: 600; font-size: 16px; }
-.preview-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text); }
-.preview-iframe { flex: 1; width: 100%; border: none; }
-
-/* Bottom Bar */
-.bottom-bar { padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: #FFFFFF; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #E5E5E5; z-index: 5; flex-shrink: 0; }
-.input-container { display: flex; flex-direction: column; background: var(--surface); border-radius: 24px; padding: 10px 14px; gap: 8px; }
-.top-tools { display: flex; gap: 8px; align-items: center; }
-.tool-btn { display: flex; align-items: center; gap: 6px; background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 20px; padding: 4px 10px; font-size: 12px; color: var(--text-light); cursor: pointer; font-weight: 500; }
-.tool-btn.active { background: var(--blue); color: var(--blue-text); border-color: var(--blue); }
-
-.image-preview { display: none; padding: 6px; background: #FFF; border-radius: 10px; border: 1px solid #E5E5E5; margin-bottom: 4px; position: relative; width: fit-content; }
-.image-preview img { height: 50px; border-radius: 6px; display: block; }
-.image-preview .remove-img { position: absolute; top: -6px; right: -6px; background: #FF6B2C; color: #FFF; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; }
-
-.textarea-row { display: flex; align-items: flex-end; gap: 8px; }
-textarea { flex: 1; border: none; background: transparent; padding: 6px 0; font-size: 16px; resize: none; max-height: 100px; outline: none; font-family: inherit; line-height: 1.4; color: var(--text); }
-textarea::placeholder { color: var(--text-light); }
-.action-row { display: flex; align-items: center; gap: 8px; }
-.icon-btn { background: transparent; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); padding: 4px; }
-.icon-btn svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.send-btn { background: var(--text); color: #FFF; border: none; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-left: auto; }
-.send-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.5; }
-
-.loader { display: flex; gap: 4px; align-items: center; color: var(--text-light); font-size: 14px; padding: 10px 0; }
-.dot { width: 5px; height: 5px; background: var(--text-light); border-radius: 50%; animation: pulse 1s infinite alternate; }
-.dot:nth-child(2) { animation-delay: 0.2s; }
-.dot:nth-child(3) { animation-delay: 0.4s; }
-@keyframes pulse { to { opacity: 0.2; transform: translateY(-3px); } }
-
-/* Top New Page Modal */
-.top-page-modal { position: fixed; inset: 0; background: #FFF; z-index: 100; display: none; flex-direction: column; padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); }
-.top-page-modal.open { display: flex; }
-.top-page-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
-.close-top-page { background: none; border: none; font-size: 24px; cursor: pointer; }
-.top-page-modal h2 { font-family: 'Instrument Serif', serif; font-style: italic; }
-
-/* Bottom Sheet (Attachment) */
-.attachment-page { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 60; display: none; align-items: flex-end; justify-content: center; }
-.attachment-page.open { display: flex; }
-.attachment-sheet { width: 100%; max-width: 600px; background: #FFF; border-radius: 24px 24px 0 0; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); animation: slideUp 0.3s ease-out; }
-.attachment-sheet h3 { margin: 0 0 20px 0; font-size: 18px; text-align: center; font-family: 'Instrument Serif', serif; font-style: italic; }
-.attachment-option { display: flex; align-items: center; gap: 16px; padding: 16px; border-radius: 16px; background: var(--surface); margin-bottom: 12px; cursor: pointer; font-weight: 500; font-size: 16px; }
-.attachment-option svg { width: 28px; height: 28px; stroke: var(--text); fill: none; stroke-width: 2; }
-.attachment-cancel { width: 100%; padding: 16px; border: none; background: transparent; font-size: 16px; font-weight: 600; color: var(--text-light); cursor: pointer; margin-top: 10px; }
-
-/* Voice Mode Overlay */
-.voice-mode { position: fixed; inset: 0; background: #000000; z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; color: #FFF; }
-.voice-mode.active { display: flex; }
-.voice-circle { width: 120px; height: 120px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 40px; animation: breathe 1.5s infinite alternate; }
-.voice-circle svg { width: 50px; height: 50px; stroke: #FFF; fill: none; stroke-width: 2; }
-@keyframes breathe { from { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 44, 0.7); } to { transform: scale(1.1); box-shadow: 0 0 0 30px rgba(255, 107, 44, 0); } }
-.voice-text { font-size: 18px; color: #DDD; margin-bottom: 20px; text-align: center; }
-.close-voice { position: absolute; bottom: 50px; background: rgba(255,255,255,0.2); border: none; color: #FFF; padding: 12px 24px; border-radius: 30px; font-size: 16px; cursor: pointer; }
+/* Font family updated with fallback to fix square boxes */
+:root{--bg:#fff;--panel:#f7f7f6;--panel2:#efefed;--text:#191918;--muted:#777671;--line:#e8e7e4;--accent:#f36b38;--accent2:#fff0e9;--user:#f4f1ed;--shadow:0 12px 40px #00000012;--danger:#d93025}
+[data-theme="dark"]{--bg:#101010;--panel:#191919;--panel2:#242424;--text:#f4f2ee;--muted:#aaa7a0;--line:#30302e;--accent:#ff7846;--accent2:#38231b;--user:#242321;--shadow:0 12px 40px #0005}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:var(--bg);color:var(--text);font-family:Inter,"Noto Sans Tamil",sans-serif;-webkit-font-smoothing:antialiased}button,input,textarea{font:inherit}button{cursor:pointer}#app{height:100dvh;display:flex;flex-direction:column;max-width:1000px;margin:auto;position:relative}
+header{height:62px;flex:none;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:var(--bg)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.5px}.logo{width:30px;height:30px;border-radius:10px;background:var(--accent);color:white;display:grid;place-items:center;font-size:18px}.head-actions{display:flex;gap:8px;align-items:center}
+.iconbtn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:12px;width:38px;height:38px;font-size:17px;display:grid;place-items:center}
+.langselect{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:12px;padding:0 8px;height:38px;font-size:12px;cursor:pointer}
+main{flex:1;min-height:0;display:flex;flex-direction:column;position:relative}
+#chat{flex:1;overflow-y:auto;padding:28px 18px 20px;scroll-behavior:smooth}
+.welcome{max-width:650px;margin:8vh auto 25px;text-align:center}.welcome .spark{font-size:32px;color:var(--accent)}.welcome h1{font-size:clamp(28px,6vw,44px);letter-spacing:-1.8px;margin:12px 0 5px}.welcome h1 em{font-family:"Instrument Serif","Noto Sans Tamil",serif;font-weight:400;color:var(--accent)}.welcome p{color:var(--muted);font-size:14px;line-height:1.7;margin:8px 0 22px}
+.suggestions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;text-align:left}.suggestion{padding:14px;border:1px solid var(--line);border-radius:15px;background:var(--panel);color:var(--text);font-size:13px;line-height:1.5;text-align:left}.suggestion span{display:block;color:var(--muted);font-size:11px;margin-top:5px}
+.message{max-width:760px;margin:0 auto 20px;display:flex;gap:10px;align-items:flex-start}.avatar{flex:none;width:28px;height:28px;border-radius:9px;background:var(--accent2);color:var(--accent);display:grid;place-items:center;font-size:14px}.bubble{min-width:0;max-width:calc(100% - 40px);font-size:14px;line-height:1.75;overflow-wrap:anywhere}.message.user{justify-content:flex-end}.message.user .avatar{order:2;background:var(--panel2);color:var(--muted)}.message.user .bubble{background:var(--user);padding:11px 14px;border-radius:16px 4px 16px 16px}.message.ai .bubble{padding:2px 0}
+.bubble pre{white-space:pre-wrap;overflow-x:auto;background:var(--panel);padding:12px;border-radius:10px}.bubble code{background:var(--panel2);padding:1px 5px;border-radius:5px;font-size:13px}.bubble pre code{background:none;padding:0}.bubble strong{font-weight:700}.bubble a{color:var(--accent)}.bubble ul,.bubble ol{margin:6px 0;padding-left:22px}.bubble img{max-width:min(240px,100%);border-radius:12px;display:block;margin-bottom:8px}
+.msg-tools{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}.tiny{border:0;background:transparent;color:var(--muted);font-size:12px;padding:4px;border-radius:6px}.tiny:hover{color:var(--accent)}
+.cursor::after{content:'▍';animation:blink 1s infinite;color:var(--accent)}@keyframes blink{50%{opacity:0}}
+.composer-wrap{padding:10px 16px max(14px,env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 16%)}.composer{max-width:760px;margin:auto;border:1px solid var(--line);border-radius:20px;background:var(--panel);padding:10px 11px 8px;box-shadow:var(--shadow)}#prompt{width:100%;resize:none;border:0;outline:0;background:transparent;color:var(--text);font-size:14px;line-height:1.6;min-height:44px;max-height:150px;padding:5px 4px}#prompt::placeholder{color:var(--muted)}.composer-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px}.tools{display:flex;gap:5px;align-items:center;flex-wrap:wrap}.tool{border:1px solid transparent;background:transparent;color:var(--muted);border-radius:10px;padding:7px 9px;font-size:12px}.tool.active{background:var(--accent2);color:var(--accent);border-color:#f36b3833}
+.send{width:36px;height:36px;border:0;border-radius:12px;background:var(--accent);color:#fff;font-size:17px}.send:disabled{opacity:.45}.send.stop{background:var(--danger)}.hint{text-align:center;color:var(--muted);font-size:10px;margin:8px 0 0}
+#imagePreview{display:none;margin:4px 4px 8px;position:relative;width:max-content}#imagePreview img{max-width:100px;max-height:75px;border-radius:9px}#removeImage{position:absolute;right:-7px;top:-7px;border:0;border-radius:50%;background:var(--text);color:var(--bg);width:21px;height:21px}
+#status{max-width:760px;margin:0 auto 8px;color:var(--muted);font-size:12px;min-height:17px;padding:0 4px}
+.overlay{display:none;position:absolute;inset:0;background:#0006;z-index:5}.drawer{position:absolute;top:0;bottom:0;left:0;width:min(310px,85vw);background:var(--bg);border-right:1px solid var(--line);padding:18px;display:flex;flex-direction:column}.drawer-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.drawer button{color:var(--text)}.newchat{padding:11px;border:1px solid var(--line);background:var(--panel);border-radius:12px;text-align:left}.history-title{font-size:11px;color:var(--muted);margin:22px 0 8px;display:flex;justify-content:space-between}.history-list{overflow:auto;flex:1}.history-row{display:flex;align-items:center;border-radius:9px}.history-row:hover{background:var(--panel)}.history-item{flex:1;text-align:left;border:0;background:transparent;padding:10px 8px;color:var(--text);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.del-btn{border:0;background:transparent;color:var(--muted);padding:8px;font-size:14px}.del-btn:hover{color:var(--danger)}
+#voiceState{display:none;position:absolute;inset:0;background:var(--bg);z-index:6;align-items:center;justify-content:center;flex-direction:column;gap:18px}.pulse{width:76px;height:76px;border-radius:50%;background:var(--accent2);display:grid;place-items:center;color:var(--accent);font-size:30px}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:9px 16px;border-radius:10px;font-size:13px;z-index:20;opacity:0;transition:opacity .25s;pointer-events:none}.toast.show{opacity:1}
+@media(max-width:520px){header{height:56px;padding:0 13px}#chat{padding:18px 13px}.welcome{margin-top:6vh}.suggestions{grid-template-columns:1fr}.composer-wrap{padding-left:10px;padding-right:10px}.tool{padding:7px 6px}.hint{font-size:9px}.langselect{padding:0 5px;font-size:11px}}
 </style>
 </head>
 <body>
-
-<!-- Single Action Sheet (Preview Options) -->
-<div class="action-sheet" id="actionSheet" onclick="closeActionSheet(event)">
-  <div class="action-sheet-content" onclick="event.stopPropagation()">
-    <h3>HTML Code Ready</h3>
-    <div class="action-option" onclick="doAction('live')">
-      <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      Live Preview (App-ல் பார்)
-    </div>
-    <div class="action-option" onclick="doAction('browser')">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      Open in Browser (Chrome-ல் திற)
-    </div>
-    <button class="action-cancel" onclick="closeActionSheet(event)">Cancel</button>
+<div id="app">
+<header>
+  <div class="brand"><button class="iconbtn" id="menuBtn" aria-label="Menu">☰</button><div class="logo">✳</div><span>Zyra</span></div>
+  <div class="head-actions">
+    <select class="langselect" id="langSelect" title="Language">
+      <option value="auto">🌐 Auto</option>
+      <option value="ta">தமிழ்</option>
+      <option value="en">English</option>
+      <option value="hi">हिन्दी</option>
+    </select>
+    <button class="iconbtn" id="newBtn" title="New chat">＋</button>
+    <button class="iconbtn" id="themeBtn" title="Theme">☾</button>
   </div>
-</div>
-
-<!-- Preview Modal -->
-<div class="preview-modal" id="previewModal">
-  <div class="preview-header">
-    <span class="preview-title">Live Preview</span>
-    <button class="preview-close" onclick="closePreview()">✕</button>
-  </div>
-  <iframe class="preview-iframe" id="previewIframe"></iframe>
-</div>
-
-<!-- Top New Page -->
-<div class="top-page-modal" id="topPageModal">
-  <div class="top-page-header">
-    <button class="close-top-page" onclick="closeTopPage()">✕</button>
-    <h2>New Tools (புதிய வசதிகள்)</h2>
-  </div>
-  <p style="color: var(--text-light);">இந்தப் பக்கத்தில் புதிய வசதிகள் விரைவில் சேர்க்கப்படும்.</p>
-</div>
-
-<!-- Bottom Sheet (Attachment) -->
-<div class="attachment-page" id="attachmentPage" onclick="closeAttachmentPage(event)">
-  <div class="attachment-sheet" onclick="event.stopPropagation()">
-    <h3>Attach File</h3>
-    <div class="attachment-option" onclick="triggerFileInput('image/*')">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-      Photo Library (புகைப்படங்கள்)
+</header>
+<main>
+  <section id="chat" aria-live="polite">
+    <div class="welcome" id="welcome">
+      <div class="spark">✳</div>
+      <h1>மனதில் ஒரு <em>பொறி.</em></h1>
+      <p>வணக்கம்! நான் Zyra. உங்கள் எண்ணங்கள், கேள்விகள், திட்டங்கள் — எதையும் பகிரலாம்.<br>தமிழ் · English · हिन्दी</p>
+      <div class="suggestions">
+        <button class="suggestion" data-prompt="இந்த வாரம் நான் செய்தவற்றைச் சுருக்கமாகத் தொகுத்து, முக்கிய முன்னுரிமைகளைச் சொல்லுங்கள்.">◷ வாரச் சுருக்கம்<span>இந்த வாரத்தை ஒழுங்குபடுத்துங்கள்</span></button>
+        <button class="suggestion" data-prompt="எனது இன்றைய பணிகளுக்கான எளிய திட்டம் உருவாக்குங்கள்.">☼ தினசரி திட்டம்<span>இன்றைய நாளைத் திட்டமிடுங்கள்</span></button>
+        <button class="suggestion" data-prompt="ஒரு கடினமான விஷயத்தை எளிமையாக விளக்குங்கள்.">✳ கற்றுக்கொள்வோம்<span>எளிய விளக்கம் பெறுங்கள்</span></button>
+        <button class="suggestion" data-prompt="எனக்கு புதிய யோசனைகள் சொல்லுங்கள்.">◇ புதிய யோசனைகள்<span>சிந்தனையைத் தூண்டுங்கள்</span></button>
+      </div>
     </div>
-    <div class="attachment-option" onclick="triggerFileInput('image/*', true)">
-      <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      Camera (கேமரா)
+  </section>
+  <div id="status"></div>
+  <div class="composer-wrap">
+    <div class="composer">
+      <div id="imagePreview"><img id="previewImg" alt="Selected image"><button id="removeImage" title="Remove image">×</button></div>
+      <textarea id="prompt" rows="1" placeholder="Zyra-விடம் எதையும் கேளுங்கள்..."></textarea>
+      <div class="composer-bottom">
+        <div class="tools">
+          <button class="tool" id="attachBtn" title="Attach image">＋ படம்</button>
+          <button class="tool" id="thinkBtn">✧ Think</button>
+          <button class="tool" id="searchBtn">⌕ Search</button>
+          <button class="tool" id="micBtn" title="Voice input">🎙</button>
+        </div>
+        <button class="send" id="sendBtn" aria-label="Send">↑</button>
+      </div>
+      <input type="file" id="imageInput" accept="image/*" hidden>
     </div>
-    <div class="attachment-option" onclick="triggerFileInput('application/pdf')">
-      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-      Document (ஆவணங்கள்)
-    </div>
-    <button class="attachment-cancel" onclick="closeAttachmentPage(event)">Cancel</button>
+    <p class="hint">Zyra தவறுகள் செய்யலாம். முக்கியமான தகவல்களைச் சரிபார்க்கவும்.</p>
   </div>
-</div>
-
-<!-- Voice Mode Overlay -->
-<div class="voice-mode" id="voiceMode">
-  <div class="voice-circle">
-    <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+  <div class="overlay" id="drawerOverlay">
+    <aside class="drawer">
+      <div class="drawer-top"><strong>Zyra</strong><button class="iconbtn" id="closeDrawer">×</button></div>
+      <button class="newchat" id="drawerNew">＋ புதிய உரையாடல்</button>
+      <div class="history-title"><span>சமீபத்திய உரையாடல்கள்</span><button class="tiny" id="clearAll" style="display:none">Clear all</button></div>
+      <div class="history-list" id="historyList"></div>
+      <div class="drawer-footer">உரையாடல் வரலாறு இந்தச் சாதனத்தில் மட்டும் சேமிக்கப்படும்.</div>
+    </aside>
   </div>
-  <div class="voice-text" id="voiceStatus">பேசுங்கள் (Listening...)</div>
-  <button class="close-voice" onclick="stopVoice()">Cancel</button>
+  <div id="voiceState"><div class="pulse">🎙</div><strong>கேட்கிறேன்...</strong><button class="primary" id="stopVoice">நிறுத்து</button></div>
+  <div class="toast" id="toast"></div>
+</main>
 </div>
-
-<!-- Sidebar Overlay -->
-<div class="overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-<!-- Sidebar -->
-<div class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <h2 style="margin:0;font-size:20px;">Chats</h2>
-    <button class="menu-btn" onclick="toggleSidebar()">✕</button>
-  </div>
-  <input type="text" id="searchInput" class="sidebar-search" placeholder="Search chat content..." oninput="renderSidebar()">
-  <div class="sidebar-list" id="sidebarList"></div>
-</div>
-
-<!-- Top Header -->
-<div class="top-header">
-  <div class="header-left">
-    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-    <h1 class="header-title">Zyra</h1>
-  </div>
-  <div class="header-right">
-    <button class="top-plus-btn" onclick="openTopPage()">+</button>
-    <button class="new-chat-btn" onclick="startNewChat()">+ New</button>
-  </div>
-</div>
-
-<div class="center-view" id="centerView">
-  <h1 id="tagline">மனதில் ஒரு பொறி.</h1>
-  <p id="intro">உங்கள் எண்ணங்களைத் தெளிவாக்குங்கள்.</p>
-</div>
-
-<div class="chat-area" id="chatArea"></div>
-
-<div class="bottom-bar">
-  <div class="input-container">
-    <div class="image-preview" id="imagePreview">
-      <img id="previewImg" src="" alt="preview">
-      <div class="remove-img" onclick="removeImage()">×</div>
-    </div>
-
-    <div class="top-tools">
-      <button class="tool-btn" id="thinkBtn" onclick="toggleTool('think')">
-        <svg viewBox="0 0 24 24"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg> Think
-      </button>
-      <button class="tool-btn" id="searchBtn" onclick="toggleTool('search')">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Search
-      </button>
-    </div>
-
-    <div class="textarea-row">
-      <textarea id="notes" rows="1" placeholder="Message Zyra..." oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
-    </div>
-
-    <div class="action-row">
-      <button class="icon-btn" id="speakerBtn" onclick="toggleSpeaker()">
-        <svg id="speakerIcon" viewBox="0 0 24 24">
-           <path d="M11 5L6 9H2v6h4l5 4V5z"/>
-           <line x1="22" y1="9" x2="16" y2="15"/>
-           <line x1="16" y1="9" x2="22" y2="15"/>
-        </svg>
-      </button>
-
-      <button class="icon-btn" onclick="openAttachmentPage()">
-        <svg viewBox="0 0 24 24">
-           <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-           <line x1="12" y1="8" x2="12" y2="16"/>
-           <line x1="8" y1="12" x2="16" y2="12"/>
-        </svg>
-      </button>
-      <input type="file" id="fileInput" accept="image/*" onchange="handleImage(event)" hidden>
-      <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleImage(event)" hidden>
-      <input type="file" id="docInput" accept=".pdf,.doc,.docx,.txt" onchange="handleImage(event)" hidden>
-      
-      <button class="icon-btn" id="micBtn" onclick="startVoiceMode()">
-        <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-      </button>
-
-      <button class="send-btn" id="sendBtn" onclick="spark()">
-        <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-      </button>
-    </div>
-  </div>
-</div>
-
 <script>
+(() => {
+'use strict';
+const API_URL = '/api/chat'; // உங்கள் Backend URL
 const $ = id => document.getElementById(id);
-let selectedImage = null, selectedMime = null;
-let isThinking = false;
-let isSearching = false;
-let userScrolledUp = false;
-let allChats = []; 
-let activeChatId = null;
-let recognition = null;
-let isMuted = true;
-let currentHTMLCode = ""; // To store the HTML for the action sheet
+const chat = $('chat'), promptBox = $('prompt'), sendBtn = $('sendBtn');
+let selectedImage = null, think = false, searching = false, busy = false, recognition = null;
+let currentMessages = [];
+let currentChatId = null;
+let history = [];
+let abortController = null;
 
-// Visual Viewport API for perfect mobile keyboard handling
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', () => {
-    document.body.style.height = window.visualViewport.height + 'px';
-    if (document.activeElement && document.activeElement.tagName === 'TEXTAREA') {
-      scrollToBottom(true);
-    }
+try { history = JSON.parse(localStorage.getItem('zyra_history') || '[]'); if(!Array.isArray(history)) history=[]; } catch { history=[]; }
+try { const l = localStorage.getItem('zyra_lang'); if(l) $('langSelect').value = l; } catch {}
+
+function toast(msg){
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(window.toastTimer); window.toastTimer = setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+function getLang(){
+  const sel = $('langSelect').value;
+  if(sel !== 'auto') return sel;
+  const t = promptBox.value.trim();
+  if(/[அ-ஹ]/.test(t)) return 'ta';
+  if(/[ऀ-ॿ]/.test(t)) return 'hi';
+  return 'en';
+}
+$('langSelect').onchange = () => { try{ localStorage.setItem('zyra_lang', $('langSelect').value); }catch{} };
+
+function chatTitle(){
+  const u = currentMessages.find(m => m.role === 'user');
+  if(!u || !u.text) return 'புதிய உரையாடல்';
+  return Array.from(u.text).slice(0, 55).join('');
+}
+function saveHistory(){
+  if(!currentMessages.length) return;
+  if(currentChatId === null) currentChatId = Date.now();
+  const idx = history.findIndex(h => h.id === currentChatId);
+  const item = { id: currentChatId, title: chatTitle(), messages: currentMessages.slice(), updated: Date.now() };
+  if(idx >= 0) history[idx] = item;
+  else history.unshift(item);
+  history = history.slice(0, 20);
+  try{ localStorage.setItem('zyra_history', JSON.stringify(history)); }catch{ toast('சேமிப்பு நிரம்பியது — பழைய உரையாடலை நீக்கவும்.'); }
+  renderHistory();
+}
+function renderHistory(){
+  const list = $('historyList'); list.innerHTML = '';
+  $('clearAll').style.display = history.length ? 'inline' : 'none';
+  history.forEach(item => {
+    const row = document.createElement('div'); row.className = 'history-row';
+    const b = document.createElement('button'); b.className = 'history-item'; b.textContent = item.title || 'உரையாடல்';
+    b.onclick = () => loadChat(item.id);
+    const del = document.createElement('button'); del.className = 'del-btn'; del.textContent = '✕'; del.title = 'Delete';
+    del.onclick = (e) => { e.stopPropagation(); deleteChat(item.id); };
+    row.append(b, del); list.appendChild(row);
   });
 }
-
-function openTopPage() { $('topPageModal').classList.add('open'); }
-function closeTopPage() { $('topPageModal').classList.remove('open'); }
-
-function openAttachmentPage() { $('attachmentPage').classList.add('open'); }
-function closeAttachmentPage(e) {
-  if (e && e.target !== e.currentTarget && e.type === 'click' && e.target.className !== 'attachment-cancel') return;
-  $('attachmentPage').classList.remove('open');
+function deleteChat(id){
+  history = history.filter(h => h.id !== id);
+  try{ localStorage.setItem('zyra_history', JSON.stringify(history)); }catch{}
+  if(currentChatId === id){ currentMessages = []; currentChatId = null; }
+  renderHistory(); toast('நீக்கப்பட்டது');
 }
-function triggerFileInput(type, isCamera = false) {
-  closeAttachmentPage(); 
-  if (isCamera) $('cameraInput').click();
-  else if (type === 'application/pdf') $('docInput').click();
-  else $('fileInput').click();
+$('clearAll').onclick = () => { history = []; currentMessages = []; currentChatId = null; try{ localStorage.removeItem('zyra_history'); }catch{} renderHistory(); chat.innerHTML = ''; renderWelcome(); toast('வரலாறு அழிக்கப்பட்டது'); };
+function loadChat(id){
+  const item = history.find(h => h.id === id); if(!item) return;
+  currentMessages = (item.messages || []).slice(); currentChatId = id;
+  chat.innerHTML = '';
+  currentMessages.forEach(m => addMessage(m.role, m.text, m.image, false));
+  $('drawerOverlay').style.display = 'none';
 }
 
-function toggleSpeaker() {
-  isMuted = !isMuted;
-  const icon = $('speakerIcon');
-  if (isMuted) {
-    icon.innerHTML = `<path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/>`;
-    window.speechSynthesis.cancel();
-  } else {
-    icon.innerHTML = `<path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>`;
+function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function renderMarkdown(text){
+  let s = escapeHtml(text || '');
+  s = s.replace(/```([\s\S]*?)```/g, (_,c) => '<pre><code>'+c+'</code></pre>');
+  s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  return s;
+}
+
+function addMessage(role, text, image = null, store = true){
+  $('welcome')?.remove();
+  const row = document.createElement('div'); row.className = 'message ' + (role === 'user' ? 'user' : 'ai');
+  const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.textContent = role === 'user' ? '●' : '✳';
+  const bubble = document.createElement('div'); bubble.className = 'bubble';
+  if(image){ const img = document.createElement('img'); img.src = image; img.alt = 'Attached image'; bubble.appendChild(img); }
+  const content = document.createElement('div'); content.className = 'content';
+  content.innerHTML = role === 'ai' ? renderMarkdown(text) : escapeHtml(text || '');
+  bubble.appendChild(content);
+  if(role === 'ai'){
+    const tools = document.createElement('div'); tools.className = 'msg-tools';
+    const copy = document.createElement('button'); copy.className = 'tiny'; copy.textContent = 'Copy';
+    copy.onclick = () => { navigator.clipboard?.writeText(text || ''); toast('Copied ✓'); };
+    const speak = document.createElement('button'); speak.className = 'tiny'; speak.textContent = 'Read aloud';
+    speak.onclick = () => { if('speechSynthesis' in window){ speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text||''); u.lang = getLang()==='ta'?'ta-IN':getLang()==='hi'?'hi-IN':'en-US'; speechSynthesis.speak(u); } };
+    tools.append(copy, speak); bubble.appendChild(tools);
   }
+  row.append(avatar, bubble); chat.appendChild(row); chat.scrollTop = chat.scrollHeight;
+  if(store) currentMessages.push({ role, text, image });
 }
 
-function speakText(text) {
-  if (isMuted) return;
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  if (/[\u0B80-\u0BFF]/.test(text)) utterance.lang = 'ta-IN';
-  else if (/[\u0900-\u097F]/.test(text)) utterance.lang = 'hi-IN';
-  else utterance.lang = 'en-US';
-  window.speechSynthesis.speak(utterance);
+function setStatus(s){ $('status').textContent = s; }
+function setBusy(v){
+  busy = v; sendBtn.disabled = false;
+  sendBtn.classList.toggle('stop', v);
+  sendBtn.textContent = v ? '■' : '↑';
+  sendBtn.setAttribute('aria-label', v ? 'Stop' : 'Send');
 }
+function resetImage(){ selectedImage = null; $('imagePreview').style.display = 'none'; $('imageInput').value = ''; }
 
-function toggleSidebar() {
-  $('sidebar').classList.toggle('open');
-  $('sidebarOverlay').classList.toggle('open');
-}
+let lastRequest = null;
+async function send(){
+  if(busy){ abortController?.abort(); return; }
+  const text = promptBox.value.trim();
+  if(!text && !selectedImage) return;
 
-function initApp() {
-  try {
-    const savedChats = localStorage.getItem('zyra_chats');
-    if (savedChats) allChats = JSON.parse(savedChats);
-  } catch (e) {}
+  const imageData = selectedImage;
+  addMessage('user', text, imageData);
+  promptBox.value = ''; promptBox.style.height = 'auto'; resetImage();
+  setBusy(true); setStatus('Zyra யோசிக்கிறது…');
 
-  if (allChats.length === 0) startNewChat();
-  else {
-    activeChatId = allChats[0].id;
-    renderCurrentChat();
-  }
-  renderSidebar();
-}
-
-function startNewChat() {
-  const newChat = { id: 'chat_' + Date.now(), title: 'New Chat', timestamp: Date.now(), messages: [] };
-  allChats.unshift(newChat);
-  activeChatId = newChat.id;
-  saveData();
-  $('centerView').style.display = 'flex';
-  $('chatArea').classList.remove('active');
-  $('chatArea').innerHTML = '';
-  $('notes').value = '';
-  renderSidebar();
-  if ($('sidebar').classList.contains('open')) toggleSidebar();
-}
-
-function saveData() {
-  try { localStorage.setItem('zyra_chats', JSON.stringify(allChats)); } catch (e) {}
-}
-
-function renderSidebar() {
-  const query = $('searchInput').value.toLowerCase();
-  const list = $('sidebarList');
-  let filtered = allChats;
-  if (query) filtered = allChats.filter(chat => chat.title.toLowerCase().includes(query) || chat.messages.some(m => m.text && m.text.toLowerCase().includes(query)));
-
-  const groups = { 'Today': [], 'Yesterday': [], 'Previous 7 Days': [], 'Older': [] };
-  filtered.forEach(chat => {
-    const date = new Date(chat.timestamp);
-    const today = new Date(); today.setHours(0,0,0,0);
-    const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
-    if (date >= today) groups['Today'].push(chat);
-    else if (date >= yesterday) groups['Yesterday'].push(chat);
-    else if (date >= new Date(today.getTime() - 7*24*60*60*1000)) groups['Previous 7 Days'].push(chat);
-    else groups['Older'].push(chat);
-  });
-
-  let html = '';
-  for (const [groupName, chats] of Object.entries(groups)) {
-    if (chats.length > 0) {
-      html += `<div class="sidebar-group-title">${groupName}</div>`;
-      chats.forEach(chat => {
-        const isActive = chat.id === activeChatId ? 'active' : '';
-        html += `<div class="sidebar-item ${isActive}" onclick="loadChat('${chat.id}')"><span class="text">${esc(chat.title)}</span><span class="delete-icon" onclick="deleteChat(event, '${chat.id}')">🗑️</span></div>`;
-      });
-    }
-  }
-  if (!html) html = '<p style="text-align:center;color:#888;font-size:14px;margin-top:20px;">No results found.</p>';
-  list.innerHTML = html;
-}
-
-function loadChat(id) {
-  activeChatId = id;
-  renderCurrentChat();
-  renderSidebar();
-  if ($('sidebar').classList.contains('open')) toggleSidebar();
-}
-
-function deleteChat(e, id) {
-  e.stopPropagation();
-  if (!confirm("இந்த அரட்டையை அழிக்கவா?")) return;
-  allChats = allChats.filter(c => c.id !== id);
-  saveData();
-  if (activeChatId === id) {
-    if (allChats.length > 0) activeChatId = allChats[0].id;
-    else { startNewChat(); return; }
-  }
-  renderSidebar();
-  renderCurrentChat();
-}
-
-// --- Single Button Action Sheet Logic ---
-function openActionSheet(htmlCode) {
-  currentHTMLCode = htmlCode;
-  $('actionSheet').classList.add('open');
-}
-function closeActionSheet(e) {
-  if (e && e.target !== e.currentTarget && e.type === 'click' && e.target.className !== 'action-cancel') return;
-  $('actionSheet').classList.remove('open');
-}
-function doAction(type) {
-  let cleanCode = currentHTMLCode;
-  const match = cleanCode.match(/```html([\s\S]*?)```/);
-  if (match) cleanCode = match[1].trim();
-  else {
-     const matchGeneric = cleanCode.match(/```([\s\S]*?)```/);
-     if(matchGeneric) cleanCode = matchGeneric[1].trim();
-  }
-
-  if (type === 'live') {
-    $('previewIframe').srcdoc = cleanCode;
-    $('previewModal').classList.add('open');
-  } else if (type === 'browser') {
-    window.open('data:text/html;charset=utf-8,' + encodeURIComponent(cleanCode), '_blank');
-  }
-  closeActionSheet();
-}
-
-function closePreview() {
-  $('previewModal').classList.remove('open');
-  $('previewIframe').srcdoc = '';
-}
-// -----------------------------------------
-
-// தலைப்பைத் தானாக மாற்றும் ஃபங்ஷன்
-function getAnswerHeader(text) {
-  if (/[\u0B80-\u0BFF]/.test(text)) return 'பதில்';
-  return 'ANSWER';
-}
-
-function renderCurrentChat() {
-  const chatArea = $('chatArea');
-  chatArea.innerHTML = '';
-  const chat = allChats.find(c => c.id === activeChatId);
-  
-  if (!chat || chat.messages.length === 0) {
-    $('centerView').style.display = 'flex';
-    chatArea.classList.remove('active');
-    return;
-  }
-  
-  $('centerView').style.display = 'none';
-  chatArea.classList.add('active');
-  
-  chat.messages.forEach(msg => {
-    const div = document.createElement('div');
-    if (msg.role === 'user') {
-      div.className = 'msg-user';
-      if (msg.image) { const img = document.createElement('img'); img.src = msg.image; div.appendChild(img); }
-      if (msg.text) { const span = document.createElement('span'); span.textContent = msg.text; div.appendChild(span); }
-    } else {
-      div.className = 'msg-ai';
-      const headerTitle = getAnswerHeader(msg.text);
-      
-      let previewBtn = '';
-      if (msg.text.includes('<html') || msg.text.includes('<body') || msg.text.includes('```html')) {
-        const safeText = encodeURIComponent(msg.text);
-        previewBtn = `
-          <div style="margin-top:12px;">
-             <button onclick="openActionSheet(decodeURIComponent('${safeText}'))" style="background:var(--text); color:#FFF; border:none; padding:8px 14px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;">
-               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-               Preview Code
-             </button>
-          </div>
-        `;
-      }
-
-      div.innerHTML = `<h3>${headerTitle}</h3><p>${esc(msg.text)}</p>${previewBtn}`;
-    }
-    chatArea.appendChild(div);
-  });
-  scrollToBottom(true);
-}
-
-function toggleTool(tool) {
-  if (tool === 'think') { isThinking = !isThinking; $('thinkBtn').classList.toggle('active', isThinking); }
-  else if (tool === 'search') { isSearching = !isSearching; $('searchBtn').classList.toggle('active', isSearching); }
-}
-
-function startVoiceMode() {
-  if (!('webkitSpeechRecognition' in window)) { alert("உங்கள் போனில் குரல் வசதி ஆதரிக்கப்படவில்லை."); return; }
-  $('voiceMode').classList.add('active');
-  $('voiceStatus').textContent = "பேசுங்கள் (Listening...)";
-  recognition = new webkitSpeechRecognition();
-  recognition.lang = 'ta-IN'; 
-  recognition.interimResults = false;
-  recognition.onresult = function(event) {
-    const text = event.results[0][0].transcript;
-    $('voiceStatus').textContent = "புரிந்துகொண்டது: " + text;
-    setTimeout(() => {
-      $('voiceMode').classList.remove('active');
-      $('notes').value = text;
-      spark(); 
-    }, 1000);
+  const payload = {
+    notes: text || 'இந்தப் படத்தைப் பார்த்து விளக்குங்கள்.',
+    image: imageData ? imageData.split(',')[1] : null,
+    mimeType: imageData ? (imageData.match(/data:(.*?);/)||[])[1] || 'image/jpeg' : null,
+    think, searching, lang: getLang(),
+    history: currentMessages.slice(-12)
   };
-  recognition.onerror = function(e) { $('voiceStatus').textContent = "பிழை: மீண்டும் முயற்சிக்கவும்."; setTimeout(() => $('voiceMode').classList.remove('active'), 1500); };
-  recognition.onend = function() { if ($('voiceMode').classList.contains('active')) $('voiceStatus').textContent = "பேச்சு முடிந்தது..."; };
-  recognition.start();
-}
+  lastRequest = payload;
 
-function stopVoice() { if (recognition) recognition.stop(); $('voiceMode').classList.remove('active'); }
+  const aiRow = document.createElement('div'); aiRow.className = 'message ai'; aiRow.id = 'streamMsg';
+  aiRow.innerHTML = '<div class="avatar">✳</div>';
+  const bubble = document.createElement('div'); bubble.className = 'bubble';
+  const content = document.createElement('div'); content.className = 'content cursor'; content.textContent = '';
+  bubble.appendChild(content);
+  aiRow.appendChild(bubble); chat.appendChild(aiRow); chat.scrollTop = chat.scrollHeight;
 
-function handleImage(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    selectedImage = e.target.result;
-    selectedMime = file.type;
-    $('previewImg').src = e.target.result;
-    $('imagePreview').style.display = 'block';
-  };
-  reader.readAsDataURL(file);
-}
+  let full = '';
+  abortController = new AbortController();
 
-function removeImage() {
-  selectedImage = null; selectedMime = null;
-  $('imagePreview').style.display = 'none';
-  $('fileInput').value = '';
-  $('cameraInput').value = '';
-  $('docInput').value = '';
-}
-
-function esc(s) { return String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
-
-// Unlimited Scroll Logic
-function scrollToBottom(force = false) {
-  if (!userScrolledUp || force) {
-    const chat = $('chatArea');
-    requestAnimationFrame(() => {
-      chat.scrollTop = chat.scrollHeight;
+  try{
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: abortController.signal
     });
-  }
-}
+    if(!res.ok) throw new Error(`Server error (${res.status})`);
 
-$('chatArea').addEventListener('scroll', function() {
-  const chat = this;
-  const isAtBottom = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 100;
-  userScrolledUp = !isAtBottom;
-});
-
-async function spark() {
-  const notes = $('notes').value.trim();
-  if (!notes && !selectedImage) return;
-  
-  userScrolledUp = false; 
-  $('centerView').style.display = 'none';
-  $('chatArea').classList.add('active');
-  const sendBtn = $('sendBtn');
-  sendBtn.disabled = true;
-  
-  const currentChat = allChats.find(c => c.id === activeChatId);
-  if (currentChat.messages.length === 0 && notes) currentChat.title = notes.substring(0, 30) + (notes.length > 30 ? '...' : '');
-  currentChat.timestamp = Date.now();
-  
-  const newUserMsg = { role: "user", text: notes || 'Image provided', image: selectedImage };
-  currentChat.messages.push(newUserMsg);
-  saveData();
-  renderSidebar();
-
-  const userMsgDiv = document.createElement('div');
-  userMsgDiv.className = 'msg-user';
-  if (selectedImage) { const img = document.createElement('img'); img.src = selectedImage; userMsgDiv.appendChild(img); }
-  if (notes) { const textNode = document.createElement('span'); textNode.textContent = notes; userMsgDiv.appendChild(textNode); }
-  $('chatArea').appendChild(userMsgDiv);
-  scrollToBottom(true); 
-
-  const loaderMsg = document.createElement('div');
-  loaderMsg.className = 'msg-ai';
-  loaderMsg.innerHTML = '<div class="loader"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
-  $('chatArea').appendChild(loaderMsg);
-  scrollToBottom(true);
-
-  try {
-    // Get the saved language preference
-    let savedLang = localStorage.getItem('zyra_lang_pref') || 'auto';
-    
-    // Check if user asks to switch language
-    if (/talk.*tamil|tamil.*talk|speak.*tamil/i.test(notes)) { savedLang = 'Tamil'; localStorage.setItem('zyra_lang_pref', savedLang); }
-    else if (/talk.*english|english.*talk|speak.*english/i.test(notes)) { savedLang = 'English'; localStorage.setItem('zyra_lang_pref', savedLang); }
-    else if (/talk.*hindi|hindi.*talk|speak.*hindi/i.test(notes)) { savedLang = 'Hindi'; localStorage.setItem('zyra_lang_pref', savedLang); }
-    else if (/talk.*malayalam|malayalam.*talk|speak.*malayalam/i.test(notes)) { savedLang = 'Malayalam'; localStorage.setItem('zyra_lang_pref', savedLang); }
-    else if (/talk.*telugu|telugu.*talk|speak.*telugu/i.test(notes)) { savedLang = 'Telugu'; localStorage.setItem('zyra_lang_pref', savedLang); }
-    else if (/talk.*kannada|kannada.*talk|speak.*kannada/i.test(notes)) { savedLang = 'Kannada'; localStorage.setItem('zyra_lang_pref', savedLang); }
-    // Add more languages as needed...
-
-    let finalNotes = notes;
-    if (savedLang !== 'auto') {
-      finalNotes = notes + `\n\n(Important: Please reply to my message in ${savedLang} only.)`;
-    }
-
-    const historyToSend = currentChat.messages.slice(0, -1).map(m => ({ role: m.role, text: m.text }));
-    const payload = { notes: finalNotes, projectName: currentChat.title, mode: 'ask', lang: 'auto', think: isThinking, history: historyToSend, isSearching: isSearching };
-    if (selectedImage) { payload.image = selectedImage.split(',')[1]; payload.mimeType = selectedMime; }
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); 
-
-    const res = await fetch('/api/summarize', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload), signal: controller.signal
-    });
-    
-    clearTimeout(timeoutId);
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'ERROR');
+    full = data.answer || data.response || data.summary || data.text || 'பதில் கிடைக்கவில்லை.';
     
-    const aiText = data.answer || data.summary || "பதில் கிடைக்கவில்லை.";
-    currentChat.messages.push({ role: "model", text: aiText });
-    saveData();
-    speakText(aiText);
-
-    $('chatArea').removeChild(loaderMsg);
-    
-    const aiMsg = document.createElement('div');
-    aiMsg.className = 'msg-ai';
-    
-    const headerTitle = getAnswerHeader(aiText);
-    aiMsg.innerHTML = `<h3>${headerTitle}</h3><p>${esc(aiText)}</p>`;
-    
-    // If it's HTML code, show the single button
-    if (aiText.includes('<html') || aiText.includes('<body') || aiText.includes('```html')) {
-      const safeText = encodeURIComponent(aiText);
-      const buttonDiv = document.createElement('div');
-      buttonDiv.style = "margin-top:12px;";
-      
-      const previewBtn = document.createElement('button');
-      previewBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px; vertical-align:middle;"><polygon points="5 3 19 12 5 21 5 3"/></svg> Preview Code`;
-      previewBtn.style = "background:var(--text); color:#FFF; border:none; padding:8px 14px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center;";
-      previewBtn.onclick = () => openActionSheet(decodeURIComponent(safeText));
-      
-      buttonDiv.appendChild(previewBtn);
-      aiMsg.appendChild(buttonDiv);
+    // Typewriter effect to simulate streaming
+    content.classList.remove('cursor');
+    let i = 0;
+    const speed = 15;
+    function typeWriter() {
+        if (i < full.length) {
+            content.innerHTML = renderMarkdown(full.substring(0, i + 1)) + '<span class="cursor"></span>';
+            chat.scrollTop = chat.scrollHeight;
+            i++;
+            setTimeout(typeWriter, speed);
+        } else {
+            content.innerHTML = renderMarkdown(full);
+            const tools = document.createElement('div'); tools.className = 'msg-tools';
+            const copy = document.createElement('button'); copy.className='tiny'; copy.textContent='Copy';
+            copy.onclick = () => { navigator.clipboard?.writeText(full); toast('Copied ✓'); };
+            const speak = document.createElement('button'); speak.className='tiny'; speak.textContent='Read aloud';
+            speak.onclick = () => { if('speechSynthesis' in window){ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(full); u.lang=getLang()==='ta'?'ta-IN':getLang()==='hi'?'hi-IN':'en-US'; speechSynthesis.speak(u);} };
+            tools.append(copy, speak); bubble.appendChild(tools);
+            
+            currentMessages.push({ role: 'ai', text: full });
+            saveHistory();
+            setStatus('');
+            setBusy(false);
+            promptBox.focus();
+        }
     }
+    typeWriter();
 
-    $('chatArea').appendChild(aiMsg);
-    scrollToBottom(true);
-
-  } catch (e) {
-    $('chatArea').removeChild(loaderMsg);
-    const errMsg = document.createElement('div');
-    errMsg.className = 'msg-ai';
-    let errText = e.name === 'AbortError' ? "பதில் வர அதிக நேரம் எடுக்கிறது." : e.message;
-    errMsg.innerHTML = `<p style="color:#FF6B2C; font-weight:500; padding:12px; background:#FFF0E5; border-radius:12px;">${errText}</p>`;
-    $('chatArea').appendChild(errMsg);
-    scrollToBottom(true);
-  } finally {
-    sendBtn.disabled = false;
-    $('notes').value = ''; $('notes').style.height = '';
-    removeImage(); 
+  }catch(err){
+    aiRow.remove();
+    setBusy(false);
+    if(err.name === 'AbortError'){
+      setStatus('');
+    } else {
+      const errRow = document.createElement('div'); errRow.className = 'message ai';
+      errRow.innerHTML = '<div class="avatar">✳</div>';
+      const eb = document.createElement('div'); eb.className='bubble';
+      eb.textContent = 'இணைப்பில் சிக்கல்: ' + (err.message || 'Unknown error');
+      const retry = document.createElement('button'); retry.className='tiny'; retry.textContent='↻ Retry';
+      retry.onclick = () => { errRow.remove(); promptBox.value = lastRequest?.notes || ''; send(); };
+      eb.appendChild(document.createElement('br')); eb.appendChild(retry);
+      errRow.appendChild(eb); chat.appendChild(errRow); chat.scrollTop = chat.scrollHeight;
+      setStatus('');
+    }
   }
 }
 
-window.onload = initApp;
+sendBtn.addEventListener('click', send);
+promptBox.addEventListener('input', () => { promptBox.style.height='auto'; promptBox.style.height=Math.min(promptBox.scrollHeight,150)+'px'; });
+promptBox.addEventListener('keydown', e => { if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); } });
+$('thinkBtn').onclick = () => { think = !think; $('thinkBtn').classList.toggle('active', think); };
+$('searchBtn').onclick = () => { searching = !searching; $('searchBtn').classList.toggle('active', searching); };
+$('attachBtn').onclick = () => $('imageInput').click();
+$('imageInput').onchange = async e => {
+  const file = e.target.files?.[0]; if(!file) return;
+  if(!file.type.startsWith('image/')){ toast('படக் கோப்பைத் தேர்ந்தெடுக்கவும்.'); return; }
+  if(file.size > 8*1024*1024){ toast('படம் 8 MB-ஐ விடச் சிறியதாக இருக்க வேண்டும்.'); return; }
+  const reader = new FileReader();
+  reader.onload = () => { selectedImage = reader.result; $('previewImg').src = selectedImage; $('imagePreview').style.display='block'; };
+  reader.readAsDataURL(file);
+};
+$('removeImage').onclick = resetImage;
+
+function renderWelcome(){
+  chat.innerHTML = `
+    <div class="welcome" id="welcome">
+      <div class="spark">✳</div>
+      <h1>மனதில் ஒரு <em>பொறி.</em></h1>
+      <p>வணக்கம்! நான் Zyra. உங்கள் எண்ணங்கள், கேள்விகள், திட்டங்கள் — எதையும் பகிரலாம்.<br>தமிழ் · English · हिन्दी</p>
+      <div class="suggestions">
+        <button class="suggestion" data-prompt="இந்த வாரம் நான் செய்தவற்றைச் சுருக்கமாகத் தொகுத்து, முக்கிய முன்னுரிமைகளைச் சொல்லுங்கள்.">◷ வாரச் சுருக்கம்<span>இந்த வாரத்தை ஒழுங்குபடுத்துங்கள்</span></button>
+        <button class="suggestion" data-prompt="எனது இன்றைய பணிகளுக்கான எளிய திட்டம் உருவாக்குங்கள்.">☼ தினசரி திட்டம்<span>இன்றைய நாளைத் திட்டமிடுங்கள்</span></button>
+        <button class="suggestion" data-prompt="ஒரு கடினமான விஷயத்தை எளிமையாக விளக்குங்கள்.">✳ கற்றுக்கொள்வோம்<span>எளிய விளக்கம் பெறுங்கள்</span></button>
+        <button class="suggestion" data-prompt="எனக்கு புதிய யோசனைகள் சொல்லுங்கள்.">◇ புதிய யோசனைகள்<span>சிந்தனையைத் தூண்டுங்கள்</span></button>
+      </div>
+    </div>`;
+  bindSuggestions();
+}
+function bindSuggestions(){
+  document.querySelectorAll('[data-prompt]').forEach(b => b.onclick = () => { promptBox.value = b.dataset.prompt; send(); });
+}
+function newChat(){
+  if(currentMessages.length) saveHistory();
+  currentMessages = []; currentChatId = null;
+  renderWelcome(); promptBox.focus();
+}
+
+$('newBtn').onclick = newChat;
+$('drawerNew').onclick = () => { $('drawerOverlay').style.display='none'; newChat(); };
+$('menuBtn').onclick = () => { $('drawerOverlay').style.display='block'; };
+$('closeDrawer').onclick = () => { $('drawerOverlay').style.display='none'; };
+$('drawerOverlay').addEventListener('click', e => { if(e.target === $('drawerOverlay')){ $('drawerOverlay').style.display='none'; } });
+$('themeBtn').onclick = () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme !== 'dark';
+  root.dataset.theme = dark ? 'dark' : 'light';
+  $('themeBtn').textContent = dark ? '☀' : '☾';
+  try{ localStorage.setItem('zyra_theme', root.dataset.theme); }catch{}
+};
+try{ const saved = localStorage.getItem('zyra_theme'); if(saved){ document.documentElement.dataset.theme = saved; $('themeBtn').textContent = saved==='dark'?'☀':'☾'; } }catch{}
+
+$('micBtn').onclick = () => {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ setStatus('இந்த browser-ல் voice input ஆதரிக்கப்படவில்லை.'); return; }
+  if(recognition){ recognition.stop(); return; }
+  recognition = new SR();
+  const l = getLang();
+  recognition.lang = l==='ta'?'ta-IN':l==='hi'?'hi-IN':'en-IN';
+  recognition.interimResults = false;
+  $('voiceState').style.display = 'flex';
+  recognition.onresult = e => { promptBox.value += (promptBox.value?' ':'') + e.results[0][0].transcript; promptBox.dispatchEvent(new Event('input')); };
+  recognition.onerror = () => setStatus('Voice input செயல்படவில்லை.');
+  recognition.onend = () => { $('voiceState').style.display = 'none'; recognition = null; };
+  recognition.start();
+};
+$('stopVoice').onclick = () => recognition?.stop();
+
+renderHistory();
+})();
 </script>
 </body>
 </html>
