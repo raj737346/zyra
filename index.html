@@ -11,7 +11,7 @@
 <style>
 :root{
   --bg:#ffffff; --text:#191918; --muted:#777671;
-  --accent:#1f57ff; /* Blue Send Button */
+  --accent:#1f57ff; 
   --accent2:#f3f6ff; 
   --panel:#f7f7f6;
   --border:#e8e7e4; --user:#f4f1ed; --shadow:0 12px 40px rgba(0,0,0,0.07);
@@ -427,24 +427,6 @@ function getLocation() {
     });
 }
 
-// 🔴 DuckDuckGo Search Integration (No API Key Needed)
-async function searchWeb(query) {
-    try {
-        const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1`;
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data.AbstractText) {
-            return data.AbstractText;
-        }
-        if (data.RelatedTopics && data.RelatedTopics.length > 0) {
-            return data.RelatedTopics[0].Text || null;
-        }
-        return null;
-    } catch (e) {
-        return null;
-    }
-}
-
 async function send(){
   if(busy){ abortController?.abort(); return; }
   const text = promptBox.value.trim();
@@ -481,10 +463,14 @@ async function send(){
 
   if (sysInstruction) finalNotes = sysInstruction + "\n" + finalNotes;
 
-  if (searching) {
-      const searchResult = await searchWeb(text);
-      if (searchResult) {
-          finalNotes = `[Web Search Result]: ${searchResult}\n\n[User Question]: ${finalNotes}`;
+  // 🔴 Location Logic for Nearby Queries
+  const locationWords = ['nearby', 'near me', 'restaurant', 'hotel', 'hospital', 'location', 'weather', 'map'];
+  if (locationWords.some(word => lowerText.includes(word))) {
+      const loc = await getLocation();
+      if (loc) {
+          sysInstruction += `[User's Current Location: Lat ${loc.lat}, Lon ${loc.lon}]\n`;
+      } else {
+          sysInstruction += `[User Location: Unknown (Unable to access GPS)]\n`;
       }
   }
 
