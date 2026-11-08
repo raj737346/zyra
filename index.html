@@ -211,6 +211,9 @@ let currentChatId = null;
 let history = [];
 let abortController = null;
 
+// 🔴 முக்கிய மாற்றம்: மொழியை நினைவில் வைத்துக்கொள்ளும் மாறி (Memory Variable)
+let currentLanguage = 'en'; 
+
 try { history = JSON.parse(localStorage.getItem('zyra_history') || '[]'); if(!Array.isArray(history)) history=[]; } catch { history=[]; }
 try { const savedTheme = localStorage.getItem('zyra_theme'); if(savedTheme) document.documentElement.dataset.theme = savedTheme; } catch {}
 
@@ -289,13 +292,20 @@ function deleteChat(id){
 $('clearAll').onclick = () => { 
   history = []; currentMessages = []; currentChatId = null; 
   try{ localStorage.removeItem('zyra_history'); }catch{} 
-  renderHistory(); chat.innerHTML = ''; welcomeScreen.style.display = 'flex'; 
+  renderHistory(); chat.innerHTML = ''; welcomeScreen.style.display='flex'; 
 };
 
 function loadChat(id){
   const item = history.find(h => h.id === id); if(!item) return;
   currentMessages = (item.messages || []).slice(); currentChatId = id;
   chat.innerHTML = ''; welcomeScreen.style.display = 'none';
+  
+  // Chat-ஐ load செய்யும்போது மொழியை மீண்டும் கண்டறியவும்
+  currentLanguage = 'en';
+  for (let m of currentMessages) {
+      if (m.text && /[\u0B80-\u0BFF]/.test(m.text)) { currentLanguage = 'ta'; break; }
+  }
+
   currentMessages.forEach(m => addMessage(m.role, m.text, m.image, false));
   $('drawerOverlay').classList.remove('show');
 }
@@ -394,7 +404,6 @@ async function send(){
 
   const lowerText = text.toLowerCase();
   
-  // Direct News Fetching
   if ((lowerText.includes('news') || lowerText.includes('headlines')) && searching) {
       const searchQuery = text.replace(/news|headlines|give me|the latest|about/gi, '').trim() || 'Global';
       const googleNewsUrl = `https://news.google.com/search?q=${encodeURIComponent(searchQuery)}&hl=en-IN&gl=IN&ceid=IN:en`;
@@ -416,17 +425,25 @@ async function send(){
       return;
   }
 
-  // 🔴 Language Lock: Force English unless Tamil is explicitly requested
+  // 🧠 மொழியை நினைவில் வைத்துக்கொள்ளும் லாஜிக் (Memory Logic)
+  if (lowerText.includes('tamil') || /[\u0B80-\u0BFF]/.test(text)) {
+      currentLanguage = 'ta'; // தமிழ் மொழிக்கு மாற்று
+  } else if (lowerText.includes('english')) {
+      currentLanguage = 'en'; // ஆங்கில மொழிக்கு மாற்று
+  }
+
   let finalNotes = text;
-  if (!lowerText.includes('tamil') && !/[\u0B80-\u0BFF]/.test(text)) {
-      finalNotes = text + "\n\n(IMPORTANT INSTRUCTION: Reply strictly in English only. Do not use Tamil.)";
+  if (currentLanguage === 'en') {
+      finalNotes = text + "\n\n(IMPORTANT INSTRUCTION: Reply strictly in English only.)";
+  } else if (currentLanguage === 'ta') {
+      finalNotes = text + "\n\n(IMPORTANT INSTRUCTION: Reply strictly in Tamil only.)";
   }
 
   const payload = {
     notes: finalNotes || 'Analyze this image.',
     think: think,
     isSearching: searching,
-    lang: 'en',
+    lang: currentLanguage, // தேர்ந்தெடுத்த மொழியை Backend-க்கு அனுப்பு
     history: currentMessages.slice(-10)
   };
   
@@ -517,7 +534,7 @@ promptBox.addEventListener('keydown', e => {
 
 $('newBtn').onclick = () => {
   if(currentMessages.length) saveHistory();
-  currentMessages = []; currentChatId = null;
+  currentMessages = []; currentChatId = null; currentLanguage = 'en'; // புதிய சாட்டில் மீண்டும் ஆங்கிலம்
   chat.innerHTML = ''; welcomeScreen.style.display = 'flex'; promptBox.focus();
 };
 
@@ -530,7 +547,7 @@ $('voiceBtn').onclick = () => {
   if(!SR){ alert('Voice not supported'); return; }
   if(recognition){ recognition.stop(); return; }
   recognition = new SR();
-  recognition.lang = 'en-US'; 
+  recognition.lang = currentLanguage === 'ta' ? 'ta-IN' : 'en-US'; 
   recognition.interimResults = false;
   recognition.onresult = e => { promptBox.value += e.results[0][0].transcript; promptBox.dispatchEvent(new Event('input')); };
   recognition.onend = () => recognition = null;
