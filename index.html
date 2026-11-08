@@ -34,19 +34,17 @@ header{height:60px;flex:none;display:flex;align-items:center;justify-content:spa
 
 /* Main Content */
 main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:20px;scroll-behavior:smooth}
-.center-logo{font-size:40px;font-weight:700;color:var(--accent);margin-top:20vh;margin-bottom:16px;letter-spacing:-1px}
-.center-title{font-size:24px;font-weight:600;color:var(--text);letter-spacing:-0.5px;margin-bottom:30px}
+.center-logo{font-size:42px;font-weight:700;color:var(--accent);margin-top:20vh;margin-bottom:10px;letter-spacing:-1px}
+.center-title{font-size:22px;font-weight:500;color:var(--muted);letter-spacing:-0.5px;margin-bottom:40px}
 
-/* 🔴 New Minimalist Suggestions Style */
-.suggestions{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:540px;margin-bottom:30px}
+/* 🔴 Minimalist Text Suggestions (No Boxes) */
+.suggestions{display:flex;flex-direction:column;gap:16px;width:100%;max-width:500px;margin-bottom:30px;text-align:left}
 .suggestion{
-  display:flex; flex-direction:column; align-items:flex-start; justify-content:center;
-  padding:18px; background:var(--panel); border:1px solid var(--border); 
-  border-radius:16px; font-size:15px; color:var(--text); transition:all 0.2s;
-  cursor:pointer; text-align:left; gap:10px; font-weight:500;
+  font-size:16px; color:var(--muted); transition:color 0.2s;
+  cursor:pointer; background:none; border:none; padding:0; text-align:left;
 }
-.suggestion:hover{background:var(--accent-bg); border-color:var(--accent); color:var(--accent); transform:translateY(-2px)}
-.suggestion .icon{font-size:24px; margin-bottom:2px}
+.suggestion:hover{color:var(--accent)}
+.suggestion span { margin-right: 8px; }
 
 /* Chat Messages */
 .chat-container{width:100%;max-width:700px;display:flex;flex-direction:column;gap:24px;padding-bottom:20px}
@@ -142,19 +140,19 @@ select.lang-select{background:var(--panel); border:1px solid var(--border); bord
       <div class="center-logo">Zyra</div>
       <h1 class="center-title">Where would you like to begin?</h1>
       
-      <!-- 🔴 New Minimalist Suggestions -->
+      <!-- 🔴 Minimalist Text Suggestions -->
       <div class="suggestions">
         <button class="suggestion" onclick="quickPrompt('இன்றைய தமிழ் நாளிதழ் செய்திகள் சொல்லுங்கள்')">
-          <span class="icon">📰</span> இன்றைய செய்திகள்
+          <span>📰</span> இன்றைய செய்திகளைச் சொல்லுங்கள்
         </button>
         <button class="suggestion" onclick="quickPrompt('ஒரு சுவாரஸ்யமான கதை சொல்லுங்கள்')">
-          <span class="icon">📖</span> ஒரு கதை சொல்
+          <span>📖</span> ஒரு சுவாரஸ்யமான கதை சொல்
         </button>
         <button class="suggestion" onclick="quickPrompt('ஒரு அழகான இயற்கை காட்சியின் படத்தை உருவாக்குங்கள்')">
-          <span class="icon">🖼️</span> படம் உருவாக்கு
+          <span>🖼️</span> ஒரு அழகான படத்தை உருவாக்கு
         </button>
         <button class="suggestion" onclick="quickPrompt('எனக்கு ஒரு நல்ல மேற்கோள் சொல்லுங்கள்')">
-          <span class="icon">✨</span> மேற்கோள்
+          <span>✨</span> இன்றைய மேற்கோளைச் சொல்
         </button>
       </div>
     </div>
