@@ -4,107 +4,95 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
-<title>Zyra — AI</title>
+<title>Zyra — Spark your mind</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#ffffff; --text:#111111; --muted:#888888;
-  --accent:#1f57ff; --accent-bg:#f3f6ff; --panel:#f9f9f9;
-  --border:#e5e5e5; --user-bg:#f3f4f6; --shadow:0 4px 20px rgba(0,0,0,0.05);
+  --bg:#ffffff; --text:#191918; --muted:#777671;
+  --accent:#f36b38; --accent2:#fff0e9; --panel:#f7f7f6;
+  --border:#e8e7e4; --user:#f4f1ed; --shadow:0 12px 40px rgba(0,0,0,0.07);
 }
 [data-theme="dark"]{
-  --bg:#111111; --text:#eeeeee; --muted:#888888;
-  --accent:#3b75ff; --accent-bg:#1a2235; --panel:#1e1e1e;
-  --border:#333333; --user-bg:#2a2a2a; --shadow:0 4px 20px rgba(0,0,0,0.3);
+  --bg:#101010; --text:#f4f2ee; --muted:#aaa7a0;
+  --accent:#ff7846; --accent2:#38231b; --panel:#191919;
+  --border:#30302e; --user:#242321; --shadow:0 12px 40px rgba(0,0,0,0.3);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:Inter,sans-serif;-webkit-font-smoothing:antialiased}
 button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer;background:none;border:none}
-#app{height:100dvh;display:flex;flex-direction:column;max-width:900px;margin:0 auto;position:relative}
+#app{height:100dvh;display:flex;flex-direction:column;max-width:1000px;margin:0 auto;position:relative}
 
 /* Header */
-header{height:60px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 20px}
-.header-left{display:flex;align-items:center;gap:12px}
+header{height:60px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid var(--border);background:var(--bg)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-0.5px}
+.logo-btn{width:30px;height:30px;border-radius:10px;background:var(--accent);color:white;display:grid;place-items:center;font-size:18px}
+.head-actions{display:flex;align-items:center;gap:8px}
 .iconbtn{color:var(--text);display:grid;place-items:center;width:36px;height:36px;border-radius:50%;transition:background 0.2s}
 .iconbtn:hover{background:var(--panel)}
-.header-right{display:flex;align-items:center;gap:10px}
 
 /* Main Content */
 main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:20px;scroll-behavior:smooth}
 
-/* 🔴 Zyra Logo (New Gradient Style) */
-.center-logo{
-  font-size: 56px; 
-  font-weight: 700; 
-  letter-spacing: -2px;
-  margin-top: 18vh;
-  margin-bottom: 40px;
-  background: linear-gradient(135deg, #1f57ff, #b52aff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: float 3s ease-in-out infinite;
-}
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
-  100% { transform: translateY(0px); }
-}
+/* Welcome Screen (No Boxes, Old Logo) */
+.welcome{max-width:650px;margin:12vh auto 25px;text-align:center; display:flex; flex-direction:column; align-items:center;}
+.welcome .spark{font-size:36px;color:var(--accent); margin-bottom:16px;}
+.welcome h1{font-size:clamp(32px,6vw,48px);letter-spacing:-1.8px;margin:0 0 10px; font-weight:700;}
+.welcome h1 em{font-family:"Instrument Serif",serif;font-weight:400;color:var(--accent); font-style: italic;}
+.welcome p{color:var(--muted);font-size:15px;line-height:1.7;margin:8px 0 32px}
 
-/* Suggestions */
-.welcome-screen{display:flex; flex-direction:column; gap:20px; width:100%; max-width:500px;}
-.suggestion{display:flex; align-items:center; gap:16px; font-size:17px; color:var(--muted); cursor:pointer; background:none; border:none; padding:12px 16px; text-align:left; transition:all 0.2s; font-weight:500; border-radius:12px;}
-.suggestion:hover{background:var(--panel); color:var(--accent); transform: translateX(5px);}
-.suggestion span.icon{font-size:24px;}
+/* Text Only Suggestions */
+.suggestions{display:flex; flex-direction:column; gap:20px; width:100%; max-width:500px; text-align:left;}
+.suggestion{display:flex; align-items:center; gap:12px; font-size:16px; color:var(--muted); transition:color 0.2s; cursor:pointer; background:none; border:none; padding:8px 0; text-align:left;}
+.suggestion:hover{color:var(--accent)}
+.suggestion span.icon{font-size:22px;}
 
 /* Chat Messages */
-.chat-container{width:100%;max-width:700px;display:flex;flex-direction:column;gap:24px;padding-bottom:20px; margin-top:20px;}
-.message{display:flex;gap:12px;align-items:flex-start;width:100%}
+.chat-container{width:100%;max-width:760px;display:flex;flex-direction:column;gap:20px;padding-bottom:20px; margin-top:20px;}
+.message{display:flex;gap:10px;align-items:flex-start;width:100%}
 .message.user{justify-content:flex-end}
 .message.ai{justify-content:flex-start}
-.bubble{max-width:85%;line-height:1.6;font-size:15px;overflow-wrap:anywhere}
-.message.user .bubble{background:var(--user-bg);padding:12px 18px;border-radius:20px 20px 4px 20px}
-.message.ai .bubble{background:transparent;padding:0;max-width:100%}
+.avatar{flex:none;width:28px;height:28px;border-radius:9px;background:var(--accent2);color:var(--accent);display:grid;place-items:center;font-size:14px}
+.message.user .avatar{order:2;background:var(--panel);color:var(--muted)}
+.bubble{min-width:0;max-width:calc(100% - 40px);font-size:15px;line-height:1.7;overflow-wrap:anywhere}
+.message.user .bubble{background:var(--user);padding:12px 16px;border-radius:16px 4px 16px 16px}
+.message.ai .bubble{padding:2px 0}
 .bubble img{max-width:100%;border-radius:12px;display:block;margin-bottom:8px;box-shadow:var(--shadow)}
 
 /* Message Tools */
-.msg-tools{display:flex;gap:8px;margin-top:14px;align-items:center;flex-wrap:wrap}
-.tool-btn{color:var(--muted);font-size:13px;display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;transition:all 0.2s;border:1px solid transparent}
-.tool-btn:hover{background:var(--panel);color:var(--text);border-color:var(--border)}
-.speak-btn.active { color: var(--accent); background: var(--accent-bg); border-color: var(--accent); }
-.speak-btn.active svg { animation: pulse 1s infinite alternate; }
-@keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+.msg-tools{display:flex;gap:12px;margin-top:12px;align-items:center;flex-wrap:wrap}
+.tool-btn{color:var(--muted);font-size:13px;display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;transition:all 0.2s;}
+.tool-btn:hover{color:var(--text)}
+.speak-btn.active { color: var(--accent); font-weight: bold;}
 
 /* Markdown */
-.bubble pre{white-space:pre-wrap;overflow-x:auto;background:var(--panel);padding:14px;border-radius:12px;margin:10px 0;border:1px solid var(--border)}
-.bubble code{background:var(--panel);padding:2px 6px;border-radius:6px;font-size:13px;border:1px solid var(--border)}
-.bubble pre code{background:none;padding:0;border:none}
+.bubble pre{white-space:pre-wrap;overflow-x:auto;background:var(--panel);padding:12px;border-radius:10px;margin:10px 0}
+.bubble code{background:var(--panel);padding:2px 6px;border-radius:6px;font-size:13px}
 .bubble a{color:var(--accent);text-decoration:none}
 .bubble p{margin-bottom:12px}
 .bubble p:last-child{margin-bottom:0}
 
 /* Composer Area */
-.composer-wrap{width:100%;padding:10px 20px 20px;display:flex;flex-direction:column;align-items:center;background:linear-gradient(transparent, var(--bg) 20%)}
-.composer{width:100%;max-width:700px;background:var(--bg);border:1px solid var(--border);border-radius:24px;padding:10px 14px 10px 18px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 15px rgba(0,0,0,0.03);flex-wrap:wrap}
-.composer:focus-within{border-color:#d0d0d0}
-[data-theme="dark"] .composer:focus-within{border-color:#444}
-.composer input{flex:1;border:none;background:transparent;font-size:16px;outline:none;padding:8px 0;min-width:120px}
+.composer-wrap{width:100%;padding:10px 16px max(14px,env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;background:linear-gradient(transparent, var(--bg) 20%)}
+.composer{width:100%;max-width:760px;background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:10px 14px 10px 18px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);flex-wrap:wrap}
+.composer:focus-within{border-color:var(--accent)}
+.composer input{flex:1;border:none;background:transparent;font-size:15px;outline:none;padding:8px 0;min-width:120px}
 .composer input::placeholder{color:var(--muted)}
 .composer-actions{display:flex;align-items:center;gap:8px}
 .preview-img{width:40px;height:40px;border-radius:8px;object-fit:cover;display:none;margin-right:5px}
 
 /* Toggles */
-.toggle-btns{display:flex;gap:6px;margin-bottom:8px;width:100%;max-width:700px;flex-wrap:wrap}
+.toggle-btns{display:flex;gap:6px;margin-bottom:10px;width:100%;max-width:760px;flex-wrap:wrap}
 .tbtn{border:1px solid transparent;background:var(--panel);color:var(--muted);padding:6px 12px;border-radius:20px;font-size:13px;display:flex;align-items:center;gap:6px;font-weight:500}
-.tbtn.active{background:var(--accent-bg);color:var(--accent);border-color:#d0dfff}
+.tbtn.active{background:var(--accent2);color:var(--accent);border-color:#f36b3833}
 
 /* Buttons */
-.icon-send{background:var(--accent);color:white;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;transition:all 0.2s}
-.icon-send:disabled{opacity:0.6;background:var(--muted);cursor:not-allowed}
+.icon-send{background:var(--accent);color:white;width:36px;height:36px;border-radius:12px;display:grid;place-items:center;transition:all 0.2s}
+.icon-send:disabled{opacity:0.6;cursor:not-allowed}
 .icon-send.stop-state{background:var(--text);color:var(--bg)}
-.icon-circle{color:var(--text);width:36px;height:36px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--border)}
+.icon-circle{color:var(--text);width:36px;height:36px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--border);background:var(--bg)}
 .icon-circle:hover{background:var(--panel)}
 
 /* Typing indicator */
@@ -129,30 +117,35 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 <body>
 <div id="app">
   <header>
-    <div class="header-left">
+    <div class="brand">
       <button class="iconbtn" id="menuBtn" title="History">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
+      <div class="logo-btn">✳</div>
+      <span>Zyra</span>
     </div>
-    <div class="header-right">
+    <div class="head-actions">
       <button class="iconbtn" id="exportBtn" title="Export Chat">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
       </button>
       <button class="iconbtn" id="themeBtn" title="Toggle Theme">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
       <button class="iconbtn" id="newBtn" title="New Chat">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
       </button>
     </div>
   </header>
 
   <main id="chatArea">
-    <div id="welcomeScreen" style="display:flex; flex-direction:column; align-items:center; width:100%;">
-      <!-- புதிய அழகான Zyra லோகோ -->
-      <div class="center-logo">Zyra</div>
+    <!-- Old Logo Style Welcome Screen (No Boxes) -->
+    <div id="welcomeScreen" class="welcome">
+      <div class="spark">✳</div>
+      <h1>Spark your <em>mind.</em></h1>
+      <p>Hello! I am Zyra. Share your thoughts, questions, or plans.<br>Any language is fine.</p>
       
-      <div class="welcome-screen">
+      <!-- Text Only Suggestions -->
+      <div class="suggestions">
         <button class="suggestion" onclick="enableSearch(); quickPrompt('Give me the latest global and Indian news')">
           <span class="icon">📰</span> Latest Global News
         </button>
@@ -184,15 +177,15 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
     </div>
     <div class="composer">
       <img id="imgPreview" class="preview-img" src="" alt="preview">
-      <input type="text" id="prompt" placeholder="Type a message or hold to speak..." autocomplete="off">
+      <input type="text" id="prompt" placeholder="Ask Zyra anything..." autocomplete="off">
       
       <div class="composer-actions">
         <input type="file" id="fileInput" accept="image/*" hidden>
         <button class="icon-circle" id="attachBtn" title="Attach Image">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>
         </button>
         <button class="icon-circle" id="voiceBtn" title="Voice Input">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 10v4m4-7v10m4-7v4"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 10v4m4-7v10m4-7v4"/></svg>
         </button>
         <button class="icon-send" id="sendBtn" title="Send">
           <svg id="sendIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
@@ -371,7 +364,8 @@ function createSpeakBtn(text) {
 
 function addMessage(role, text, image = null, store = true){
   welcomeScreen.style.display = 'none';
-  const row = document.createElement('div'); row.className = 'message ' + role;
+  const row = document.createElement('div'); row.className = 'message ' + (role === 'user' ? 'user' : 'ai');
+  const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.textContent = role === 'user' ? '●' : '✳';
   const bubble = document.createElement('div'); bubble.className = 'bubble';
   
   if(image){ const img = document.createElement('img'); img.src = image; bubble.appendChild(img); }
@@ -395,7 +389,7 @@ function addMessage(role, text, image = null, store = true){
     tools.appendChild(copy); tools.appendChild(speak); bubble.appendChild(tools);
   }
 
-  row.appendChild(bubble); chat.appendChild(row);
+  row.append(avatar, bubble); chat.appendChild(row);
   const main = $('chatArea'); main.scrollTop = main.scrollHeight;
   if(store) currentMessages.push({ role, text, image });
 }
@@ -419,18 +413,18 @@ async function send(){
 
   const lowerText = text.toLowerCase();
   if ((lowerText.includes('news') || lowerText.includes('headlines')) && searching) {
+      const searchQuery = text.replace(/news|headlines|give me|the latest|about/gi, '').trim() || 'Global';
+      const googleNewsUrl = `https://news.google.com/search?q=${encodeURIComponent(searchQuery)}&hl=en-IN&gl=IN&ceid=IN:en`;
+
       const aiRow = document.createElement('div'); aiRow.className = 'message ai';
+      const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.textContent = '✳';
       const bubble = document.createElement('div'); bubble.className = 'bubble';
-      bubble.innerHTML = `<p>Here are the latest global and Indian news headlines. Click below to read:</p>
-      <ul style="margin-left: 20px; margin-bottom: 10px;">
-        <li><a href="https://news.google.com/" target="_blank">Google News (Global & India)</a></li>
-        <li><a href="https://www.reuters.com/" target="_blank">Reuters (World News)</a></li>
-        <li><a href="https://www.bbc.com/news" target="_blank">BBC News</a></li>
-      </ul>
-      <p style="font-size: 13px; color: var(--muted);">(Note: To fetch summaries directly from AI, your Gemini API needs the Search Grounding feature enabled).</p>`;
+      bubble.innerHTML = `<p>Here are the latest headlines for "${searchQuery}":</p>
+      <p><a href="${googleNewsUrl}" target="_blank" style="font-weight:bold; font-size:16px; display:inline-block; padding:10px 15px; background:var(--accent2); color:var(--accent); border-radius:8px;">👉 Click here to read the latest news</a></p>
+      <p style="font-size: 13px; color: var(--muted); margin-top: 10px;">(Direct link provided because your Gemini API doesn't have Search Grounding enabled).</p>`;
       
-      aiRow.appendChild(bubble); chat.appendChild(aiRow);
-      currentMessages.push({ role: 'ai', text: "Provided direct links to global news." });
+      aiRow.append(avatar, bubble); chat.appendChild(aiRow);
+      currentMessages.push({ role: 'ai', text: `Provided direct Google News link for: ${searchQuery}` });
       saveHistory();
       
       busy = false; 
@@ -453,9 +447,10 @@ async function send(){
   }
 
   const aiRow = document.createElement('div'); aiRow.className = 'message ai'; aiRow.id = 'streamMsg';
+  const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.textContent = '✳';
   const bubble = document.createElement('div'); bubble.className = 'bubble';
   const content = document.createElement('div'); content.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
-  bubble.appendChild(content); aiRow.appendChild(bubble); chat.appendChild(aiRow);
+  bubble.appendChild(content); aiRow.append(avatar, bubble); chat.appendChild(aiRow);
   const main = $('chatArea'); main.scrollTop = main.scrollHeight;
 
   let full = '';
