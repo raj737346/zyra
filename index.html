@@ -463,14 +463,19 @@ async function send(){
 
   if (sysInstruction) finalNotes = sysInstruction + "\n" + finalNotes;
 
-  // 🔴 Location Logic for Nearby Queries
-  const locationWords = ['nearby', 'near me', 'restaurant', 'hotel', 'hospital', 'location', 'weather', 'map'];
-  if (locationWords.some(word => lowerText.includes(word))) {
-      const loc = await getLocation();
-      if (loc) {
-          sysInstruction += `[User's Current Location: Lat ${loc.lat}, Lon ${loc.lon}]\n`;
-      } else {
-          sysInstruction += `[User Location: Unknown (Unable to access GPS)]\n`;
+  // 🔴 Real Search Integration (DuckDuckGo)
+  if (searching) {
+      let searchQuery = text;
+      // If user asks for restaurants/theatres without a city, add a generic search
+      if (lowerText.includes('restaurant') || lowerText.includes('food') || lowerText.includes('eat')) {
+          if (!lowerText.includes('in')) searchQuery = `Best restaurants near me`;
+      } else if (lowerText.includes('theatre') || lowerText.includes('movie') || lowerText.includes('cinema')) {
+          if (!lowerText.includes('in')) searchQuery = `Movie theatres near me`;
+      }
+
+      const searchResult = await searchWeb(searchQuery);
+      if (searchResult) {
+          finalNotes = `[Web Search Result for "${searchQuery}"]: ${searchResult}\n\n[User Question]: ${finalNotes}`;
       }
   }
 
