@@ -234,6 +234,7 @@ $('themeBtn').onclick = () => {
   try{ localStorage.setItem('zyra_theme', root.dataset.theme); }catch{}
 };
 
+// Attach Image Logic
 $('attachBtn').onclick = () => $('fileInput').click();
 $('fileInput').onchange = (e) => {
   const file = e.target.files[0];
