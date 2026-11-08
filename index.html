@@ -37,12 +37,9 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:cente
 .center-logo{font-size:42px;font-weight:700;color:var(--accent);margin-top:20vh;margin-bottom:10px;letter-spacing:-1px}
 .center-title{font-size:22px;font-weight:500;color:var(--muted);letter-spacing:-0.5px;margin-bottom:40px}
 
-/* 🔴 Minimalist Text Suggestions (No Boxes) */
+/* Minimalist Text Suggestions */
 .suggestions{display:flex;flex-direction:column;gap:16px;width:100%;max-width:500px;margin-bottom:30px;text-align:left}
-.suggestion{
-  font-size:16px; color:var(--muted); transition:color 0.2s;
-  cursor:pointer; background:none; border:none; padding:0; text-align:left;
-}
+.suggestion{font-size:16px; color:var(--muted); transition:color 0.2s; cursor:pointer; background:none; border:none; padding:0; text-align:left;}
 .suggestion:hover{color:var(--accent)}
 .suggestion span { margin-right: 8px; }
 
@@ -140,15 +137,16 @@ select.lang-select{background:var(--panel); border:1px solid var(--border); bord
       <div class="center-logo">Zyra</div>
       <h1 class="center-title">Where would you like to begin?</h1>
       
-      <!-- 🔴 Minimalist Text Suggestions -->
       <div class="suggestions">
-        <button class="suggestion" onclick="quickPrompt('இன்றைய தமிழ் நாளிதழ் செய்திகள் சொல்லுங்கள்')">
+        <!-- Auto-search is enabled for news -->
+        <button class="suggestion" onclick="enableSearch(); quickPrompt('இன்றைய தமிழ் நாளிதழ் செய்திகள் சொல்லுங்கள்')">
           <span>📰</span> இன்றைய செய்திகளைச் சொல்லுங்கள்
         </button>
         <button class="suggestion" onclick="quickPrompt('ஒரு சுவாரஸ்யமான கதை சொல்லுங்கள்')">
           <span>📖</span> ஒரு சுவாரஸ்யமான கதை சொல்
         </button>
-        <button class="suggestion" onclick="quickPrompt('ஒரு அழகான இயற்கை காட்சியின் படத்தை உருவாக்குங்கள்')">
+        <!-- Image generation prompt -->
+        <button class="suggestion" onclick="quickPrompt('ஒரு அழகான இயற்கை காட்சியின் படத்தை உருவாக்கி எனக்குக் காட்டு')">
           <span>🖼️</span> ஒரு அழகான படத்தை உருவாக்கு
         </button>
         <button class="suggestion" onclick="quickPrompt('எனக்கு ஒரு நல்ல மேற்கோள் சொல்லுங்கள்')">
@@ -224,6 +222,14 @@ let abortController = null;
 
 try { history = JSON.parse(localStorage.getItem('zyra_history') || '[]'); if(!Array.isArray(history)) history=[]; } catch { history=[]; }
 try { const savedTheme = localStorage.getItem('zyra_theme'); if(savedTheme) document.documentElement.dataset.theme = savedTheme; } catch {}
+
+// Utility to turn Search on automatically
+window.enableSearch = () => {
+    if (!searching) {
+        searching = true;
+        $('searchBtn').classList.add('active');
+    }
+};
 
 window.quickPrompt = (text) => {
     promptBox.value = text;
@@ -319,6 +325,7 @@ function loadChat(id){
 function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function renderMarkdown(text){
   let s = escapeHtml(text || '');
+  // Image Markdown syntax
   s = s.replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g, '<img src="$2" alt="$1">');
   s = s.replace(/```([\s\S]*?)```/g, (_,c) => '<pre><code>'+c+'</code></pre>');
   s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
@@ -404,6 +411,43 @@ async function send(){
   sendBtn.classList.add('stop-state');
   sendIcon.innerHTML = '<rect x="6" y="6" width="12" height="12" fill="currentColor"/>'; 
 
+  // Image Generation Feature
+  const lowerText = text.toLowerCase();
+  if (lowerText.includes('படம்') || lowerText.includes('image')) {
+    try {
+      // Using a free public image generator endpoint (Pollinations.ai)
+      const promptSeed = encodeURIComponent(text);
+      const imgUrl = `https://image.pollinations.ai/prompt/${promptSeed}?width=600&height=600&nologo=true`;
+      
+      const aiRow = document.createElement('div'); aiRow.className = 'message ai';
+      const bubble = document.createElement('div'); bubble.className = 'bubble';
+      
+      const img = document.createElement('img');
+      img.src = imgUrl;
+      img.alt = "Generated Image";
+      img.style.maxWidth = '100%';
+      img.style.borderRadius = '12px';
+      img.style.marginBottom = '10px';
+      
+      const txt = document.createElement('div');
+      txt.textContent = "உங்கள் கேள்விக்கான படம் இதோ:";
+      
+      bubble.appendChild(txt); bubble.appendChild(img);
+      aiRow.appendChild(bubble); chat.appendChild(aiRow);
+      
+      currentMessages.push({ role: 'ai', text: "உருவாக்கப்பட்ட படம்:\n![image](" + imgUrl + ")" });
+      saveHistory();
+      
+      busy = false; 
+      sendBtn.classList.remove('stop-state');
+      sendIcon.innerHTML = '<path d="M12 19V5M5 12l7-7 7 7"/>'; 
+      return;
+    } catch (e) {
+      console.log("Image gen error:", e);
+    }
+  }
+
+  // Standard Text API
   const payload = {
     notes: text || 'Analyze this image.',
     think: think,
