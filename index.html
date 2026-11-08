@@ -393,6 +393,8 @@ async function send(){
   sendIcon.innerHTML = '<rect x="6" y="6" width="12" height="12" fill="currentColor"/>'; 
 
   const lowerText = text.toLowerCase();
+  
+  // Direct News Fetching
   if ((lowerText.includes('news') || lowerText.includes('headlines')) && searching) {
       const searchQuery = text.replace(/news|headlines|give me|the latest|about/gi, '').trim() || 'Global';
       const googleNewsUrl = `https://news.google.com/search?q=${encodeURIComponent(searchQuery)}&hl=en-IN&gl=IN&ceid=IN:en`;
@@ -414,9 +416,10 @@ async function send(){
       return;
   }
 
+  // 🔴 Language Lock: Force English unless Tamil is explicitly requested
   let finalNotes = text;
   if (!lowerText.includes('tamil') && !/[\u0B80-\u0BFF]/.test(text)) {
-      finalNotes = text + "\n\n(IMPORTANT INSTRUCTION: Reply strictly in English only.)";
+      finalNotes = text + "\n\n(IMPORTANT INSTRUCTION: Reply strictly in English only. Do not use Tamil.)";
   }
 
   const payload = {
